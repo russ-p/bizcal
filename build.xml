@@ -1,0 +1,83 @@
+<project name="bizcal" basedir=".">
+
+
+
+  <property environment="env" />
+
+  <property name="version" value="0.0.1"/>
+
+
+
+  <path id="cp">
+
+    <pathelement location="classes"/>
+
+    <pathelement location="lib/tablelayout.jar"/>
+
+    <pathelement location="lib/esc.jar"/>
+
+  </path>
+
+  
+
+        
+
+  <target name="compile">
+
+      <mkdir dir="classes"/>
+
+	  <javac srcdir="src" debug="on"
+
+	         destdir="classes">
+
+	      <classpath refid="cp"/>
+
+	  </javac>
+
+  </target>
+
+  
+
+  <target name="jar" depends="compile">
+
+    <mkdir dir="bin"/>
+
+    <delete file="bin/bizcal.jar"/>
+
+    <jar jarfile="bin/bizcal.jar"
+
+         basedir="classes"
+
+         includes="bizcal/**"
+
+         />
+
+  </target>
+
+  
+
+  <target name="delete-classes">
+
+  	<delete dir="classes"/>
+
+  </target>
+
+  
+
+  <target name="getlib">
+
+    <mkdir dir="lib"/>
+
+	<get src="http://butler.sourceforge.net/lib/TableLayout.jar" dest="lib/TableLayout.jar"/>          
+
+	<get src="http://butler.sourceforge.net/lib/ecs.jar" dest="lib/ecs.jar"/>          
+
+  </target>
+
+  
+
+  
+
+  
+
+</project>
