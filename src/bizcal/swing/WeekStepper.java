@@ -1,8 +1,11 @@
 package bizcal.swing;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,6 +14,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -33,40 +37,54 @@ public class WeekStepper
 	private JLabel label;
 	private Calendar cal;
 	private List listeners = new ArrayList();
+	private Font font = new Font("Arial Black", Font.PLAIN, 16);
+	private Color textColor = new Color(0, 100, 150);
+	private String fastRewindArrow = "/bizcal/res/go_fb.gif";
+	private String prevArrow = "/bizcal/res/go_back.gif";
+	private String nextArrow = "/bizcal/res/go_forward.gif";
+	private String fastForwardArrow = "/bizcal/res/go_ff.gif";
 	
 	public WeekStepper()
 		throws Exception
 	{
 		cal = Calendar.getInstance(LocaleBroker.getLocale());
-		cal.setTime(DateUtil.round2Day(new Date()));
+		cal.setTime(DateUtil.round2Week(new Date()));
 		panel = new TableLayoutPanel();
+		//panel.setBackground(Color.WHITE);
+		panel.createColumn();
 		panel.createColumn();
 		panel.createColumn(TableLayoutPanel.FILL);
 		panel.createColumn();
+		panel.createColumn();
 		Row row = panel.createRow();
-		byte[] bytes = StreamCopier.copyToByteArray(getClass().getResourceAsStream("/bizcal/swing/util/previous.png"));
-        ImageIcon icon = new ImageIcon(bytes);
-		JButton button = new JButton(icon);
-		button.addActionListener(new ActionListener() {
+		ActionListener listener;
+		listener = new ActionListener() {
+			public void actionPerformed(ActionEvent event) {				
+			}
+		};
+		row.createCell(createButton(fastRewindArrow, listener));
+		listener = new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				previous();
 			}
-		});
-		row.createCell(button);
+		};
+		row.createCell(createButton(prevArrow, listener));
 		label = new JLabel(getText());
 		label.setHorizontalAlignment(JLabel.CENTER);
-		Font font = new Font("Verdana", Font.BOLD, 14);
 		label.setFont(font);
+		label.setForeground(textColor);
 		row.createCell(label, TableLayoutPanel.CENTER, TableLayoutPanel.CENTER);
-		bytes = StreamCopier.copyToByteArray(getClass().getResourceAsStream("/bizcal/swing/util/next.png"));
-        icon = new ImageIcon(bytes);
-		button = new JButton(icon);
-		button.addActionListener(new ActionListener() {
+		listener = new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				next();
 			}
-		});
-		row.createCell(button);
+		};
+		row.createCell(createButton(nextArrow, listener));
+		listener = new ActionListener() {
+			public void actionPerformed(ActionEvent event) {				
+			}
+		};
+		row.createCell(createButton(fastForwardArrow, listener));
 	}
 	
 	private String getText()
@@ -136,6 +154,26 @@ public class WeekStepper
 			ErrorHandler.handleError(e);
 		}
 	}
-	
 
+	private Icon getIcon(String filename)
+		throws Exception
+	{
+		byte[] bytes = StreamCopier.copyToByteArray(getClass().getResourceAsStream(filename));
+        return new ImageIcon(bytes);        
+	}
+	
+	private JComponent createButton(String filename, ActionListener listener)
+		throws Exception
+	{
+		JButton button = new JButton(getIcon(filename));
+		button.addActionListener(listener);
+		return button;
+	}
+	
+	public void setDate(Date date)
+		throws Exception
+	{
+		cal.setTime(DateUtil.round2Week(date));
+		fireStateChanged();
+	}
 }

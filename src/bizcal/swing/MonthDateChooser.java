@@ -362,7 +362,7 @@ public class MonthDateChooser
 					calendar.add(Calendar.MONTH, 1);
 				}
 				setNavigationDate(calendar.getTime());
-				fireDateSelected(calendar.getTime());
+				//fireDateSelected(calendar.getTime());
 				refresh();
 			}
 			catch (Exception e) {
@@ -505,19 +505,19 @@ public class MonthDateChooser
 	}		
 }
 	
-	public void addDateListener(DateListener l)
+	/*public void addDateListener(DateListener l)
 	{
 		_listeners.add(l);
-	}
+	}*/
 	
 	private void selectDate(Date date)
 		throws Exception
 	{		
 		_currDate = DateUtil.round2Day(date);
-		fireDateSelected(date);
+		//fireDateSelected(date);
 	}
 	
-	private void fireDateSelected(Date date)
+	/*private void fireDateSelected(Date date)
 		throws Exception
 	{
 		Iterator i = _listeners.iterator();
@@ -525,7 +525,7 @@ public class MonthDateChooser
 			DateListener l = (DateListener) i.next();
 			l.dateSelected(date);
 		}
-	}
+	}*/
 			
 	public void setSelectionInterval(int dayCount)
 		throws Exception
