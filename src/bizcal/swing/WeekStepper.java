@@ -37,8 +37,9 @@ public class WeekStepper
 	private JLabel label;
 	private Calendar cal;
 	private List listeners = new ArrayList();
-	private Font font = new Font("Arial Black", Font.PLAIN, 16);
-	private Color textColor = new Color(0, 100, 150);
+	private Font font = new Font("Verdana", Font.BOLD, 16);
+	//private Color textColor = new Color(0, 100, 150);
+	private Color textColor = Color.BLACK;
 	private String fastRewindArrow = "/bizcal/res/go_fb.gif";
 	private String prevArrow = "/bizcal/res/go_back.gif";
 	private String nextArrow = "/bizcal/res/go_forward.gif";
@@ -139,8 +140,10 @@ public class WeekStepper
 
 	private void nextMonth()
 	{
+		System.err.println("WeekStepper.nextMonth1: " + cal.getTime());
 		cal.add(Calendar.MONTH, +1);
 		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+		System.err.println("WeekStepper.nextMonth2: " + cal.getTime());
 		fireStateChanged();
 	}
 
@@ -191,5 +194,10 @@ public class WeekStepper
 	{
 		cal.setTime(DateUtil.round2Week(date));
 		fireStateChanged();
+	}
+	
+	public void setFont(Font font)
+	{
+		this.font = font;
 	}
 }

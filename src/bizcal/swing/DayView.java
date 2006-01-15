@@ -229,7 +229,6 @@ public class DayView extends CalendarView {
 		double dblTime = time;
 		int ypos = (int) (dblTime / timeSpan * viewPortHeight);
 		ypos += getCaptionRowHeight();
-		System.err.println("DayView: date=" + new Date(time) + ", ypos=" + ypos);
 		return ypos;
 	}
 
