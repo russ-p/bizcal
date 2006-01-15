@@ -59,7 +59,8 @@ public class WeekStepper
 		Row row = panel.createRow();
 		ActionListener listener;
 		listener = new ActionListener() {
-			public void actionPerformed(ActionEvent event) {				
+			public void actionPerformed(ActionEvent event) {	
+				previousMonth();
 			}
 		};
 		row.createCell(createButton(fastRewindArrow, listener));
@@ -81,7 +82,8 @@ public class WeekStepper
 		};
 		row.createCell(createButton(nextArrow, listener));
 		listener = new ActionListener() {
-			public void actionPerformed(ActionEvent event) {				
+			public void actionPerformed(ActionEvent event) {
+				nextMonth();
 			}
 		};
 		row.createCell(createButton(fastForwardArrow, listener));
@@ -132,6 +134,20 @@ public class WeekStepper
 	private void previous()
 	{
 		cal.add(Calendar.WEEK_OF_YEAR, -1);
+		fireStateChanged();
+	}
+
+	private void nextMonth()
+	{
+		cal.add(Calendar.MONTH, +1);
+		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+		fireStateChanged();
+	}
+
+	private void previousMonth()
+	{
+		cal.add(Calendar.MONTH, -1);
+		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
 		fireStateChanged();
 	}
 	
