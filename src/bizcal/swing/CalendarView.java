@@ -51,7 +51,7 @@ public abstract class CalendarView
 	public CalendarModel broker;
 	protected CalendarListener listener;
 	protected List bottomCategories = new ArrayList();
-	private PopupMenuCallback popupMenuCallback;
+	protected PopupMenuCallback popupMenuCallback;
 	private boolean visible = false;
 	private Map _frameAreaMap = new HashMap();
 	private Map _eventMap = new HashMap();
@@ -101,8 +101,6 @@ public abstract class CalendarView
 	
 	public final void refresh() throws Exception
 	{
-        scrollPane.setColumnHeaderView(createColumnHeader());
-        scrollPane.setRowHeaderView(createRowHeader());
         scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, createCorner(true, true));
         scrollPane.setCorner(JScrollPane.LOWER_LEFT_CORNER, createCorner(true, false));
         scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createCorner(false, true));
@@ -111,6 +109,8 @@ public abstract class CalendarView
 		_frameAreaMap.clear();
 		_eventMap.clear();
 		refresh0();
+        scrollPane.setColumnHeaderView(getColumnHeader());
+        scrollPane.setRowHeaderView(createRowHeader());
 		initScroll();
 		// Hack to make to init scroll work
 		JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
@@ -712,7 +712,7 @@ public abstract class CalendarView
 		return desc;
 	}
 	
-	protected JComponent createColumnHeader()
+	protected JComponent getColumnHeader()
 		throws Exception
 	{
 		return null;

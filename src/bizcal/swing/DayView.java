@@ -68,7 +68,7 @@ public class DayView extends CalendarView {
 
 	private List calBackgrounds = new ArrayList();
 
-	private JComponent columnHeader;
+	private ColumnHeaderPanel columnHeader;
 
 	private JPanel rowHeader;
 	
@@ -479,9 +479,7 @@ public class DayView extends CalendarView {
 				rowHeader.setPreferredSize(new Dimension(rowHeader
 						.getPreferredSize().width, getHeight()));
 				rowHeader.revalidate();
-				columnHeader.setPreferredSize(new Dimension(getWidth(),
-						columnHeader.getPreferredSize().height));
-				columnHeader.revalidate();
+				columnHeader.setWidth(getWidth());
 			} catch (Exception e) {
 				throw BizcalException.create(e);
 			}
@@ -512,75 +510,9 @@ public class DayView extends CalendarView {
 		return result;
 	}
 
-	public JComponent createColumnHeader() throws Exception {
-		dateHeaders = new ArrayList();
-
-		final GradientArea topGradientArea = new GradientArea(
-				GradientArea.TOP_BOTTOM, Color.WHITE, vLINE_COLOR);
-		topGradientArea.setBorder(false);
-		topGradientArea.setOpaque(true);
-		final JPanel textPanel = new JPanel();
-		textPanel.setLayout(new TrueGridLayout(1,
-				getSelectedCalendars().size()));
-		textPanel.setOpaque(false);
-		int calCount = getSelectedCalendars().size();
-		if (dayCount > 1 || calCount > 1)  {
-			DateFormat toolTipFormat = new SimpleDateFormat("EEEE d MMMM",
-					Locale.getDefault());
-			DateLabelGroup labelGroup = new DateLabelGroup();
-			if (dayCount == 5 || dayCount == 7) {
-				labelGroup.addFormat(new WeekdayFormat(10));
-				labelGroup.addFormat(new WeekdayFormat(3));
-				labelGroup.addFormat(new WeekdayFormat(2));
-				labelGroup.addFormat(new WeekdayFormat(1));
-			} 
-			boolean first = true;
-			for (int j = 0; j < calCount; j++) {
-				bizcal.common.Calendar cal = 
-					(bizcal.common.Calendar) getSelectedCalendars().get(j);
-				JPanel calHeaderPanel = new JPanel();
-				textPanel.add(calHeaderPanel);
-				calHeaderPanel.setOpaque(false);
-				int rowCount = 
-					(calCount > 1 && dayCount > 1) ? 2 : 1;
-				calHeaderPanel.setLayout(new TrueGridLayout(rowCount, 1));
-				if (calCount > 1) {
-					JLabel header = new JLabel(cal.getSummary(), JLabel.CENTER);
-					header.addMouseListener(new CalHeaderMouseListener(cal.getId()));
-					header.setAlignmentY(2);
-					header.setFont(font);	
-		    		header.setCursor(new Cursor(Cursor.HAND_CURSOR));					
-					calHeaderPanel.add(header);
-				}
-				JPanel dateHeaderPanel = new JPanel();
-				dateHeaderPanel.setLayout(new TrueGridLayout(1, dayCount));
-				calHeaderPanel.add(dateHeaderPanel);
-				dateHeaderPanel.setOpaque(false);
-				Date date = getInterval().getStartDate();
-				for (int i = 0; i < dayCount; i++) {
-					JLabel header = new JLabel("X",
-							JLabel.CENTER);
-					header.setAlignmentY(2);
-					header.setFont(font);
-					header.setToolTipText(toolTipFormat.format(date));
-					if (broker.isRedDay(date))
-						header.setForeground(Color.RED);
-					labelGroup.addLabel(header, date);
-					if (first)
-						header.addComponentListener(labelGroup);
-					first = false;
-					//if(_redDays.contains(DateUtil.round2Day(date)))
-					//	header.setForeground(Color.RED);
-					dateHeaders.add(header);
-					date = DateUtil.getDiffDay(date, +1);
-					dateHeaderPanel.add(header);
-				}
-			}
-		}
-		GradientPanel panel = 
-			new GradientPanel(topGradientArea, textPanel);
-		columnHeader = panel;
-		return panel;
+	public JComponent getColumnHeader() throws Exception {
+		columnHeader = new ColumnHeaderPanel(getModel(), popupMenuCallback);
+		return columnHeader.getComponent();
 	}
 
 	protected JComponent createRowHeader() throws Exception {
@@ -633,7 +565,7 @@ public class DayView extends CalendarView {
 		else if (left && top)
 			direction = GradientArea.TOPLEFT_BOTTOMRIGHT;
         GradientArea area = new GradientArea(direction, Color.WHITE,
-        		vLINE_COLOR);
+        		ColumnHeaderPanel.GRADIENT_COLOR);
         area.setOpaque(true);
         area.setBorder(false);
         return area;
