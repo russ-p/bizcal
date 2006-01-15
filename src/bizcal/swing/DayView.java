@@ -328,10 +328,7 @@ public class DayView extends CalendarView {
 				//long hours = getTimeSpan() / 3600 / 1000;
 				long hours = 24;				
 				int width = 600;
-				int colCount = getColCount();
-				if (colCount > 0)
-					width = (600 / colCount) * colCount;
-				return new Dimension(width, (int) hours * PIXELS_PER_HOUR);
+				return new Dimension(parent.getWidth(), (int) hours * PIXELS_PER_HOUR);
 			} catch (Exception e) {
 				throw BizcalException.create(e);
 			}

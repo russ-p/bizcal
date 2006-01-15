@@ -29,6 +29,7 @@ import bizcal.swing.util.TrueGridLayout;
 import bizcal.util.BizcalException;
 import bizcal.util.DateUtil;
 import bizcal.util.LocaleBroker;
+import bizcal.util.TextUtil;
 
 public class ColumnHeaderPanel 
 {
@@ -61,7 +62,7 @@ public class ColumnHeaderPanel
 			else
 				rowCount = 1;
 			DateFormat toolTipFormat = new SimpleDateFormat("EEEE d MMMM",
-					Locale.getDefault());
+					LocaleBroker.getLocale());
 			DateFormat dateFormat = 
 				DateFormat.getDateInstance(DateFormat.SHORT, LocaleBroker.getLocale());
 			if (dayCount == 5 || dayCount == 7) {
@@ -91,10 +92,10 @@ public class ColumnHeaderPanel
 					if (model.isRedDay(date))
 						header.setForeground(Color.RED);
 					first = false;
-					date = DateUtil.getDiffDay(date, +1);
 					dateHeaders.add(header);
 					dateList.add(date);
 					panel.add(header);
+					date = DateUtil.getDiffDay(date, +1);
 				}
 			}
 		} else
@@ -191,7 +192,6 @@ public class ColumnHeaderPanel
 								(int) dateColWidth, 
 								(int) rowHeight);
 						Rectangle r = dateLabel.getBounds();
-						System.err.println("ColumnHeaderPanel: " + r.x + ", " + r.y + ", "+ r.width + ", "+ r.height + ", " + dateLabel.getText());
 						dateI++;
 					}
 				}
@@ -231,6 +231,7 @@ public class ColumnHeaderPanel
 			String str = format.format(date);
 			if (str.length() > charCount)
 				str = str.substring(0, charCount);
+			str = TextUtil.formatCase(str);
 			label.setText(str);
 		}
 	}
@@ -238,7 +239,7 @@ public class ColumnHeaderPanel
 	private int maxWidth(int charCount, FontMetrics metrics)
 		throws Exception
 	{
-		DateFormat format = new SimpleDateFormat("EEEEE");
+		DateFormat format = new SimpleDateFormat("EEEEE", LocaleBroker.getLocale());
 		Calendar cal = Calendar.getInstance(LocaleBroker.getLocale());
 		cal.set(Calendar.DAY_OF_WEEK, 1);
 		int maxWidth = 0;

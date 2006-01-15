@@ -82,7 +82,7 @@ public abstract class CalendarView
         scrollPane = 
         	new JScrollPane(calPanel,
         			JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+					JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setCursor(Cursor.getDefaultCursor());
 		scrollPane.getVerticalScrollBar().setUnitIncrement(15);
         ThisMouseListener mouseListener = new ThisMouseListener();

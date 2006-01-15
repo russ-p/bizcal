@@ -37,7 +37,7 @@ public class WeekStepper
 	private JLabel label;
 	private Calendar cal;
 	private List listeners = new ArrayList();
-	private Font font = new Font("Verdana", Font.BOLD, 16);
+	private Font font = new Font("Verdana", Font.BOLD, 14);
 	//private Color textColor = new Color(0, 100, 150);
 	private Color textColor = Color.BLACK;
 	private String fastRewindArrow = "/bizcal/res/go_fb.gif";
