@@ -39,12 +39,14 @@ public class ColumnHeaderPanel
 	private List calHeaders = new ArrayList();
 	private List dateHeaders = new ArrayList();
 	private List dateList = new ArrayList();
+	private List dateLines = new ArrayList();
 	private GradientArea gradientArea;
 	private JLabel refLabel = new JLabel("AAA");
 	private int rowCount;
 	private int dayCount;
 	private int width;
 	private CalendarModel model;
+	private Color lineColor = Color.LIGHT_GRAY;
 
 	public ColumnHeaderPanel(CalendarModel model,
 			PopupMenuCallback popupMenuCallback) throws Exception {
@@ -95,6 +97,13 @@ public class ColumnHeaderPanel
 					dateHeaders.add(header);
 					dateList.add(date);
 					panel.add(header);
+					if (i > 0) {
+						JLabel line = new JLabel();
+						line.setBackground(lineColor);
+						line.setOpaque(true);
+						panel.add(line);
+						dateLines.add(line);
+					}					
 					date = DateUtil.getDiffDay(date, +1);
 				}
 			}
@@ -177,6 +186,7 @@ public class ColumnHeaderPanel
 				if (calHeaders.size() > 0)
 					dateYPos = rowHeight;
 				int dateI = 0;
+				int dateLineI = 0;
 				for (int i=0; i < model.getSelectedCalendars().size(); i++) {
 					if (calHeaders.size() > 0) {
 						JLabel label = (JLabel) calHeaders.get(i);
@@ -187,11 +197,19 @@ public class ColumnHeaderPanel
 					}
 					for (int j=0; j < dayCount; j++) {
 						JLabel dateLabel = (JLabel) dateHeaders.get(dateI);
-						dateLabel.setBounds((int) (dateI*dateColWidth),
+						int xpos = (int) (dateI*dateColWidth);
+						dateLabel.setBounds(xpos,
 								(int) dateYPos,
 								(int) dateColWidth, 
 								(int) rowHeight);
-						Rectangle r = dateLabel.getBounds();
+						if (j > 0) {
+							JLabel line = (JLabel) dateLines.get(dateLineI);
+							line.setBounds(xpos, 
+									(int) dateYPos,
+									1,
+									(int) rowHeight);
+							dateLineI++;
+						}
 						dateI++;
 					}
 				}

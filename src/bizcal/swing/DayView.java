@@ -34,11 +34,12 @@ import bizcal.util.BizcalException;
 import bizcal.util.DateInterval;
 import bizcal.util.DateUtil;
 import bizcal.util.Interval;
+import bizcal.util.TimeOfDay;
 import bizcal.util.Tuple;
 import bizcal.util.WeekdayFormat;
 
 public class DayView extends CalendarView {
-	private static final int PIXELS_PER_HOUR = 50;
+	public static final int PIXELS_PER_HOUR = 50;
 	
 	private static final int CAPTION_ROW_HEIGHT0 = 20;
 
@@ -70,7 +71,7 @@ public class DayView extends CalendarView {
 
 	private ColumnHeaderPanel columnHeader;
 
-	private JPanel rowHeader;
+	private TimeLabelPanel rowHeader;
 	
 	private int dayCount;
 
@@ -458,7 +459,7 @@ public class DayView extends CalendarView {
 					Date date1 = new Date(date.getTime() + minutes * 60 * 1000);
 					int y1 = getYPos(date1, 0);
 					int x1 = 0;
-					int lineheight = 2;
+					int lineheight = 1;
 					if (minutes > 0) {
 						//x1 = 25;
 						lineheight = 1;
@@ -473,9 +474,8 @@ public class DayView extends CalendarView {
 					calBackground.setBounds(x1, getCaptionRowHeight(), x2 - x1,
 							getHeight());
 				}
-				rowHeader.setPreferredSize(new Dimension(rowHeader
-						.getPreferredSize().width, getHeight()));
-				rowHeader.revalidate();
+				System.err.println("DayView: height=" + getHeight());
+				rowHeader.setHeight(getHeight());
 				columnHeader.setWidth(getWidth());
 			} catch (Exception e) {
 				throw BizcalException.create(e);
@@ -512,45 +512,11 @@ public class DayView extends CalendarView {
 		return columnHeader.getComponent();
 	}
 
-	protected JComponent createRowHeader() throws Exception {
-		JPanel textPanel = new JPanel();
-		textPanel.setLayout(new GridLayout(0, 2, 0, 0));
-		DateFormat hourFormat = new SimpleDateFormat("HH");
-		Font hourFont = getDesc().getFont().deriveFont((float) 12);
-		hourFont = hourFont.deriveFont(Font.BOLD);
-
-		long pos = getFirstInterval().getStartDate().getTime();
-		while (pos < getFirstInterval().getEndDate().getTime()) {
-			Date date = new Date(pos);
-			String timeTxt = hourFormat.format(date);
-			JLabel timeLabel = new JLabel(timeTxt);
-			timeLabel.setVerticalTextPosition(JLabel.CENTER);
-			timeLabel.setFont(hourFont);
-			textPanel.add(timeLabel);
-
-			JPanel minutesPanel = new JPanel();
-			minutesPanel.setOpaque(false);
-			minutesPanel.setLayout(new GridLayout(2, 1, 0, 0));
-			textPanel.add(minutesPanel);
-			timeTxt = "00";
-			timeLabel = new JLabel(timeTxt);
-			timeLabel.setFont(font);
-			minutesPanel.add(timeLabel);
-
-			timeTxt = "30";
-			timeLabel = new JLabel(timeTxt);
-			timeLabel.setFont(font);
-			minutesPanel.add(timeLabel);
-
-			pos += 3600 * 1000;
-		}		
-        GradientArea leftGradientArea = new GradientArea(GradientArea.LEFT_RIGHT, Color.WHITE,
-        		vLINE_COLOR);
-        leftGradientArea.setOpaque(true);
-		leftGradientArea.setBorder(false);
-		rowHeader = new GradientPanel(leftGradientArea, textPanel);
-		//rowHeader = textPanel;
-		return rowHeader;
+	protected JComponent getRowHeader() throws Exception 
+	{
+		rowHeader = new TimeLabelPanel(new TimeOfDay(0,0),
+				new TimeOfDay(24,0));
+		return rowHeader.getComponent();
 	}
 	
 	protected JComponent createCorner(boolean left, boolean top) 

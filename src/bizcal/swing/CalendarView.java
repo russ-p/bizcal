@@ -110,7 +110,7 @@ public abstract class CalendarView
 		_eventMap.clear();
 		refresh0();
         scrollPane.setColumnHeaderView(getColumnHeader());
-        scrollPane.setRowHeaderView(createRowHeader());
+        scrollPane.setRowHeaderView(getRowHeader());
 		initScroll();
 		// Hack to make to init scroll work
 		JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
@@ -718,7 +718,7 @@ public abstract class CalendarView
 		return null;
 	}
 
-	protected JComponent createRowHeader() 
+	protected JComponent getRowHeader() 
 		throws Exception 
 	{
 		return null;
