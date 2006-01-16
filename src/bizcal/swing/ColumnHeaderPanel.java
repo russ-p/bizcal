@@ -7,7 +7,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.LayoutManager;
-import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.DateFormat;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -47,15 +45,24 @@ public class ColumnHeaderPanel
 	private int width;
 	private CalendarModel model;
 	private Color lineColor = Color.LIGHT_GRAY;
-
-	public ColumnHeaderPanel(CalendarModel model,
-			PopupMenuCallback popupMenuCallback) throws Exception {
-		this.popupMenuCallback = popupMenuCallback;
-		this.model = model;
-		dayCount = DateUtil.getDateDiff(model.getInterval().getEndDate(),
-				model.getInterval().getStartDate());
+	
+	public ColumnHeaderPanel()
+	{
 		panel = new JPanel();
 		panel.setLayout(new Layout());
+	}
+	
+	public void refresh()
+		throws Exception
+	{
+		calHeaders.clear();
+		dateHeaders.clear();
+		dateList.clear();
+		dateLines.clear();
+		panel.removeAll();
+		
+		dayCount = DateUtil.getDateDiff(model.getInterval().getEndDate(),
+				model.getInterval().getStartDate());
 		
 		int calCount = model.getSelectedCalendars().size();
 		if (dayCount > 1 || calCount > 1) {
@@ -178,7 +185,7 @@ public class ColumnHeaderPanel
 
 		public void layoutContainer(Container parent) {
 			try {
-				double totWidth = parent.getWidth();
+				double totWidth = width;
 				double dateColWidth = totWidth / dateHeaders.size();
 				double calColWidth = totWidth / calHeaders.size();
 				double rowHeight = parent.getHeight() / rowCount;
@@ -271,5 +278,12 @@ public class ColumnHeaderPanel
 			cal.add(Calendar.DAY_OF_WEEK, +1);
 		}
 		return maxWidth;
+	}
+	
+	public void setModel(CalendarModel model) {
+		this.model = model;
+	}
+	public void setPopupMenuCallback(PopupMenuCallback popupMenuCallback) {
+		this.popupMenuCallback = popupMenuCallback;
 	}
 }

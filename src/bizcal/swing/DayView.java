@@ -77,7 +77,7 @@ public class DayView extends CalendarView {
 
 	public DayView(DayViewConfig desc) throws Exception {
 		super(desc);
-		//dateSelected(new Date());	
+		columnHeader = new ColumnHeaderPanel();
 	}
 
 	public void refresh0() throws Exception {
@@ -140,6 +140,10 @@ public class DayView extends CalendarView {
 
 		calPanel.validate();
 		calPanel.repaint();
+		
+		columnHeader.setModel(getModel());
+		columnHeader.setPopupMenuCallback(popupMenuCallback);
+		columnHeader.refresh();
 	}
 
 	private int getColCount() 
@@ -150,11 +154,10 @@ public class DayView extends CalendarView {
 
 	private DateInterval getFirstInterval() throws Exception {
 		Date start = getInterval().getStartDate();
-		//start = DateUtil.setTimeOfDate(start, getDesc().getViewStartTime());
 		Date end = DateUtil.getDiffDay(start, +1);
-		//end = DateUtil.setTimeOfDate(end, getDesc().getViewEndTime());
 		return new DateInterval(start, end);
 	}
+	
 	private void createColumns() throws Exception {
 		DateInterval interval = getFirstInterval();
 		int cols = getColCount();
@@ -176,10 +179,12 @@ public class DayView extends CalendarView {
 			Calendar startdate = Calendar.getInstance(Locale.getDefault());
 			startdate.setTime(interval2.getStartDate());
 
-			JLabel verticalLine = new JLabel();
-			verticalLine.setOpaque(true);
-			calPanel.add(verticalLine, new Integer(1));
-			vLines.add(verticalLine);
+			if (it > 0) {
+				JLabel verticalLine = new JLabel();
+				verticalLine.setOpaque(true);
+				calPanel.add(verticalLine, new Integer(1));
+				vLines.add(verticalLine);
+			}
 			
 			List frameAreas = new ArrayList();
 			//lägger till en framearea-lista för varje dag
@@ -329,6 +334,7 @@ public class DayView extends CalendarView {
 				//long hours = getTimeSpan() / 3600 / 1000;
 				long hours = 24;				
 				int width = 600;
+				System.err.println("DayView.preferredLayoutSize=" + parent.getWidth());
 				return new Dimension(parent.getWidth(), (int) hours * PIXELS_PER_HOUR);
 			} catch (Exception e) {
 				throw BizcalException.create(e);
@@ -365,22 +371,21 @@ public class DayView extends CalendarView {
 						day = getFirstInterval();
 					}
 
-					JLabel verticalLine = (JLabel) vLines.get(i);
 					Calendar startinterv = Calendar.getInstance(Locale
 							.getDefault());
 					startinterv.setTime(day.getStartDate());
-
-					verticalLine.setBackground(getDesc().getLineColor());
-
-					if (i > 0 && startinterv.get(Calendar.DAY_OF_WEEK) == startinterv.getFirstDayOfWeek()) 
-						verticalLine.setBackground(vLINE_COLOR_DARKER);
-					if (getSelectedCalendars().size() > 1 && dayNo == 0
-							&& i != 0)
-						verticalLine.setBackground(vLINE_COLOR_EVEN_DARKER);
-
-					int vLineHeight = height - vLineTop;
-					;
-					verticalLine.setBounds(xpos, vLineTop, 1, vLineHeight);
+					
+					if (i > 0) {
+						JLabel verticalLine = (JLabel) vLines.get(i-1);
+						verticalLine.setBackground(getDesc().getLineColor());
+						if (i > 0 && startinterv.get(Calendar.DAY_OF_WEEK) == startinterv.getFirstDayOfWeek()) 
+							verticalLine.setBackground(vLINE_COLOR_DARKER);
+						if (getSelectedCalendars().size() > 1 && dayNo == 0
+								&& i != 0)
+							verticalLine.setBackground(vLINE_COLOR_EVEN_DARKER);
+						int vLineHeight = height - vLineTop;					
+						verticalLine.setBounds(xpos, vLineTop, 1, vLineHeight);
+					}
 
 					DateInterval currIntervall = getInterval(dayNo);
 					FrameArea prevArea = null;
@@ -474,8 +479,7 @@ public class DayView extends CalendarView {
 					calBackground.setBounds(x1, getCaptionRowHeight(), x2 - x1,
 							getHeight());
 				}
-				System.err.println("DayView: height=" + getHeight());
-				rowHeader.setHeight(getHeight());
+				System.err.println("DayView: width=" + getWidth());
 				columnHeader.setWidth(getWidth());
 			} catch (Exception e) {
 				throw BizcalException.create(e);
@@ -508,7 +512,6 @@ public class DayView extends CalendarView {
 	}
 
 	public JComponent getColumnHeader() throws Exception {
-		columnHeader = new ColumnHeaderPanel(getModel(), popupMenuCallback);
 		return columnHeader.getComponent();
 	}
 

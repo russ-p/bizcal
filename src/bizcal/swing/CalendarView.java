@@ -82,7 +82,7 @@ public abstract class CalendarView
         scrollPane = 
         	new JScrollPane(calPanel,
         			JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-					JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setCursor(Cursor.getDefaultCursor());
 		scrollPane.getVerticalScrollBar().setUnitIncrement(15);
         ThisMouseListener mouseListener = new ThisMouseListener();
@@ -104,13 +104,13 @@ public abstract class CalendarView
         scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, createCorner(true, true));
         scrollPane.setCorner(JScrollPane.LOWER_LEFT_CORNER, createCorner(true, false));
         scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createCorner(false, true));
-        scrollPane.revalidate();
 				
 		_frameAreaMap.clear();
 		_eventMap.clear();
 		refresh0();
         scrollPane.setColumnHeaderView(getColumnHeader());
         scrollPane.setRowHeaderView(getRowHeader());
+        scrollPane.revalidate();
 		initScroll();
 		// Hack to make to init scroll work
 		JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
