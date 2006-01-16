@@ -174,9 +174,14 @@ public class ColumnHeaderPanel
 		}
 
 		public Dimension preferredLayoutSize(Container parent) {
-			int height = refLabel.getPreferredSize().height;
-			height = rowCount * height;
-			return new Dimension(width, height);
+			try {
+				int height = refLabel.getPreferredSize().height;
+				height = rowCount * height;
+				int width = dayCount * model.getSelectedCalendars().size() * DayView.PREFERRED_DAY_WIDTH;
+				return new Dimension(width, height);
+			} catch (Exception e) {
+				throw BizcalException.create(e);
+			}
 		}
 
 		public Dimension minimumLayoutSize(Container parent) {

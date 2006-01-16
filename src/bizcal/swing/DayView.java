@@ -50,7 +50,9 @@ public class DayView extends CalendarView {
 	public static final Color vLINE_COLOR_EVEN_DARKER = new Color(100, 100, 100);
 
 	public static final Color HOUR_LINE_COLOR = vLINE_COLOR;
-
+	
+	public static final int PREFERRED_DAY_WIDTH = 10;
+	
 	private List frameAreaCols = new ArrayList();
 
 	private List eventColList = new ArrayList();
@@ -77,7 +79,6 @@ public class DayView extends CalendarView {
 
 	public DayView(DayViewConfig desc) throws Exception {
 		super(desc);
-		columnHeader = new ColumnHeaderPanel();
 	}
 
 	public void refresh0() throws Exception {
@@ -331,11 +332,8 @@ public class DayView extends CalendarView {
 
 		public Dimension preferredLayoutSize(Container parent) {
 			try {
-				//long hours = getTimeSpan() / 3600 / 1000;
-				long hours = 24;				
-				int width = 600;
-				System.err.println("DayView.preferredLayoutSize=" + parent.getWidth());
-				return new Dimension(parent.getWidth(), (int) hours * PIXELS_PER_HOUR);
+				int width = dayCount * getModel().getSelectedCalendars().size() * PREFERRED_DAY_WIDTH;
+				return new Dimension(width, getPreferredHeight());
 			} catch (Exception e) {
 				throw BizcalException.create(e);
 			}
@@ -403,7 +401,6 @@ public class DayView extends CalendarView {
 						Date endTime = event.getEnd();
 						if (endTime.after(currIntervall.getEndDate()))
 							endTime = currIntervall.getEndDate();
-						System.err.println("DayView: endTime=" + endTime);
 						int y1 = getYPos(startTime, dayNo);
 						if (y1 < getCaptionRowHeight())
 							y1 = getCaptionRowHeight();
@@ -479,7 +476,6 @@ public class DayView extends CalendarView {
 					calBackground.setBounds(x1, getCaptionRowHeight(), x2 - x1,
 							getHeight());
 				}
-				System.err.println("DayView: width=" + getWidth());
 				columnHeader.setWidth(getWidth());
 			} catch (Exception e) {
 				throw BizcalException.create(e);
@@ -512,6 +508,8 @@ public class DayView extends CalendarView {
 	}
 
 	public JComponent getColumnHeader() throws Exception {
+		if (columnHeader == null)
+			columnHeader = new ColumnHeaderPanel();			
 		return columnHeader.getComponent();
 	}
 
@@ -541,6 +539,12 @@ public class DayView extends CalendarView {
 		double viewStart = getModel().getViewStart().getValue();
 		double ratio = viewStart / (24*3600*1000);
 		return (int) (ratio * 24 * PIXELS_PER_HOUR);
+	}
+		
+	private int getPreferredHeight()
+	{
+		int hours = 24;				
+		return hours * PIXELS_PER_HOUR;		
 	}
 		
 }

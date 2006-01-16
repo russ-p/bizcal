@@ -46,7 +46,6 @@ import bizcal.util.TimeOfDay;
 
 public abstract class CalendarView 
 {
-	//protected TableLayoutPanel rootPanel;
 	protected JComponent calPanel;
 	public CalendarModel broker;
 	protected CalendarListener listener;
@@ -68,30 +67,27 @@ public abstract class CalendarView
 	{
 		this.desc = desc;
 		font = desc.getFont();
-		/*rootPanel = new TableLayoutPanel();
-        rootPanel.setBackground(Color.WHITE);
-        rootPanel.createColumn(TableLayoutPanel.FILL);
-        Row row = rootPanel.createRow();
-                
-		row = rootPanel.createRow(TableLayoutPanel.FILL);*/
         calPanel = createCalendarPanel();
         LayoutManager layout = getLayout();
         if (layout != null)
         	calPanel.setLayout(layout);
-        //calPanel.setPreferredSize(new Dimension(600, 400));
         scrollPane = 
         	new JScrollPane(calPanel,
         			JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+					JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setCursor(Cursor.getDefaultCursor());
 		scrollPane.getVerticalScrollBar().setUnitIncrement(15);
-        ThisMouseListener mouseListener = new ThisMouseListener();
+        scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, createCorner(true, true));
+        scrollPane.setCorner(JScrollPane.LOWER_LEFT_CORNER, createCorner(true, false));
+        scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createCorner(false, true));
+        scrollPane.setColumnHeaderView(getColumnHeader());
+        scrollPane.setRowHeaderView(getRowHeader());
+
+		ThisMouseListener mouseListener = new ThisMouseListener();
         ThisKeyListener keyListener = new ThisKeyListener();
         calPanel.addMouseListener(mouseListener);
         calPanel.addMouseMotionListener(mouseListener);
         calPanel.addKeyListener(keyListener);
-               
-        //row.createCell(scrollPane, TableLayoutPanel.FULL, TableLayoutPanel.FULL);
     }
 	
 	protected LayoutManager getLayout()
@@ -100,16 +96,10 @@ public abstract class CalendarView
 	}
 	
 	public final void refresh() throws Exception
-	{
-        scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, createCorner(true, true));
-        scrollPane.setCorner(JScrollPane.LOWER_LEFT_CORNER, createCorner(true, false));
-        scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createCorner(false, true));
-				
+	{				
 		_frameAreaMap.clear();
 		_eventMap.clear();
 		refresh0();
-        scrollPane.setColumnHeaderView(getColumnHeader());
-        scrollPane.setRowHeaderView(getRowHeader());
         scrollPane.revalidate();
 		initScroll();
 		// Hack to make to init scroll work
