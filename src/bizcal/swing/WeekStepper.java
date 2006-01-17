@@ -1,11 +1,9 @@
 package bizcal.swing;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,6 +15,7 @@ import java.util.List;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.event.ChangeEvent;
@@ -26,6 +25,7 @@ import bizcal.common.Bundle;
 import bizcal.swing.util.ErrorHandler;
 import bizcal.swing.util.TableLayoutPanel;
 import bizcal.swing.util.TableLayoutPanel.Row;
+import bizcal.util.BizcalException;
 import bizcal.util.DateUtil;
 import bizcal.util.LocaleBroker;
 import bizcal.util.StreamCopier;
@@ -34,12 +34,11 @@ import bizcal.util.TextUtil;
 public class WeekStepper
 {
 	private TableLayoutPanel panel;
-	private JLabel label;
 	private Calendar cal;
+	private JComboBox yearCombo;
+	private JComboBox weekCombo;
+	private JLabel textLabel;
 	private List listeners = new ArrayList();
-	private Font font = new Font("Verdana", Font.BOLD, 14);
-	//private Color textColor = new Color(0, 100, 150);
-	private Color textColor = Color.BLACK;
 	private String fastRewindArrow = "/bizcal/res/go_fb.gif";
 	private String prevArrow = "/bizcal/res/go_back.gif";
 	private String nextArrow = "/bizcal/res/go_forward.gif";
@@ -51,9 +50,13 @@ public class WeekStepper
 		cal = Calendar.getInstance(LocaleBroker.getLocale());
 		cal.setTime(DateUtil.round2Week(new Date()));
 		panel = new TableLayoutPanel();
-		//panel.setBackground(Color.WHITE);
 		panel.createColumn();
 		panel.createColumn();
+		panel.createColumn(10);
+		panel.createColumn();
+		panel.createColumn(10);
+		panel.createColumn();
+		panel.createColumn(10);
 		panel.createColumn(TableLayoutPanel.FILL);
 		panel.createColumn();
 		panel.createColumn();
@@ -61,59 +64,117 @@ public class WeekStepper
 		ActionListener listener;
 		listener = new ActionListener() {
 			public void actionPerformed(ActionEvent event) {	
-				previousMonth();
+				try { previousYear(); }
+				catch (Exception e) { ErrorHandler.handleError(e); }
 			}
 		};
 		row.createCell(createButton(fastRewindArrow, listener));
 		listener = new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				previous();
+				try { previous(); }
+				catch (Exception e) { ErrorHandler.handleError(e); }
+				
 			}
 		};
 		row.createCell(createButton(prevArrow, listener));
-		label = new JLabel(getText());
-		label.setHorizontalAlignment(JLabel.CENTER);
-		label.setFont(font);
-		label.setForeground(textColor);
-		row.createCell(label, TableLayoutPanel.CENTER, TableLayoutPanel.CENTER);
+		row.createCell();
+		initYearCombo();
+		initWeekCombo();
+		textLabel = new JLabel();
+		setCombos();
+		row.createCell(yearCombo);
+		row.createCell();
+		row.createCell(weekCombo);
+		row.createCell();
+		row.createCell(textLabel);
+				
 		listener = new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				next();
+				try { next(); }
+				catch (Exception e) { ErrorHandler.handleError(e); }				
 			}
 		};
 		row.createCell(createButton(nextArrow, listener));
 		listener = new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				nextMonth();
+				try { nextYear(); }
+				catch (Exception e) { ErrorHandler.handleError(e); }				
 			}
 		};
 		row.createCell(createButton(fastForwardArrow, listener));
 	}
 	
-	private String getText()
+	private void initYearCombo()
 		throws Exception
 	{
-		StringBuffer str = new StringBuffer();
-		str.append(Bundle.translate("Week") + " " + cal.get(Calendar.WEEK_OF_YEAR) + ": ");
-		Calendar cal2 = Calendar.getInstance(LocaleBroker.getLocale());
-		int currYear = cal2.get(Calendar.YEAR);
+		yearCombo = new JComboBox();
 		int year = cal.get(Calendar.YEAR);
-		if (currYear != year)
-			str.append(year + " ");
-		int month = cal.get(Calendar.MONTH);
-		DateFormat monthFormat = new SimpleDateFormat("MMM");
-		str.append(TextUtil.formatCase(monthFormat.format(cal.getTime())) + " ");
-		int day = cal.get(Calendar.DAY_OF_MONTH);
-		str.append(day);
-		str.append(" - ");
-		cal2.setTime(cal.getTime());
-		cal2.add(Calendar.DAY_OF_WEEK, +6);
-		int month2 = cal2.get(Calendar.MONTH);
-		if (month != month2)
-			str.append(TextUtil.formatCase(monthFormat.format(cal2.getTime())) + " ");			
-		day = cal2.get(Calendar.DAY_OF_MONTH);
-		str.append(day);
-		return str.toString();
+		for (int i=year-1; i < year+4; i++)
+			yearCombo.addItem(new Integer(i));
+		yearCombo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				try {
+					int year = ((Integer) yearCombo.getSelectedItem()).intValue();
+					cal.set(Calendar.YEAR, year);
+					refreshWeekCombo();
+					setLabel();
+				} catch (Exception e) {
+					throw BizcalException.create(e);
+				}
+			}
+		});
+	}
+	
+	private void initWeekCombo()
+		throws Exception
+	{
+		weekCombo = new JComboBox();
+		int currWeek = cal.get(Calendar.WEEK_OF_YEAR);
+		refreshWeekCombo();
+		weekCombo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				try {
+					Integer selectedItem = (Integer) weekCombo.getSelectedItem();
+					if (selectedItem == null)
+						return;
+					int week = ((Integer) weekCombo.getSelectedItem()).intValue();
+					cal.set(Calendar.WEEK_OF_YEAR, week);
+					setLabel();
+				} catch (Exception e) {
+					throw BizcalException.create(e);
+				}
+			}
+		});
+		cal.set(Calendar.WEEK_OF_YEAR, currWeek);
+	}
+		
+	private void setCombos()
+		throws Exception
+	{
+		int year = cal.get(Calendar.YEAR);
+		yearCombo.setSelectedItem(new Integer(year));
+		int week = cal.get(Calendar.WEEK_OF_YEAR);
+		if (weekCombo.getItemCount() < week)
+			week = weekCombo.getItemCount();		
+		weekCombo.setSelectedIndex(week-1);
+		setLabel();
+	}
+	
+	private void setLabel()
+		throws Exception
+	{
+		textLabel.setText(getText());		
+	}
+	
+	private void refreshWeekCombo()
+	{
+		int currWeek = cal.get(Calendar.WEEK_OF_YEAR);
+		weekCombo.removeAllItems();
+		int maxWeekNo = cal.getActualMaximum(Calendar.WEEK_OF_YEAR);
+		for (int i=1; i <= maxWeekNo; i++) {
+			weekCombo.addItem(new Integer(i));
+		}		
+		cal.set(Calendar.WEEK_OF_YEAR, currWeek);
 	}
 	
 	public JComponent getComponent()
@@ -127,30 +188,34 @@ public class WeekStepper
 	}
 	
 	private void next()
+		throws Exception
 	{
 		cal.add(Calendar.WEEK_OF_YEAR, +1);
+		setCombos();
 		fireStateChanged();
 	}
 
 	private void previous()
+	throws Exception
 	{
 		cal.add(Calendar.WEEK_OF_YEAR, -1);
+		setCombos();
 		fireStateChanged();
 	}
 
-	private void nextMonth()
+	private void nextYear()
+	throws Exception
 	{
-		System.err.println("WeekStepper.nextMonth1: " + cal.getTime());
-		cal.add(Calendar.MONTH, +1);
-		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
-		System.err.println("WeekStepper.nextMonth2: " + cal.getTime());
+		cal.add(Calendar.YEAR, +1);
+		setCombos();
 		fireStateChanged();
 	}
 
-	private void previousMonth()
+	private void previousYear()
+	throws Exception
 	{
-		cal.add(Calendar.MONTH, -1);
-		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+		cal.add(Calendar.YEAR, -1);
+		setCombos();
 		fireStateChanged();
 	}
 	
@@ -160,17 +225,13 @@ public class WeekStepper
 	}
 	
 	private void fireStateChanged()
+		throws Exception
 	{
-		try {
-			label.setText(getText());
-			ChangeEvent event = new ChangeEvent(this);
-			Iterator i = listeners.iterator();
-			while (i.hasNext()) {
-				ChangeListener l = (ChangeListener) i.next();
-				l.stateChanged(event);
-			}
-		} catch (Exception e) {
-			ErrorHandler.handleError(e);
+		ChangeEvent event = new ChangeEvent(this);
+		Iterator i = listeners.iterator();
+		while (i.hasNext()) {
+			ChangeListener l = (ChangeListener) i.next();
+			l.stateChanged(event);
 		}
 	}
 
@@ -193,11 +254,35 @@ public class WeekStepper
 		throws Exception
 	{
 		cal.setTime(DateUtil.round2Week(date));
+		setCombos();
 		fireStateChanged();
 	}
-	
-	public void setFont(Font font)
-	{
-		this.font = font;
-	}
+
+	private String getText() throws Exception {
+		StringBuffer str = new StringBuffer();
+		str.append(Bundle.translate("Week") + " "
+				+ cal.get(Calendar.WEEK_OF_YEAR) + ": ");
+		Calendar cal2 = Calendar.getInstance(LocaleBroker.getLocale());
+		int currYear = cal2.get(Calendar.YEAR);
+		int year = cal.get(Calendar.YEAR);
+		if (currYear != year)
+			str.append(year + " ");
+		int month = cal.get(Calendar.MONTH);
+		DateFormat monthFormat = new SimpleDateFormat("MMM");
+		str
+				.append(TextUtil.formatCase(monthFormat.format(cal.getTime()))
+						+ " ");
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		str.append(day);
+		str.append(" - ");
+		cal2.setTime(cal.getTime());
+		cal2.add(Calendar.DAY_OF_WEEK, +6);
+		int month2 = cal2.get(Calendar.MONTH);
+		if (month != month2)
+			str.append(TextUtil.formatCase(monthFormat.format(cal2.getTime()))
+					+ " ");
+		day = cal2.get(Calendar.DAY_OF_MONTH);
+		str.append(day);
+		return str.toString();
+	}	
 }
