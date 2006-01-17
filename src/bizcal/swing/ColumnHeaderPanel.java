@@ -190,6 +190,8 @@ public class ColumnHeaderPanel
 
 		public void layoutContainer(Container parent) {
 			try {
+				if (rowCount == 0)
+					return;
 				double totWidth = width;
 				double dateColWidth = totWidth / dateHeaders.size();
 				double calColWidth = totWidth / calHeaders.size();
