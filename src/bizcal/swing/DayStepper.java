@@ -268,7 +268,8 @@ public class DayStepper
 	public void setDate(Date date)
 		throws Exception
 	{
-		cal.setTime(DateUtil.round2Week(date));
+		cal.setTime(DateUtil.round2Day(date));
+		setCombos();
 		fireStateChanged();
 	}
 	
