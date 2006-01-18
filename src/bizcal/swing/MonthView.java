@@ -19,19 +19,20 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.border.EtchedBorder;
 import javax.swing.plaf.basic.BasicBorders;
 
 import bizcal.common.CalendarViewConfig;
 import bizcal.common.Event;
 import bizcal.swing.util.ErrorHandler;
 import bizcal.swing.util.TableLayoutPanel;
-import bizcal.swing.util.TableLayoutPanel.Cell;
 import bizcal.swing.util.TableLayoutPanel.Row;
 import bizcal.util.BizcalException;
 import bizcal.util.DateUtil;
@@ -115,12 +116,13 @@ public class MonthView
 		String text = "" + dayno;
 		Row row = panel.createRow();
 		JLabel label = new JLabel(text);
-		label.setOpaque(true);
-		label.setBackground(getDescriptor().getPrimaryColor());
-		label.setForeground(Color.black);
-		label.setFont(font);
+		//label.setOpaque(true);
+		//label.setBackground(getDescriptor().getPrimaryColor());
+		//label.setForeground(Color.black);
+		label.setFont(font.deriveFont(Font.BOLD));
 		label.addMouseListener(new DayMouseListener());
-		row.createCell(label, 3, 2);
+		row.createCell(label);
+		panel.createRow(TableLayoutPanel.FILL);
 		
 		DateFormat format = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
 		List events = (List) eventMap.get(DateUtil.round2Day(cal.getTime()));
@@ -138,16 +140,20 @@ public class MonthView
 				eventLabel.setFont(eventFont);
 				time += "-" + format.format(event.getEnd());
 				eventLabel.setToolTipText(time + " " + summary);
+				eventLabel.setOpaque(true);
+				eventLabel.setBackground(event.getColor());
 				EventMouseListener listener = new EventMouseListener();
 				listener.label = eventLabel;
 				listener.event = event;
 				eventLabel.addMouseListener(listener);
-				row.createCell(eventLabel);							
+				row.createCell(eventLabel, TableLayoutPanel.TOP, TableLayoutPanel.FULL);							
 			}
 		}
 		JScrollPane scrollPanel = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPanel.setPreferredSize(new Dimension(100,100));
 		return scrollPanel;
+		//panel.setPreferredSize(new Dimension(100, 100));
+		//return panel;
 	}
 
 	

@@ -227,6 +227,7 @@ public class ColumnHeaderPanel
 								(int) dateYPos,
 								(int) dateColWidth, 
 								(int) rowHeight);
+						System.err.println("ColumnHeaderPanel: " + xpos + ", " + dateYPos);
 						if (j > 0) {
 							JLabel line = (JLabel) dateLines.get(dateLineI);
 							line.setBounds(xpos, 
@@ -275,6 +276,7 @@ public class ColumnHeaderPanel
 			if (str.length() > charCount)
 				str = str.substring(0, charCount);
 			str = TextUtil.formatCase(str);
+			System.err.println("ColumnHeaderPanel.resizeDates: " + str);
 			label.setText(str);
 		}
 	}
