@@ -44,6 +44,7 @@ public class MonthView
 
 	private int width;
 	private TableLayoutPanel _panel;
+	private ColumnHeaderPanel columnHeader;	
 	
 	public MonthView(CalendarViewConfig desc)
 		throws Exception
@@ -66,24 +67,7 @@ public class MonthView
 		Calendar cal = Calendar.getInstance(Locale.getDefault());
 		cal.setTime(getInterval().getStartDate());
 						
-		Row headerRow = _panel.createRow(WEEKDAY_ROW_HEIGHT);
 		int month = cal.get(Calendar.MONTH);
-		int weekday = cal.getFirstDayOfWeek();
-		DateFormat format = new SimpleDateFormat("EEE", Locale.getDefault());
-		for (int i=0; i < 7; i++) {			
-			cal.set(Calendar.DAY_OF_WEEK, weekday);
-			
-			String formatedString = StringLengthFormater.formatDateString(cal.getTime(), font, (width-10)/7, null);
-			JLabel label = new JLabel(formatedString, JLabel.CENTER);
-			label.setForeground(Color.BLACK);
-			label.setBounds(0, 0, (int)(width)/7,WEEKDAY_ROW_HEIGHT);
-			label.setFont(font.deriveFont(Font.BOLD));
-			headerRow.createCell(label);
-			
-			weekday++;
-			if (weekday >= 8)
-				weekday -= 7;
-		}
 		
 		cal.set(Calendar.DAY_OF_MONTH, 1);
         int col = cal.get(Calendar.DAY_OF_WEEK); 
@@ -103,9 +87,7 @@ public class MonthView
     		row.createCell();
         }
         while (cal.get(Calendar.MONTH) == month) {
-        	int day = cal.get(Calendar.DAY_OF_MONTH);
-        	Cell dayCell;
-        	dayCell = row.createCell(createDayCell(cal, eventMap), TableLayoutPanel.FULL, TableLayoutPanel.FULL);
+        	row.createCell(createDayCell(cal, eventMap), TableLayoutPanel.FULL, TableLayoutPanel.FULL);
             if (cal.get(Calendar.DAY_OF_WEEK) == lastDayOfWeek) {
             	row = _panel.createRow(TableLayoutPanel.FILL);
             }
@@ -113,12 +95,17 @@ public class MonthView
         }
                    
         _panel.updateUI();
+        
+		columnHeader.setModel(getModel());
+		columnHeader.setPopupMenuCallback(popupMenuCallback);
+		columnHeader.refresh();
+        
 	}
 	
 	private JComponent createDayCell(Calendar cal, Map eventMap)
 		throws Exception
 	{ 	
-		Font eventFont = this.font.deriveFont(Font.BOLD);
+		Font eventFont = this.font;
 		TableLayoutPanel panel = new TableLayoutPanel();
 		panel.setBackground(Color.WHITE);
 		panel.createColumn(TableLayoutPanel.FILL);
@@ -278,6 +265,7 @@ public class MonthView
 	{
 		try {
 			
+			columnHeader.setWidth(_panel.getWidth());
 			width = _panel.getWidth();
 			refresh();
 		
@@ -339,6 +327,13 @@ public class MonthView
 		}
 		return map;
 	}
+	
+	public JComponent getColumnHeader() throws Exception {
+		if (columnHeader == null)
+			columnHeader = new ColumnHeaderPanel(7);			
+		return columnHeader.getComponent();
+	}
+	
 
 	
 }

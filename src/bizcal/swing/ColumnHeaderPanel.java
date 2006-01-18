@@ -45,11 +45,18 @@ public class ColumnHeaderPanel
 	private int width;
 	private CalendarModel model;
 	private Color lineColor = Color.LIGHT_GRAY;
+	private int fixedDayCount = -1;
 	
 	public ColumnHeaderPanel()
 	{
 		panel = new JPanel();
 		panel.setLayout(new Layout());
+	}
+	
+	public ColumnHeaderPanel(int fixedDayCount)
+	{
+		this();
+		this.fixedDayCount = fixedDayCount;
 	}
 	
 	public void refresh()
@@ -63,6 +70,8 @@ public class ColumnHeaderPanel
 		
 		dayCount = DateUtil.getDateDiff(model.getInterval().getEndDate(),
 				model.getInterval().getStartDate());
+		if (fixedDayCount > 0)
+			dayCount = fixedDayCount;
 		
 		int calCount = model.getSelectedCalendars().size();
 		if (dayCount > 1 || calCount > 1) {
@@ -93,6 +102,8 @@ public class ColumnHeaderPanel
 				dateHeaderPanel.setLayout(new TrueGridLayout(1, dayCount));
 				dateHeaderPanel.setOpaque(false);
 				Date date = model.getInterval().getStartDate();
+				if (fixedDayCount > 0)
+					date = DateUtil.round2Week(date);
 				for (int i = 0; i < dayCount; i++) {
 					JLabel header = new JLabel(dateFormat.format(date), JLabel.CENTER);
 					header.setAlignmentY(2);

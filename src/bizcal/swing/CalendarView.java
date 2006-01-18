@@ -1,5 +1,6 @@
 package bizcal.swing;
 
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -36,6 +37,7 @@ import bizcal.common.CalendarViewConfig;
 import bizcal.common.Event;
 import bizcal.swing.util.ErrorHandler;
 import bizcal.swing.util.FrameArea;
+import bizcal.swing.util.GradientArea;
 import bizcal.swing.util.LassoArea;
 import bizcal.util.BizcalException;
 import bizcal.util.DateInterval;
@@ -717,7 +719,16 @@ public abstract class CalendarView
 	protected JComponent createCorner(boolean left, boolean top) 
 	throws Exception 
 	{
-		return null;
+		String direction = GradientArea.LEFT_RIGHT;
+		if (!left && top)
+			direction = GradientArea.TOP_BOTTOM;
+		else if (left && top)
+			direction = GradientArea.TOPLEFT_BOTTOMRIGHT;
+        GradientArea area = new GradientArea(direction, Color.WHITE,
+        		ColumnHeaderPanel.GRADIENT_COLOR);
+        area.setOpaque(true);
+        area.setBorder(false);
+        return area;
 	}
 
 	
@@ -852,4 +863,6 @@ public abstract class CalendarView
 	{
 		return broker;
 	}
+	
+	
 }

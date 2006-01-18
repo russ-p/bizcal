@@ -520,21 +520,6 @@ public class DayView extends CalendarView {
 		return rowHeader.getComponent();
 	}
 	
-	protected JComponent createCorner(boolean left, boolean top) 
-	throws Exception 
-	{
-		String direction = GradientArea.LEFT_RIGHT;
-		if (!left && top)
-			direction = GradientArea.TOP_BOTTOM;
-		else if (left && top)
-			direction = GradientArea.TOPLEFT_BOTTOMRIGHT;
-        GradientArea area = new GradientArea(direction, Color.WHITE,
-        		ColumnHeaderPanel.GRADIENT_COLOR);
-        area.setOpaque(true);
-        area.setBorder(false);
-        return area;
-	}
-
 	protected int getInitYPos() throws Exception {
 		double viewStart = getModel().getViewStart().getValue();
 		double ratio = viewStart / (24*3600*1000);
