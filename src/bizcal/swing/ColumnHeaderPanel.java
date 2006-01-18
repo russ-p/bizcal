@@ -51,6 +51,10 @@ public class ColumnHeaderPanel
 	{
 		panel = new JPanel();
 		panel.setLayout(new Layout());
+		gradientArea = new GradientArea(
+				GradientArea.TOP_BOTTOM, Color.WHITE, GRADIENT_COLOR);
+		gradientArea.setBorder(false);
+		//gradientArea.setOpaque(true);
 	}
 	
 	public ColumnHeaderPanel(int fixedDayCount)
@@ -62,6 +66,7 @@ public class ColumnHeaderPanel
 	public void refresh()
 		throws Exception
 	{
+		System.err.println("ColumnHeaderPanel.refresh()");
 		calHeaders.clear();
 		dateHeaders.clear();
 		dateList.clear();
@@ -128,12 +133,7 @@ public class ColumnHeaderPanel
 		} else
 			rowCount = 0;
 
-		gradientArea = new GradientArea(
-				GradientArea.TOP_BOTTOM, Color.WHITE, GRADIENT_COLOR);
-		gradientArea.setBorder(false);
-		gradientArea.setOpaque(true);
-		panel.add(gradientArea);		
-		
+		panel.add(gradientArea);				
 	}
 	
 	public JComponent getComponent()
@@ -239,8 +239,8 @@ public class ColumnHeaderPanel
 						dateI++;
 					}
 				}
+				gradientArea.setBounds(0, 0, width, parent.getHeight());
 				resizeDates((int) dateColWidth);
-				gradientArea.setBounds(0, 0, parent.getWidth(), parent.getHeight());
 			} catch (Exception e) {
 				throw BizcalException.create(e);
 			}

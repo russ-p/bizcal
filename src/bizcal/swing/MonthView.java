@@ -24,6 +24,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EtchedBorder;
@@ -70,11 +71,12 @@ public class MonthView
 						
 		int month = cal.get(Calendar.MONTH);
 		
-		cal.set(Calendar.DAY_OF_MONTH, 1);
-        int col = cal.get(Calendar.DAY_OF_WEEK); 
+		cal.set(Calendar.DAY_OF_MONTH, 1);		
+        /*int col = cal.get(Calendar.DAY_OF_WEEK); 
     	col -= cal.getFirstDayOfWeek();
     	if (col < 0)
-    		col += 7;
+    		col += 7;*/
+		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
 
     	int lastDayOfWeek = cal.getFirstDayOfWeek();
     	lastDayOfWeek--;
@@ -83,13 +85,15 @@ public class MonthView
     	
     	Map eventMap = createEventsPerDay();
     	
-    	Row row = _panel.createRow(TableLayoutPanel.FILL);
-    	for (int i=0; i < col; i++) {
+    	Row row = _panel.createRow(TableLayoutPanel.FILL);    	
+    	/*for (int i=0; i < col; i++) {
     		row.createCell();
-        }
-        while (cal.get(Calendar.MONTH) == month) {
-        	row.createCell(createDayCell(cal, eventMap), TableLayoutPanel.FULL, TableLayoutPanel.FULL);
+        }*/
+        while (true) {
+        	row.createCell(createDayCell(cal, eventMap, month), TableLayoutPanel.FULL, TableLayoutPanel.FULL);
             if (cal.get(Calendar.DAY_OF_WEEK) == lastDayOfWeek) {
+            	if (cal.get(Calendar.MONTH) != month)
+            		break;
             	row = _panel.createRow(TableLayoutPanel.FILL);
             }
             cal.add(Calendar.DAY_OF_MONTH, 1);
@@ -103,12 +107,15 @@ public class MonthView
         
 	}
 	
-	private JComponent createDayCell(Calendar cal, Map eventMap)
+	private JComponent createDayCell(Calendar cal, Map eventMap, int month)
 		throws Exception
 	{ 	
 		Font eventFont = this.font;
 		TableLayoutPanel panel = new TableLayoutPanel();
-		panel.setBackground(Color.WHITE);
+		if (cal.get(Calendar.MONTH) == month) 
+			panel.setBackground(Color.WHITE);
+		else 
+			panel.setBackground(new Color(230, 230, 230));
 		panel.createColumn(TableLayoutPanel.FILL);
 		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 		panel.setBorder(BasicBorders.getRadioButtonBorder());
