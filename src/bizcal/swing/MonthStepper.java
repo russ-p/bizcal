@@ -61,7 +61,7 @@ public class MonthStepper
 		ActionListener listener;
 		listener = new ActionListener() {
 			public void actionPerformed(ActionEvent event) {	
-				try { previousMonth(); }
+				try { previousYear(); }
 				catch (Exception e) { ErrorHandler.handleError(e); }
 			}
 		};
@@ -92,7 +92,7 @@ public class MonthStepper
 		row.createCell(createButton(nextArrow, listener));
 		listener = new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				try { nextMonth(); }
+				try { nextYear(); }
 				catch (Exception e) { ErrorHandler.handleError(e); }				
 			}
 		};
@@ -161,23 +161,23 @@ public class MonthStepper
 		return cal.getTime();
 	}
 	
-	private void next()
+	private void nextYear()
 		throws Exception
 	{
-		cal.add(Calendar.DAY_OF_MONTH, +1);
+		cal.add(Calendar.YEAR, +1);
 		setCombos();
 		fireStateChanged();
 	}
 
-	private void previous()
+	private void previousYear()
 	throws Exception
 	{
-		cal.add(Calendar.DAY_OF_MONTH, -1);
+		cal.add(Calendar.YEAR, -1);
 		setCombos();
 		fireStateChanged();
 	}
 
-	private void nextMonth()
+	private void next()
 	throws Exception
 	{
 		cal.add(Calendar.MONTH, +1);
@@ -185,7 +185,7 @@ public class MonthStepper
 		fireStateChanged();
 	}
 
-	private void previousMonth()
+	private void previous()
 	throws Exception
 	{
 		cal.add(Calendar.MONTH, -1);

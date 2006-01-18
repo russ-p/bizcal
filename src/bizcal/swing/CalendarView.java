@@ -75,7 +75,7 @@ public abstract class CalendarView
         	calPanel.setLayout(layout);
         scrollPane = 
         	new JScrollPane(calPanel,
-        			JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+        			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setCursor(Cursor.getDefaultCursor());
 		scrollPane.getVerticalScrollBar().setUnitIncrement(15);

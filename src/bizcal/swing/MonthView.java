@@ -128,7 +128,6 @@ public class MonthView
 		TableLayoutPanel panel = new TableLayoutPanel();
 		if (cal.get(Calendar.MONTH) == month) { 
 			panel.setBackground(Color.WHITE);
-			panel.setOpaque(false);
 		} else  
 			panel.setBackground(new Color(230, 230, 230));
 		panel.createColumn(TableLayoutPanel.FILL);
@@ -390,15 +389,16 @@ public class MonthView
 				double width = parent.getWidth();
 				width = width / getModel().getSelectedCalendars().size();
 				width = width / 7;
-				double height = parent.getHeight() / cells.size();
+				double height = parent.getHeight();
+				height = height / cells.size();
 				for (int row=0; row < cells.size(); row++) {
 					List rowList = (List) cells.get(row);
 					for (int col=0; col < rowList.size(); col++) {
 						JComponent cell = (JComponent) rowList.get(col);
-						cell.setBounds((int) (col*width),
-								(int) (row*height),
-								(int) width,
-								(int) height);
+						cell.setBounds((int) (col*width+1),
+								(int) (row*height+1),
+								(int) width-1,
+								(int) height-1);
 					}
 				}
 				
