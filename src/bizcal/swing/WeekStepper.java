@@ -207,6 +207,7 @@ public class WeekStepper
 	throws Exception
 	{
 		cal.add(Calendar.YEAR, +1);
+		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
 		setCombos();
 		fireStateChanged();
 	}
@@ -215,6 +216,7 @@ public class WeekStepper
 	throws Exception
 	{
 		cal.add(Calendar.YEAR, -1);
+		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
 		setCombos();
 		fireStateChanged();
 	}

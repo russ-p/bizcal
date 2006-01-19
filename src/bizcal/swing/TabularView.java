@@ -15,6 +15,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import bizcal.common.CalendarViewConfig;
 import bizcal.common.Event;
@@ -90,6 +92,19 @@ public class TabularView extends CalendarView {
 		}
 		table.setModel(model);
 		model.fireTableDataChanged();
+		setColumnWidths();
+	}
+	
+	private void setColumnWidths()
+	{
+		TableColumnModel model = table.getColumnModel();
+		for (int i=0; i < model.getColumnCount(); i++) {
+			TableColumn col = model.getColumn(i);
+			if (i == 0)
+				col.setWidth(50);
+			else
+				col.setWidth(100);
+		}
 	}
 
 	public Date getDate(int x, int y) {
