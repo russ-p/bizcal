@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.List;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
@@ -37,6 +36,8 @@ public class FrameArea
 	private boolean selected;
 	private float alphaValue;
 	private ImageIcon icon;
+	//private Color selectionColor = new Color(196, 0, 0);
+	private Color selectionColor = Color.BLACK;
 	
 	public FrameArea()
 	throws Exception
@@ -133,7 +134,7 @@ public class FrameArea
 			BasicStroke dashed = new BasicStroke(10.0f, BasicStroke.CAP_BUTT, 
 													BasicStroke.JOIN_BEVEL, 
 			 										10.0f, dash1, 0.0f);
-			g2.setPaint(new Color(196, 0, 0));
+			g2.setPaint(selectionColor);
 			g2.setStroke(new BasicStroke(1.5f));
 			if(this.roundedRectangle)
 				g2.draw(new RoundRectangle2D.Double(1, 1, width-2, height-2, 17,17));

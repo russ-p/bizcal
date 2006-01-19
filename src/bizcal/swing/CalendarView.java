@@ -27,10 +27,7 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 
 import bizcal.common.CalendarModel;
 import bizcal.common.CalendarViewConfig;
