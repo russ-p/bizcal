@@ -54,7 +54,6 @@ public class ColumnHeaderPanel
 		gradientArea = new GradientArea(
 				GradientArea.TOP_BOTTOM, Color.WHITE, GRADIENT_COLOR);
 		gradientArea.setBorder(false);
-		//gradientArea.setOpaque(true);
 	}
 	
 	public ColumnHeaderPanel(int fixedDayCount)
@@ -66,7 +65,6 @@ public class ColumnHeaderPanel
 	public void refresh()
 		throws Exception
 	{
-		System.err.println("ColumnHeaderPanel.refresh()");
 		calHeaders.clear();
 		dateHeaders.clear();
 		dateList.clear();
@@ -96,7 +94,6 @@ public class ColumnHeaderPanel
 				bizcal.common.Calendar cal = (bizcal.common.Calendar) model
 						.getSelectedCalendars().get(j);
 				if (calCount > 1) {
-					System.err.println("ColumnHeaderPanel: summary=" + cal.getSummary());
 					JLabel header = new JLabel(cal.getSummary(), JLabel.CENTER);
 					header.addMouseListener(new CalHeaderMouseListener(cal
 							.getId()));
@@ -140,7 +137,8 @@ public class ColumnHeaderPanel
 		} else
 			rowCount = 0;
 
-		panel.add(gradientArea);				
+		panel.add(gradientArea);
+		panel.updateUI();
 	}
 	
 	public JComponent getComponent()
@@ -210,7 +208,7 @@ public class ColumnHeaderPanel
 			try {
 				if (rowCount == 0)
 					return;
-				double totWidth = width;
+				double totWidth = parent.getWidth();
 				double dateColWidth = totWidth / dateHeaders.size();
 				double calColWidth = totWidth / calHeaders.size();
 				double rowHeight = parent.getHeight() / rowCount;
@@ -252,7 +250,7 @@ public class ColumnHeaderPanel
 						dateI++;
 					}
 				}
-				gradientArea.setBounds(0, 0, width, parent.getHeight());
+				gradientArea.setBounds(0, 0, parent.getWidth(), parent.getHeight());
 				resizeDates((int) dateColWidth);
 			} catch (Exception e) {
 				throw BizcalException.create(e);

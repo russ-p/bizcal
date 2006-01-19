@@ -29,18 +29,19 @@ public class TabularView extends CalendarView {
 
 	private int dayCount = 14;
 	private JTable table;
+	private JScrollPane scroll;
 
 	public TabularView(CalendarViewConfig desc) throws Exception {
 		super(desc);
-	}
-
-	protected JComponent createCalendarPanel() throws Exception {
-		panel = new JPanel();
-		panel.setBackground(Color.WHITE);
 		table = new JTable();
-		JScrollPane scroll = new JScrollPane(table);
+		scroll = new JScrollPane(table);
+	}
+	
+	public JComponent getComponent()
+	{
 		return scroll;
 	}
+
 
 	public long getTimeInterval() throws Exception {
 		return 0;

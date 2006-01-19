@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import net.fortuna.ical4j.model.component.VEvent;
 import bizcal.common.CalendarViewConfig;
@@ -47,6 +48,7 @@ public class GroupView
 	private List hLines = new ArrayList();
 	private Map dayLabels = new HashMap();
 	private List calLabels = new ArrayList();
+	private JPanel calPanel;
 	
 	public GroupView(CalendarViewConfig desc) throws Exception	
     {
@@ -55,7 +57,15 @@ public class GroupView
 	    
 		Date start = new Date();
 		start = DateUtil.round2Month(start);
+		
+		calPanel = new JPanel();
+		calPanel.setLayout(new Layout());
     }
+	
+	public JComponent getComponent()
+	{
+		return calPanel;
+	}
 	
 	public void refresh0() throws Exception
     {		

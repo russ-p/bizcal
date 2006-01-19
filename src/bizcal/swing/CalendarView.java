@@ -48,7 +48,6 @@ import bizcal.util.TimeOfDay;
 
 public abstract class CalendarView 
 {
-	protected JComponent calPanel;
 	public CalendarModel broker;
 	protected CalendarListener listener;
 	protected List bottomCategories = new ArrayList();
@@ -62,34 +61,12 @@ public abstract class CalendarView
 	private FrameArea _newEventArea;
 	private JComponent _dragArea;
 	private CalendarViewConfig desc;
-	private JScrollPane scrollPane;
 	
 	public CalendarView(CalendarViewConfig desc)
 		throws Exception
 	{
 		this.desc = desc;
 		font = desc.getFont();
-        calPanel = createCalendarPanel();
-        LayoutManager layout = getLayout();
-        if (layout != null)
-        	calPanel.setLayout(layout);
-        scrollPane = 
-        	new JScrollPane(calPanel,
-        			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setCursor(Cursor.getDefaultCursor());
-		scrollPane.getVerticalScrollBar().setUnitIncrement(15);
-        scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, createCorner(true, true));
-        scrollPane.setCorner(JScrollPane.LOWER_LEFT_CORNER, createCorner(true, false));
-        scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createCorner(false, true));
-        scrollPane.setColumnHeaderView(getColumnHeader());
-        scrollPane.setRowHeaderView(getRowHeader());
-
-		ThisMouseListener mouseListener = new ThisMouseListener();
-        ThisKeyListener keyListener = new ThisKeyListener();
-        calPanel.addMouseListener(mouseListener);
-        calPanel.addMouseMotionListener(mouseListener);
-        calPanel.addKeyListener(keyListener);
     }
 	
 	protected LayoutManager getLayout()
@@ -102,21 +79,10 @@ public abstract class CalendarView
 		_frameAreaMap.clear();
 		_eventMap.clear();
 		refresh0();
-        scrollPane.revalidate();
-		initScroll();
-		// Hack to make to init scroll work
-		JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
-		scrollBar.setValue(scrollBar.getValue()-1);
 	}
 	
 	public abstract void refresh0() throws Exception;
-	
-	public JComponent getComponent() throws Exception
-    {
-        //return rootPanel;
-        return scrollPane;
-    }
-			
+				
 	public void setBroker(CalendarModel broker)
 	throws Exception
 	{
@@ -260,7 +226,7 @@ public abstract class CalendarView
 	    public void mouseEntered(MouseEvent e) 
 	    {
 	    	try {
-	    		scrollPane.setCursor(new Cursor(Cursor.HAND_CURSOR));
+	    		getComponent().setCursor(new Cursor(Cursor.HAND_CURSOR));
 				_frameArea.setAlphaValue(_frameArea.getAlphaValue()+0.2f);
 				//_frameArea.setBorder(true);
 				_frameArea.repaint();	    		
@@ -272,7 +238,7 @@ public abstract class CalendarView
 	    public void mouseExited(MouseEvent e) 
 	    {
 	    	try {
-	    		scrollPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+	    		getComponent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 				_frameArea.setAlphaValue(_frameArea.getAlphaValue()-0.2f);
 				//_frameArea.setBorder(false);
 				_frameArea.repaint();
@@ -378,7 +344,7 @@ public abstract class CalendarView
 		{
 			if(event.getKeyCode() == SHIFT)
 			{
-				calPanel.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));				
+				getComponent().setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));				
 			}
 			
 			if(event.getKeyCode() == CTRL && _selectedEvents.size()>0)
@@ -392,7 +358,7 @@ public abstract class CalendarView
 			try 
 			{
 				if(event.getKeyCode() == SHIFT ||event.getKeyCode() == CTRL)
-					calPanel.setCursor(null);
+					getComponent().setCursor(null);
 				
 			} catch (Exception exc) 
 			{
@@ -497,7 +463,7 @@ public abstract class CalendarView
 					_dragArea.setVisible(true);
 					_dragArea.setBounds(e.getPoint().x, e.getPoint().y, 100, 100);
 					//getCalenderArea().add(_dragArea);
-					getCalenderArea().revalidate();
+					getComponent().revalidate();
 				}
 				if (_dragArea == null)
 					return;
@@ -518,7 +484,7 @@ public abstract class CalendarView
 		
 		public void mouseMoved(MouseEvent e)
 		{
-			calPanel.requestFocusInWindow();		
+			getComponent().requestFocusInWindow();		
 		}		
 	}
 	
@@ -553,7 +519,7 @@ public abstract class CalendarView
 	public void setCursor(Cursor cursor)
 	{
 		//rootPanel.setCursor(cursor);
-		scrollPane.setCursor(cursor);
+		getComponent().setCursor(cursor);
 	}
 	
 	protected void register(Object calId, Event event, FrameArea area)
@@ -610,22 +576,12 @@ public abstract class CalendarView
 		listener.copy(_selectedEvents);
 	}
 			
-	protected JComponent getCalenderArea() throws Exception {
-		return calPanel;
-	}
-	
-	protected JComponent createCalendarPanel()
-		throws Exception
-	{
-		return new JLayeredPane();
-	}
-	
 	protected boolean supportsDrag()
 	{
 		return true;
 	}
 
-	protected void addDraggingComponents()
+	/*protected void addDraggingComponents()
 		throws Exception
 	{
 		_lassoArea = new LassoArea();
@@ -633,7 +589,7 @@ public abstract class CalendarView
 		_newEventArea = new FrameArea();
 		_newEventArea.setVisible(false);
 		calPanel.add(_newEventArea, new Integer(2));		
-	}
+	}*/
 	
 	private void lasso(Object id, Date date1, Date date2)
 		throws Exception
@@ -703,19 +659,7 @@ public abstract class CalendarView
 	{
 		return desc;
 	}
-	
-	protected JComponent getColumnHeader()
-		throws Exception
-	{
-		return null;
-	}
-
-	protected JComponent getRowHeader() 
-		throws Exception 
-	{
-		return null;
-	}
-	
+		
 	protected JComponent createCorner(boolean left, boolean top) 
 	throws Exception 
 	{
@@ -730,7 +674,6 @@ public abstract class CalendarView
         area.setBorder(false);
         return area;
 	}
-
 	
 	protected int getInitYPos()
 	throws Exception
@@ -738,12 +681,6 @@ public abstract class CalendarView
 		return 0;
 	}
 	
-	public void initScroll()
-		throws Exception
-	{
-		scrollPane.getViewport().setViewPosition(new Point(0, getInitYPos()));
-	}
-
 	protected class CalHeaderMouseListener extends MouseAdapter {
 		private Object calId;
 
@@ -879,5 +816,7 @@ public abstract class CalendarView
 		}
 		return map;
 	}
+	
+	public abstract JComponent getComponent();
 	
 }

@@ -8,6 +8,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -22,10 +23,15 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 
 import bizcal.common.DayViewConfig;
 import bizcal.common.Event;
+import bizcal.swing.CalendarView.ThisKeyListener;
+import bizcal.swing.CalendarView.ThisMouseListener;
 import bizcal.swing.util.FrameArea;
 import bizcal.swing.util.GradientArea;
 import bizcal.swing.util.GradientPanel;
@@ -76,9 +82,34 @@ public class DayView extends CalendarView {
 	private TimeLabelPanel rowHeader;
 	
 	private int dayCount;
+	
+	private JScrollPane scrollPane;
+	
+	private JLayeredPane calPanel;
 
 	public DayView(DayViewConfig desc) throws Exception {
 		super(desc);
+		calPanel = new JLayeredPane();
+		calPanel.setLayout(new Layout());
+		ThisMouseListener mouseListener = new ThisMouseListener();
+        ThisKeyListener keyListener = new ThisKeyListener();
+        calPanel.addMouseListener(mouseListener);
+        calPanel.addMouseMotionListener(mouseListener);
+        calPanel.addKeyListener(keyListener);		
+        scrollPane = 
+        	new JScrollPane(calPanel,
+        			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setCursor(Cursor.getDefaultCursor());
+		scrollPane.getVerticalScrollBar().setUnitIncrement(15);
+        scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, createCorner(true, true));
+        scrollPane.setCorner(JScrollPane.LOWER_LEFT_CORNER, createCorner(true, false));
+        scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createCorner(false, true));
+		columnHeader = new ColumnHeaderPanel();			
+        scrollPane.setColumnHeaderView(columnHeader.getComponent());
+		rowHeader = new TimeLabelPanel(new TimeOfDay(0,0),
+				new TimeOfDay(24,0));
+        scrollPane.setRowHeaderView(rowHeader.getComponent());
 	}
 
 	public void refresh0() throws Exception {
@@ -97,7 +128,7 @@ public class DayView extends CalendarView {
 		calBackgrounds.clear();
 		vLines.clear();
 
-		addDraggingComponents();
+		//addDraggingComponents();
 
 		Font hourFont = getDesc().getFont().deriveFont((float) 12);
 		hourFont = hourFont.deriveFont(Font.BOLD);
@@ -145,6 +176,12 @@ public class DayView extends CalendarView {
 		columnHeader.setModel(getModel());
 		columnHeader.setPopupMenuCallback(popupMenuCallback);
 		columnHeader.refresh();
+		
+		initScroll();
+		// Hack to make to init scroll work
+		JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
+		scrollBar.setValue(scrollBar.getValue()-1);
+		
 	}
 
 	private int getColCount() 
@@ -322,10 +359,6 @@ public class DayView extends CalendarView {
 
 	private int getTimeHeight() throws Exception {
 		return getHeight() - getCaptionRowHeight();
-	}
-
-	protected LayoutManager getLayout() {
-		return new Layout();
 	}
 
 	private class Layout implements LayoutManager {
@@ -506,19 +539,6 @@ public class DayView extends CalendarView {
 		return result;
 	}
 
-	public JComponent getColumnHeader() throws Exception {
-		if (columnHeader == null)
-			columnHeader = new ColumnHeaderPanel();			
-		return columnHeader.getComponent();
-	}
-
-	protected JComponent getRowHeader() throws Exception 
-	{
-		rowHeader = new TimeLabelPanel(new TimeOfDay(0,0),
-				new TimeOfDay(24,0));
-		return rowHeader.getComponent();
-	}
-	
 	protected int getInitYPos() throws Exception {
 		double viewStart = getModel().getViewStart().getValue();
 		double ratio = viewStart / (24*3600*1000);
@@ -530,5 +550,15 @@ public class DayView extends CalendarView {
 		int hours = 24;				
 		return hours * PIXELS_PER_HOUR;		
 	}
+	
+	public JComponent getComponent()
+	{
+		return scrollPane;
+	}
+	
+	public void initScroll() throws Exception {
+		scrollPane.getViewport().setViewPosition(new Point(0, getInitYPos()));
+	}
+	
 		
 }
