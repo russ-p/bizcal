@@ -73,6 +73,7 @@ public class ColumnHeaderPanel
 		dateLines.clear();
 		panel.removeAll();
 		
+		Calendar calendar = Calendar.getInstance(LocaleBroker.getLocale());
 		dayCount = DateUtil.getDateDiff(model.getInterval().getEndDate(),
 				model.getInterval().getStartDate());
 		if (fixedDayCount > 0)
@@ -95,13 +96,13 @@ public class ColumnHeaderPanel
 				bizcal.common.Calendar cal = (bizcal.common.Calendar) model
 						.getSelectedCalendars().get(j);
 				if (calCount > 1) {
+					System.err.println("ColumnHeaderPanel: summary=" + cal.getSummary());
 					JLabel header = new JLabel(cal.getSummary(), JLabel.CENTER);
 					header.addMouseListener(new CalHeaderMouseListener(cal
 							.getId()));
-					header.setAlignmentY(2);
-					//header.setFont(font);	
 					header.setCursor(new Cursor(Cursor.HAND_CURSOR));
 					calHeaders.add(header);
+					panel.add(header);
 				}
 				JPanel dateHeaderPanel = new JPanel();
 				dateHeaderPanel.setLayout(new TrueGridLayout(1, dayCount));
@@ -120,10 +121,16 @@ public class ColumnHeaderPanel
 					dateHeaders.add(header);
 					dateList.add(date);
 					panel.add(header);
-					if (i > 0) {
+					if (i > 0 || j > 0) {
 						JLabel line = new JLabel();
 						line.setBackground(lineColor);
 						line.setOpaque(true);
+						line.setBackground(lineColor);
+						if (DateUtil.getDayOfWeek(date) == calendar.getFirstDayOfWeek()) 
+							line.setBackground(DayView.LINE_COLOR_DARKER);
+						if (model.getSelectedCalendars().size() > 1 && i == 0)
+							line.setBackground(DayView.LINE_COLOR_EVEN_DARKER);
+						
 						panel.add(line);
 						dateLines.add(line);
 					}					
@@ -219,6 +226,7 @@ public class ColumnHeaderPanel
 								0,
 								(int) calColWidth,
 								(int) rowHeight);
+						System.err.println("ColumnHeaderPanel: " + (i*calColWidth) + ", " + rowHeight + ", " + label.getText());
 					}
 					for (int j=0; j < dayCount; j++) {
 						JLabel dateLabel = (JLabel) dateHeaders.get(dateI);
@@ -227,13 +235,18 @@ public class ColumnHeaderPanel
 								(int) dateYPos,
 								(int) dateColWidth, 
 								(int) rowHeight);
-						System.err.println("ColumnHeaderPanel: " + xpos + ", " + dateYPos);
-						if (j > 0) {
+						if (j > 0 || i > 0) {
 							JLabel line = (JLabel) dateLines.get(dateLineI);
+							int ypos = (int) dateYPos;
+							int height = (int) rowHeight;
+							if (j == 0) {
+								ypos = 0;
+								height = (int) (2*rowHeight);
+							}
 							line.setBounds(xpos, 
-									(int) dateYPos,
+									ypos,
 									1,
-									(int) rowHeight);
+									height);
 							dateLineI++;
 						}
 						dateI++;
@@ -276,7 +289,6 @@ public class ColumnHeaderPanel
 			if (str.length() > charCount)
 				str = str.substring(0, charCount);
 			str = TextUtil.formatCase(str);
-			System.err.println("ColumnHeaderPanel.resizeDates: " + str);
 			label.setText(str);
 		}
 	}

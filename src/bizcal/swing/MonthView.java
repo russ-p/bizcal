@@ -16,6 +16,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -73,35 +74,46 @@ public class MonthView
 						
 		int month = cal.get(Calendar.MONTH);
 		
-		cal.set(Calendar.DAY_OF_MONTH, 1);		
-		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
-
     	int lastDayOfWeek = cal.getFirstDayOfWeek();
     	lastDayOfWeek--;
     	if (lastDayOfWeek < 1)
     		lastDayOfWeek += 7;
-    	
-    	Map eventMap = createEventsPerDay();
-    	List row = new ArrayList();
-    	cells.add(row);
-        while (true) {
-        	JComponent cell = createDayCell(cal, eventMap, month);
-        	_panel.add(cell);
-        	row.add(cell);
-            if (cal.get(Calendar.DAY_OF_WEEK) == lastDayOfWeek) {
-            	if (cal.get(Calendar.MONTH) != month)
-            		break;
-            	row = new ArrayList();
-            	cells.add(row);
-            }
-            cal.add(Calendar.DAY_OF_MONTH, 1);
-        }
+
+    	Iterator j = getModel().getSelectedCalendars().iterator();
+    	while (j.hasNext()) {
+    		bizcal.common.Calendar calInfo = (bizcal.common.Calendar) j.next();
+    		cal.setTime(getInterval().getStartDate());
+    		cal.set(Calendar.DAY_OF_MONTH, 1);		
+    		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+	    	Map eventMap = createEventsPerDay(calInfo.getId());
+	    	int rowno = 0;
+	        while (true) {
+		    	List row;
+		    	if (cells.size() <= rowno) {
+		    		row = new ArrayList();
+		    		cells.add(row);
+		    	} else
+		    		row = (List) cells.get(rowno);
+	        	JComponent cell = createDayCell(cal, eventMap, month);
+	        	_panel.add(cell);
+	        	row.add(cell);
+	            if (cal.get(Calendar.DAY_OF_WEEK) == lastDayOfWeek) {
+	            	if (cal.get(Calendar.MONTH) != month)
+	            		break;
+	            	System.err.println("MonthView: " + row.size());
+	            	rowno++;
+	            }
+	            cal.add(Calendar.DAY_OF_MONTH, 1);
+	        }
+    	}
 
         int colCount = getModel().getSelectedCalendars().size()*7;
         for (int i=0; i < colCount-1; i++) {
 			JLabel line = new JLabel();
 			line.setBackground(Color.LIGHT_GRAY);
 			line.setOpaque(true);
+			if ((i+1) % 7 == 0)
+				line.setBackground(DayView.LINE_COLOR_EVEN_DARKER);			
 			_panel.add(line);     
 			vLines.add(line);
         }
@@ -333,29 +345,7 @@ public class MonthView
 	{
 		return false;
 	}
-	
-	private Map createEventsPerDay()
-		throws Exception
-	{
-		Map map = new HashMap();
-		Iterator j = getModel().getSelectedCalendars().iterator();
-		while (j.hasNext()) {
-			bizcal.common.Calendar cal = (bizcal.common.Calendar) j.next();
-			Iterator i = getModel().getEvents(cal.getId()).iterator();
-			while (i.hasNext()) {
-				Event event = (Event) i.next();
-				Date date = DateUtil.round2Day(event.getStart());
-				List events = (List) map.get(date);
-				if (events == null) {
-					events = new ArrayList();
-					map.put(date, events);
-				}
-				events.add(event);
-			}
-		}
-		return map;
-	}
-	
+		
 	public JComponent getColumnHeader() throws Exception {
 		if (columnHeader == null)
 			columnHeader = new ColumnHeaderPanel(7);			

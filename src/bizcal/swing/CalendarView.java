@@ -864,5 +864,20 @@ public abstract class CalendarView
 		return broker;
 	}
 	
+	protected Map createEventsPerDay(Object calId) throws Exception {
+		Map map = new HashMap();
+		Iterator i = getModel().getEvents(calId).iterator();
+		while (i.hasNext()) {
+			Event event = (Event) i.next();
+			Date date = DateUtil.round2Day(event.getStart());
+			List events = (List) map.get(date);
+			if (events == null) {
+				events = new ArrayList();
+				map.put(date, events);
+			}
+			events.add(event);
+		}
+		return map;
+	}
 	
 }

@@ -43,13 +43,13 @@ public class DayView extends CalendarView {
 	
 	private static final int CAPTION_ROW_HEIGHT0 = 20;
 
-	public static final Color vLINE_COLOR = new Color(230, 230, 230);
+	public static final Color LINE_COLOR = new Color(230, 230, 230);
 
-	public static final Color vLINE_COLOR_DARKER = new Color(200, 200, 200);
+	public static final Color LINE_COLOR_DARKER = new Color(200, 200, 200);
 
-	public static final Color vLINE_COLOR_EVEN_DARKER = new Color(100, 100, 100);
+	public static final Color LINE_COLOR_EVEN_DARKER = new Color(100, 100, 100);
 
-	public static final Color HOUR_LINE_COLOR = vLINE_COLOR;
+	public static final Color HOUR_LINE_COLOR = LINE_COLOR;
 	
 	public static final int PREFERRED_DAY_WIDTH = 10;
 	
@@ -183,6 +183,11 @@ public class DayView extends CalendarView {
 			if (it > 0) {
 				JLabel verticalLine = new JLabel();
 				verticalLine.setOpaque(true);
+				verticalLine.setBackground(getDesc().getLineColor());
+				if (startdate.get(Calendar.DAY_OF_WEEK) == startdate.getFirstDayOfWeek()) 
+					verticalLine.setBackground(LINE_COLOR_DARKER);
+				if (getSelectedCalendars().size() > 1 && it % dayCount == 0)
+					verticalLine.setBackground(LINE_COLOR_EVEN_DARKER);
 				calPanel.add(verticalLine, new Integer(1));
 				vLines.add(verticalLine);
 			}
@@ -375,12 +380,6 @@ public class DayView extends CalendarView {
 					
 					if (i > 0) {
 						JLabel verticalLine = (JLabel) vLines.get(i-1);
-						verticalLine.setBackground(getDesc().getLineColor());
-						if (i > 0 && startinterv.get(Calendar.DAY_OF_WEEK) == startinterv.getFirstDayOfWeek()) 
-							verticalLine.setBackground(vLINE_COLOR_DARKER);
-						if (getSelectedCalendars().size() > 1 && dayNo == 0
-								&& i != 0)
-							verticalLine.setBackground(vLINE_COLOR_EVEN_DARKER);
 						int vLineHeight = height - vLineTop;					
 						verticalLine.setBounds(xpos, vLineTop, 1, vLineHeight);
 					}

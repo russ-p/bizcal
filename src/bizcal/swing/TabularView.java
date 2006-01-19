@@ -3,103 +3,101 @@ package bizcal.swing;
 import java.awt.Color;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Vector;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import bizcal.common.CalendarViewConfig;
 import bizcal.common.Event;
-import bizcal.swing.util.TableLayoutPanel;
-import bizcal.swing.util.TableLayoutPanel.Row;
-import bizcal.util.DateInterval;
+import bizcal.util.DateUtil;
+import bizcal.util.LocaleBroker;
 
 /**
  * @author Fredrik Bertilsson
  */
 public class TabularView extends CalendarView {
-	private TableLayoutPanel panel;
+	private JPanel panel;
 
 	private int dayCount = 14;
+	private JTable table;
 
 	public TabularView(CalendarViewConfig desc) throws Exception {
 		super(desc);
 	}
 
 	protected JComponent createCalendarPanel() throws Exception {
-		panel = new TableLayoutPanel();
+		panel = new JPanel();
 		panel.setBackground(Color.WHITE);
-		return panel;
+		table = new JTable();
+		JScrollPane scroll = new JScrollPane(table);
+		return scroll;
 	}
 
 	public long getTimeInterval() throws Exception {
 		return 0;
 	}
+	
 
 	public void refresh0() throws Exception {
-		panel.deleteRows();
-		panel.deleteColumns();
-		panel.clear();
-		panel.removeAll();
-		panel.doLayout();
-		panel.revalidate();
+		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, LocaleBroker.getLocale());
+		DateFormat timeFormat = DateFormat.getTimeInstance(DateFormat.SHORT, LocaleBroker.getLocale());
+		DefaultTableModel model = new DefaultTableModel();
+		model.addColumn(tr("Date"));
+		Map eventMap = new HashMap();
 		Iterator i = getSelectedCalendars().iterator();
 		while (i.hasNext()) {
-			bizcal.common.Calendar cal = (bizcal.common.Calendar) i.next();
-			panel.createColumn(TableLayoutPanel.FILL);
+			bizcal.common.Calendar cal = 
+				(bizcal.common.Calendar) i.next();
+			model.addColumn(cal.getSummary());
+			eventMap.put(cal.getId(), createEventsPerDay(cal.getId()));
 		}
-		Row header = panel.createRow();
-		Row row = panel.createRow(TableLayoutPanel.FILL);
-		i = getSelectedCalendars().iterator();
-		while (i.hasNext()) {
-			bizcal.common.Calendar cal = (bizcal.common.Calendar) i.next();
-			header.createCell(new JLabel(cal.getSummary()));
-			CalendarTable calTab = new CalendarTable();
-			calTab.refresh(broker.getEvents(cal.getId()));
-			JScrollPane scrollPane = new JScrollPane(calTab);
-			scrollPane.setBackground(Color.WHITE);
-			row.createCell(scrollPane);
+		Date date = getInterval().getStartDate();
+		while (date.before(getInterval().getEndDate())) {
+			Vector row = new Vector();
+			row.add(dateFormat.format(date));
+			i = getSelectedCalendars().iterator();
+			while (i.hasNext()) {
+				bizcal.common.Calendar cal = 
+					(bizcal.common.Calendar) i.next();
+				Map eventsPerDay = (Map) eventMap.get(cal.getId());
+				List events = (List) eventsPerDay.get(date);
+				StringBuffer str = new StringBuffer();
+				if (events != null) {
+					Iterator j = events.iterator();
+					while (j.hasNext()) {
+						Event event = (Event) j.next();
+						str.append(timeFormat.format(event.getStart()) + "-");
+						str.append(timeFormat.format(event.getEnd()));
+						if (j.hasNext())
+							str.append(", ");					
+					}
+				}				
+				row.add(str);
+			}
+			model.addRow(row);
+			System.err.println("TabularView: " + row);
+			date = DateUtil.getDiffDay(date, +1);
 		}
-		panel.revalidate();
+		table.setModel(model);
+		model.fireTableDataChanged();
 	}
 
 	public Date getDate(int x, int y) {
 		return null;
 	}
 
-	private class CalendarTable extends JTable {
-		private static final long serialVersionUID = 1L;
-
-		public CalendarTable() {
-			DefaultTableModel model = new DefaultTableModel();
-			model.addColumn("Start");
-			model.addColumn("Slut");
-			model.addColumn("Beskrivning");
-			setModel(model);
-			setBackground(Color.WHITE);
-		}
-
-		public void refresh(List events) throws Exception {
-			DateFormat format = DateFormat.getDateTimeInstance(
-					DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
-			DefaultTableModel model = (DefaultTableModel) getModel();
-			if (events == null)
-				return;
-			Iterator i = events.iterator();
-			while (i.hasNext()) {
-				Event event = (Event) i.next();
-				Object row[] = new Object[3];
-				row[0] = format.format(event.getStart());
-				row[1] = format.format(event.getEnd());
-				row[2] = event.getSummary();
-				model.addRow(row);
-			}
-		}
+	private String tr(String str)
+	{
+		return str;
 	}
-
+	
 }
