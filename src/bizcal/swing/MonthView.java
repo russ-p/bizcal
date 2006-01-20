@@ -106,7 +106,7 @@ public class MonthView
 		    		cells.add(row);
 		    	} else
 		    		row = (List) cells.get(rowno);
-	        	JComponent cell = createDayCell(cal, eventMap, month);
+	        	JComponent cell = createDayCell(cal, eventMap, month, calInfo.getId());
 	        	calPanel.add(cell);
 	        	row.add(cell);
 	            if (cal.get(Calendar.DAY_OF_WEEK) == lastDayOfWeek) {
@@ -144,7 +144,7 @@ public class MonthView
 	}
 	
 	
-	private JComponent createDayCell(Calendar cal, Map eventMap, int month)
+	private JComponent createDayCell(Calendar cal, Map eventMap, int month, Object calId)
 		throws Exception
 	{ 	
 		Font eventFont = this.font;
@@ -182,94 +182,44 @@ public class MonthView
 					summary = event.getSummary();
 				JLabel eventLabel = new JLabel(time + " " + summary);
 				eventLabel.setFont(eventFont);
-				time += "-" + format.format(event.getEnd());
+				time += "-" + format.format(event.getEnd());				
 				eventLabel.setToolTipText(time + " " + summary);
 				eventLabel.setOpaque(true);
 				eventLabel.setBackground(event.getColor());
-				EventMouseListener listener = new EventMouseListener();
-				listener.label = eventLabel;
-				listener.event = event;
-				eventLabel.addMouseListener(listener);
+				if (event.getIcon() != null)
+					eventLabel.setIcon(event.getIcon());
+				eventLabel.addMouseListener(new EventMouseListener(event, calId));
 				row.createCell(eventLabel, TableLayoutPanel.TOP, TableLayoutPanel.FULL);							
 			}
 		}
-		JScrollPane scrollPanel = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		JScrollPane scrollPanel = 
+			new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPanel.setPreferredSize(new Dimension(100,100));
 		//return scrollPanel;
 		return panel;
 	}
 
-	
 	private class EventMouseListener
 		extends MouseAdapter
 	{
-		public JLabel label;
-		public Event event;
+		private Event event;
+		private Object calId;
 		
-		public void mouseEntered(MouseEvent e)
+		public EventMouseListener(Event event, Object calId)
 		{
-			label = (JLabel) e.getSource();
-			
-			label.setCursor(new Cursor(Cursor.HAND_CURSOR));
-			label.setBackground(label.getBackground().darker());
-			label.setForeground(Color.LIGHT_GRAY);
-			
+			this.calId = calId;
+			this.event = event;
 		}
 		
-		public void mouseExited(MouseEvent e)
+		public void mouseClicked(MouseEvent mevent)
 		{
-			label = (JLabel) e.getSource();
-			label.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			label.setBackground(label.getBackground().brighter());
-			label.setForeground(Color.BLACK);
-		}
-		
-		public void mouseClicked(MouseEvent e)
-		{
-			try
-			{				
-				//put this code in a separate method
-				TableLayoutPanel borderPanel = new TableLayoutPanel();
-				borderPanel.createColumn(5);
-				borderPanel.createColumn(TableLayoutPanel.FILL);
-				borderPanel.createColumn(5);
-				Row row = borderPanel.createRow(5);
-				row = borderPanel.createRow(TableLayoutPanel.FILL);
-				row.createCell();
-				JTabbedPane tab = new JTabbedPane();
-				tab.add("Information", new JLabel("Information"));
-				tab.add("Deltagare", new JLabel("Deltagare"));
-				tab.setPreferredSize(new Dimension(300,300));
-				row.createCell(tab, 2, 2);
-				
-				row = borderPanel.createRow(5);
-				
-				row = borderPanel.createRow();
-				row.createCell();
-				row.createCell(new JButton("Ok"), 2, 3);
-				row = borderPanel.createRow(5);
-							
-				JDialog dia = new JDialog();
-				dia.setModal(true);
-				dia.setLocation(20, 20);
-				
-				DateFormat format = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
-							
-				dia.setTitle(format.format(event.getStart())+ " - "+ format.format(event.getEnd()));
-				dia.setContentPane(borderPanel);
-				dia.pack();
-				dia.setVisible(true);
-				System.out.println("clicked");
-				calPanel.updateUI();
-				calPanel.repaint();
-				
+			try {
+				if (mevent.getClickCount() == 2)
+					listener.showEvent(calId, event);
+			} catch (Exception e) {
+				ErrorHandler.handleError(e);
 			}
-			catch (Exception ex)
-			{
-				throw BizcalException.create(ex);
-			}				
 		}
-
 	}
 	
 	private class DayMouseListener
