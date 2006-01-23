@@ -42,7 +42,6 @@ public class ColumnHeaderPanel
 	private JLabel refLabel = new JLabel("AAA");
 	private int rowCount;
 	private int dayCount;
-	private int width;
 	private CalendarModel model;
 	private Color lineColor = Color.LIGHT_GRAY;
 	private int fixedDayCount = -1;
@@ -89,7 +88,6 @@ public class ColumnHeaderPanel
 				DateFormat.getDateInstance(DateFormat.SHORT, LocaleBroker.getLocale());
 			if (dayCount == 5 || dayCount == 7) {
 			}
-			boolean first = true;
 			for (int j = 0; j < calCount; j++) {
 				bizcal.common.Calendar cal = (bizcal.common.Calendar) model
 						.getSelectedCalendars().get(j);
@@ -114,7 +112,6 @@ public class ColumnHeaderPanel
 					header.setToolTipText(toolTipFormat.format(date));
 					if (model.isRedDay(date))
 						header.setForeground(Color.RED);
-					first = false;
 					dateHeaders.add(header);
 					dateList.add(date);
 					panel.add(header);
@@ -258,11 +255,6 @@ public class ColumnHeaderPanel
 		}
 	}
 	
-	public void setWidth(int i)
-	{
-		width = i;
-	}
-
 	private void resizeDates(int width)
 		throws Exception
 	{
@@ -271,9 +263,9 @@ public class ColumnHeaderPanel
 		FontMetrics metrics = refLabel.getFontMetrics(refLabel.getFont());
 		int charCount = 10;
 		if (maxWidth(charCount, metrics) > width) {
-			charCount = 5;
+			charCount = 3;
 			if (maxWidth(charCount, metrics) > width) {
-				charCount = 3;
+				charCount = 2;
 				if (maxWidth(charCount, metrics) > width) {
 					charCount = 1;
 				}

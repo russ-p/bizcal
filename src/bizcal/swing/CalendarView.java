@@ -383,8 +383,11 @@ public abstract class CalendarView
 					return;
 				Date date = getDate(e.getPoint().x, e.getPoint().y);
 				Object id = getCalendarId(e.getPoint().x, e.getPoint().y);
-	    		if (listener != null)
-	    			listener.newEvent(id, date);
+	    		if (listener == null)
+	    			return;
+	    		if (!getModel().isInsertable(id, date))
+	    			return;
+	    		listener.newEvent(id, date);
 			} catch (Exception exc) {
 				ErrorHandler.handleError(exc);
 			}						
@@ -742,7 +745,6 @@ public abstract class CalendarView
 		{
 			try {
 				if (patterns.size() == 0) {
-					DateFormat format;
 					Locale l = LocaleBroker.getLocale();
 					patterns.add(DateFormat.getDateInstance(DateFormat.LONG, l));
 					patterns.add(DateFormat.getDateInstance(DateFormat.MEDIUM, l));

@@ -21,13 +21,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 
 import bizcal.common.CalendarViewConfig;
 import bizcal.common.Event;
@@ -41,7 +38,6 @@ import bizcal.util.TextUtil;
 public class MonthView
 	extends CalendarView
 {
-	private int width;
 	private ColumnHeaderPanel columnHeader;
 	private List cells = new ArrayList();
 	private List hLines = new ArrayList();
@@ -181,6 +177,7 @@ public class MonthView
 				eventLabel.setToolTipText(time + " " + summary);
 				eventLabel.setOpaque(true);
 				eventLabel.setBackground(event.getColor());
+				eventLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 				if (event.getIcon() != null)
 					eventLabel.setIcon(event.getIcon());
 				eventLabel.addMouseListener(new EventMouseListener(event, calId));
@@ -250,33 +247,17 @@ public class MonthView
 			try {
 				if (e.getClickCount() < 2)
 					return;
-	    		if (listener != null)
-	    			listener.newEvent(calId, date);
+	    		if (listener == null)
+	    			return;
+	    		if (!getModel().isInsertable(calId, date))
+	    			return;
+	    		listener.newEvent(calId, date);
 			} catch (Exception exc) {
 				ErrorHandler.handleError(exc);
 			}
 		}
 	}
-	
-	private class ThisComponentListener
-	extends ComponentAdapter
-{
-	
-	public void componentResized(ComponentEvent e)
-	{
-		try {
-			
-			columnHeader.setWidth(calPanel.getWidth());
-			width = calPanel.getWidth();
-			refresh();
 		
-		} catch (Exception exc) {
-			exc.printStackTrace();
-			ErrorHandler.handleError(exc);
-		}
-	}		
-}
-	
 	protected Date getDate(int xPos, int yPos) 
 	throws Exception 
 	{
@@ -302,7 +283,6 @@ public class MonthView
 		calPanel = new JPanel();
 		calPanel.setLayout(new Layout());
 		calPanel.setBackground(Color.WHITE);
-		calPanel.addComponentListener(new ThisComponentListener());
 		return calPanel;
 	}
 	

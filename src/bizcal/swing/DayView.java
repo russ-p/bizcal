@@ -6,12 +6,9 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,19 +27,13 @@ import javax.swing.JScrollPane;
 
 import bizcal.common.DayViewConfig;
 import bizcal.common.Event;
-import bizcal.swing.CalendarView.ThisKeyListener;
-import bizcal.swing.CalendarView.ThisMouseListener;
 import bizcal.swing.util.FrameArea;
-import bizcal.swing.util.GradientArea;
-import bizcal.swing.util.GradientPanel;
-import bizcal.swing.util.TrueGridLayout;
 import bizcal.util.BizcalException;
 import bizcal.util.DateInterval;
 import bizcal.util.DateUtil;
 import bizcal.util.Interval;
 import bizcal.util.TimeOfDay;
 import bizcal.util.Tuple;
-import bizcal.util.WeekdayFormat;
 
 public class DayView extends CalendarView {
 	public static final int PIXELS_PER_HOUR = 50;
@@ -62,8 +53,6 @@ public class DayView extends CalendarView {
 	private List frameAreaCols = new ArrayList();
 
 	private List eventColList = new ArrayList();
-
-	private List dateHeaders = new ArrayList();
 
 	private List _dateList = new ArrayList();
 
@@ -322,15 +311,6 @@ public class DayView extends CalendarView {
 		return cal.getId();
 	}
 
-	private int getColumnWidth() 
-	throws Exception
-	{
-		int colCount = getColCount();
-		if (colCount == 0)
-			colCount = 1;
-		return (calPanel.getWidth() - getXOffset()) / colCount;
-	}
-
 	protected int getXOffset() {
 		//return LABEL_COL_WIDTH;
 		return 0;
@@ -392,8 +372,6 @@ public class DayView extends CalendarView {
 					numberOfCols = 1;
 
 				for (int i = 0; i < eventColList.size(); i++) {
-					bizcal.common.Calendar calInfo = (bizcal.common.Calendar) getSelectedCalendars()
-							.get(i / dayCount);
 					int dayNo = i % dayCount;
 					int xpos = getXPos(i);
 					int captionYOffset = getCaptionRowHeight()
@@ -508,22 +486,10 @@ public class DayView extends CalendarView {
 					calBackground.setBounds(x1, getCaptionRowHeight(), x2 - x1,
 							getHeight());
 				}
-				columnHeader.setWidth(getWidth());
 			} catch (Exception e) {
 				throw BizcalException.create(e);
 			}
 		}
-	}
-
-	private int getNoOfStatusRows() throws Exception {
-		int rows = 0;
-		if (getDesc().isSummedDay())
-			rows++;
-		if (getDesc().isSummedWeek())
-			rows++;
-		if (getDesc().isSummedTotal())
-			rows++;
-		return rows;
 	}
 
 	protected Object getCalendarId(int x, int y) throws Exception {
