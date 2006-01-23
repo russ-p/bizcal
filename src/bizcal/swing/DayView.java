@@ -117,7 +117,7 @@ public class DayView extends CalendarView {
 		calBackgrounds.clear();
 		vLines.clear();
 
-		//addDraggingComponents();
+		addDraggingComponents(calPanel);
 
 		Font hourFont = getDesc().getFont().deriveFont((float) 12);
 		hourFont = hourFont.deriveFont(Font.BOLD);

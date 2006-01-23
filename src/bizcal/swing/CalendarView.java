@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import bizcal.common.CalendarModel;
@@ -447,8 +448,6 @@ public abstract class CalendarView
 		public void mouseDragged(MouseEvent e)
 		{
 			try {
-				if (_dragArea == null)
-					return;
 				if (!_dragging) {
 					_dragging = true;
 					Object id = getCalendarId(e.getPoint().x, e.getPoint().y);
@@ -466,6 +465,8 @@ public abstract class CalendarView
 					//getCalenderArea().add(_dragArea);
 					getComponent().revalidate();
 				}
+				if (_dragArea == null)
+					return;				
 				Object calId = getCalendarId(e.getPoint().x, e.getPoint().y);
 				if (!calId.equals(_dragCalId)) {
 					e.consume();
@@ -486,6 +487,14 @@ public abstract class CalendarView
 			getComponent().requestFocusInWindow();		
 		}		
 	}
+	
+	protected void addDraggingComponents(JComponent calPanel) throws Exception {
+		_lassoArea = new LassoArea();
+		calPanel.add(_lassoArea, 1000);
+		_newEventArea = new FrameArea();
+		_newEventArea.setVisible(false);
+		calPanel.add(_newEventArea, new Integer(2));
+	}	
 	
 	protected Object getCalendarId(int x, int y)
 		throws Exception 
