@@ -55,11 +55,6 @@ public class MonthView
 		super(desc);
 		calPanel = new JPanel();
 		calPanel.setLayout(new Layout());
-		ThisMouseListener mouseListener = new ThisMouseListener();
-        ThisKeyListener keyListener = new ThisKeyListener();
-        calPanel.addMouseListener(mouseListener);
-        calPanel.addMouseMotionListener(mouseListener);
-        calPanel.addKeyListener(keyListener);		
         scrollPane = 
         	new JScrollPane(calPanel,
         			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -149,6 +144,7 @@ public class MonthView
 	{ 	
 		Font eventFont = this.font;
 		TableLayoutPanel panel = new TableLayoutPanel();
+		panel.addMouseListener(new DayMouseListener(calId, cal.getTime()));
 		if (cal.get(Calendar.MONTH) == month) { 
 			panel.setBackground(Color.WHITE);
 		} else  
@@ -164,7 +160,6 @@ public class MonthView
 		//label.setBackground(getDescriptor().getPrimaryColor());
 		//label.setForeground(Color.black);
 		label.setFont(font.deriveFont(Font.BOLD));
-		label.addMouseListener(new DayMouseListener());
 		row.createCell(label);
 		panel.createRow(TableLayoutPanel.FILL);
 		
@@ -225,10 +220,18 @@ public class MonthView
 	private class DayMouseListener
 	extends MouseAdapter
 	{
-		public JLabel label;
+		private Object calId;
+		private Date date;
+		
+		public DayMouseListener(Object calId, Date date)
+		{
+			this.calId = calId;
+			this.date = date;
+		}
+		
 		public void mouseEntered(MouseEvent e)
 		{
-			label = (JLabel) e.getSource();
+			JPanel label = (JPanel) e.getSource();
 			label.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			label.setBackground(label.getBackground().darker());
 			label.setForeground(Color.LIGHT_GRAY);			
@@ -236,7 +239,7 @@ public class MonthView
 		
 		public void mouseExited(MouseEvent e)
 		{
-			label = (JLabel) e.getSource();
+			JPanel label = (JPanel) e.getSource();
 			label.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 			label.setBackground(label.getBackground().brighter());
 			label.setForeground(Color.BLACK);
@@ -244,14 +247,13 @@ public class MonthView
 		
 		public void mouseClicked(MouseEvent e)
 		{
-			try
-			{
-				label = (JLabel) e.getSource();
-			}
-		
-			catch (Exception ex)
-			{
-				throw BizcalException.create(ex);
+			try {
+				if (e.getClickCount() < 2)
+					return;
+	    		if (listener != null)
+	    			listener.newEvent(calId, date);
+			} catch (Exception exc) {
+				ErrorHandler.handleError(exc);
 			}
 		}
 	}
@@ -275,7 +277,9 @@ public class MonthView
 	}		
 }
 	
-	protected Date getDate(int xPos, int yPos) throws Exception {
+	protected Date getDate(int xPos, int yPos) 
+	throws Exception 
+	{
 		return null;
 	}
 	
@@ -354,7 +358,6 @@ public class MonthView
 							0,
 							1,
 							parent.getHeight());
-					System.err.println("MonthView: " + (colCount+1)*width + ", " + 0 + ", " + 1 + ", " + parent.getHeight());
 		        }
 		        int rowCount = cells.size()-1;
 		        for (int i=0; i < rowCount; i++) {

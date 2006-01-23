@@ -387,8 +387,7 @@ public abstract class CalendarView
 	    			listener.newEvent(id, date);
 			} catch (Exception exc) {
 				ErrorHandler.handleError(exc);
-			}
-						
+			}						
 		}
 
     	private void maybeShowPopup(MouseEvent e) {
@@ -445,6 +444,8 @@ public abstract class CalendarView
 		public void mouseDragged(MouseEvent e)
 		{
 			try {
+				if (_dragArea == null)
+					return;
 				if (!_dragging) {
 					_dragging = true;
 					Object id = getCalendarId(e.getPoint().x, e.getPoint().y);
@@ -462,8 +463,6 @@ public abstract class CalendarView
 					//getCalenderArea().add(_dragArea);
 					getComponent().revalidate();
 				}
-				if (_dragArea == null)
-					return;
 				Object calId = getCalendarId(e.getPoint().x, e.getPoint().y);
 				if (!calId.equals(_dragCalId)) {
 					e.consume();
