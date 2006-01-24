@@ -532,7 +532,7 @@ public abstract class CalendarView
 	
 	protected void register(Object calId, Event event, FrameArea area)
 	{
-		_frameAreaMap.put("" + calId + event.getId(), area);
+		_frameAreaMap.put("" + calId + event.getId() + event.getStart().getTime(), area);
 		List list = (List) _eventMap.get(calId);
 		if (list == null) {
 			list = new ArrayList();
@@ -543,7 +543,7 @@ public abstract class CalendarView
 	
 	protected FrameArea getFrameArea(Object calId, Event event)
 	{
-		return (FrameArea) _frameAreaMap.get("" + calId + event.getId());		
+		return (FrameArea) _frameAreaMap.get("" + calId + event.getId() + event.getStart().getTime());		
 	}
 	
 	public void select(Object calId, Event event, boolean flag)
