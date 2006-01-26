@@ -7,8 +7,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.LayoutManager;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.DateFormat;
@@ -363,5 +361,12 @@ public class MonthView
 	{
 		return scrollPane;
 	}
+	
+	public void addListener(CalendarListener listener)
+	{
+		super.addListener(listener);
+		columnHeader.addCalendarListener(listener);
+	}
+	
 	
 }

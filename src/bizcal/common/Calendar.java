@@ -14,6 +14,7 @@ public class Calendar
 	private BufferedImage image;
 	private boolean enabled = true;
 	private boolean blankIsAvailible = true;
+	private boolean closeable = false;
 	
 	public Object getId() {
 		return id;
@@ -55,5 +56,11 @@ public class Calendar
 	}
 	public void setBlankIsAvailible(boolean blankIsAvailible) {
 		this.blankIsAvailible = blankIsAvailible;
+	}
+	public boolean isCloseable() {
+		return closeable;
+	}
+	public void setCloseable(boolean closeable) {
+		this.closeable = closeable;
 	}
 }

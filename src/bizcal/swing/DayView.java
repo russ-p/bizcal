@@ -526,5 +526,12 @@ public class DayView extends CalendarView {
 		scrollPane.getViewport().setViewPosition(new Point(0, getInitYPos()));
 	}
 	
+	public void addListener(CalendarListener listener)
+	{
+		super.addListener(listener);
+		columnHeader.addCalendarListener(listener);
+	}
+	
+	
 		
 }

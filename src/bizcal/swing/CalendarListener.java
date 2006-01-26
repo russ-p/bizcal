@@ -35,6 +35,9 @@ public interface CalendarListener
 	
 	public void deleteEvent(Event event)
 		throws Exception;
+	
+	public void closeCalendar(Object calId)
+		throws Exception;
 
 	public static class BaseImpl implements CalendarListener {
 		public void dateSelected(Date date) throws Exception {
@@ -79,12 +82,10 @@ public interface CalendarListener
 		{			
 		}
 		
-		public boolean isInsertable(Object id, Date date) throws Exception
-		{
-			return true;
+		public void closeCalendar(Object calId)
+			throws Exception
+		{			
 		}
-		
-		
 		
 	}	
 	

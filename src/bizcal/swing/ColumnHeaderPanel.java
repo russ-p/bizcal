@@ -1,5 +1,6 @@
 package bizcal.swing;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -22,7 +23,9 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import bizcal.common.CalendarModel;
+import bizcal.swing.util.ErrorHandler;
 import bizcal.swing.util.GradientArea;
+import bizcal.swing.util.ResourceIcon;
 import bizcal.swing.util.TrueGridLayout;
 import bizcal.util.BizcalException;
 import bizcal.util.DateUtil;
@@ -45,6 +48,7 @@ public class ColumnHeaderPanel
 	private CalendarModel model;
 	private Color lineColor = Color.LIGHT_GRAY;
 	private int fixedDayCount = -1;
+	private CalendarListener listener;
 	
 	public ColumnHeaderPanel()
 	{
@@ -92,10 +96,21 @@ public class ColumnHeaderPanel
 				bizcal.common.Calendar cal = (bizcal.common.Calendar) model
 						.getSelectedCalendars().get(j);
 				if (calCount > 1) {
-					JLabel header = new JLabel(cal.getSummary(), JLabel.CENTER);
-					header.addMouseListener(new CalHeaderMouseListener(cal
+					JLabel headerLabel = new JLabel(cal.getSummary(), JLabel.CENTER);
+					headerLabel.addMouseListener(new CalHeaderMouseListener(cal
 							.getId()));
-					header.setCursor(new Cursor(Cursor.HAND_CURSOR));
+					headerLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+					JComponent header = headerLabel;
+					if (cal.isCloseable()) {
+						JPanel panel = new JPanel();
+						panel.setOpaque(false);
+						panel.setLayout(new BorderLayout());
+						panel.add(headerLabel, BorderLayout.CENTER);
+						JLabel iconLabel = new JLabel(new ResourceIcon("/bizcal/res/cancel.gif"));
+						iconLabel.addMouseListener(new CloseListener(cal.getId()));
+						panel.add(iconLabel, BorderLayout.EAST);
+						header = panel;
+					} 
 					calHeaders.add(header);
 					panel.add(header);
 				}
@@ -163,6 +178,8 @@ public class ColumnHeaderPanel
 				if (e.isPopupTrigger()) {
 					JPopupMenu popup = popupMenuCallback
 							.getCalendarPopupMenu(calId);
+					if (popup == null)
+						return;
 					popup.show(e.getComponent(), e.getX(), e.getY());
 				}
 			} catch (Exception exc) {
@@ -216,12 +233,11 @@ public class ColumnHeaderPanel
 				int dateLineI = 0;
 				for (int i=0; i < model.getSelectedCalendars().size(); i++) {
 					if (calHeaders.size() > 0) {
-						JLabel label = (JLabel) calHeaders.get(i);
+						JComponent label = (JComponent) calHeaders.get(i);
 						label.setBounds((int) (i*calColWidth), 
 								0,
 								(int) calColWidth,
 								(int) rowHeight);
-						System.err.println("ColumnHeaderPanel: " + (i*calColWidth) + ", " + rowHeight + ", " + label.getText());
 					}
 					for (int j=0; j < dayCount; j++) {
 						JLabel dateLabel = (JLabel) dateHeaders.get(dateI);
@@ -308,4 +324,30 @@ public class ColumnHeaderPanel
 	public void setPopupMenuCallback(PopupMenuCallback popupMenuCallback) {
 		this.popupMenuCallback = popupMenuCallback;
 	}
+	
+	public void addCalendarListener(CalendarListener listener)
+	{
+		this.listener = listener;
+	}
+	
+	private class CloseListener
+		extends MouseAdapter
+	{
+		private Object calId;
+		
+		public CloseListener(Object calId)
+		{
+			this.calId = calId;
+		}
+		
+		public void mouseClicked(MouseEvent event)
+		{
+			try {
+				listener.closeCalendar(calId);
+			} catch (Exception e) {
+				ErrorHandler.handleError(e);
+			}
+		}
+	}
+	
 }
