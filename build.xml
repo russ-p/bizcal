@@ -12,7 +12,7 @@
 
     <pathelement location="classes"/>
 
-    <pathelement location="lib/tablelayout.jar"/>
+    <pathelement location="lib/TableLayout.jar"/>
 
     <pathelement location="lib/ecs.jar"/>
 
@@ -70,7 +70,7 @@
 
     <mkdir dir="lib"/>
 
-	<get src="http://bizcal.sourceforge.net/lib/tablelayout.jar" dest="lib/tablelayout.jar"/>          
+	<get src="http://bizcal.sourceforge.net/lib/TableLayout.jar" dest="lib/TableLayout.jar"/>          
 
 	<get src="http://bizcal.sourceforge.net/lib/ecs.jar" dest="lib/ecs.jar"/>          
 

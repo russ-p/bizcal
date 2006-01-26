@@ -7,8 +7,8 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import layout.TableLayout;
-import layout.TableLayoutConstraints;
+import info.clearthought.layout.TableLayout;
+import info.clearthought.layout.TableLayoutConstraints;
 
 public class TableLayoutPanel
     extends JPanel
