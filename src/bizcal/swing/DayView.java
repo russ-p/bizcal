@@ -203,7 +203,7 @@ public class DayView extends CalendarView {
 
 			_dateList.add(interval2.getStartDate());
 
-			Calendar startdate = Calendar.getInstance(Locale.getDefault());
+			Calendar startdate = DateUtil.newCalendar();
 			startdate.setTime(interval2.getStartDate());
 
 			if (it > 0) {

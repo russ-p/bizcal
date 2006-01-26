@@ -12,11 +12,13 @@ import java.util.TimeZone;
  */
 public class DateUtil 
 {
+	private static CalendarFactory calFactory = 
+		new DefaultCalendarFactory();
+	
 	public static Date round2Day(Date date)
 		throws Exception
 	{
-		Calendar cal = Calendar.getInstance(Locale.getDefault());
-        cal.setTimeZone(TimeZone.getDefault());
+		Calendar cal = newCalendar();
 		cal.setTime(date);
 		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
@@ -28,8 +30,7 @@ public class DateUtil
 	public static Date round2Minute(Date date)
 		throws Exception
 	{
-		Calendar cal = Calendar.getInstance(Locale.getDefault());
-        cal.setTimeZone(TimeZone.getDefault());
+		Calendar cal = newCalendar();
 		cal.setTime(date);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
@@ -39,8 +40,7 @@ public class DateUtil
 	public static int getDayOfWeek(Date date)
 		throws Exception
 	{
-		Calendar cal = Calendar.getInstance(Locale.getDefault());
-        cal.setTimeZone(TimeZone.getDefault());
+		Calendar cal = newCalendar();
 		cal.setTime(date);
 		return cal.get(Calendar.DAY_OF_WEEK);
 		
@@ -63,8 +63,7 @@ public class DateUtil
 	public static Date getStartOfWeek(Date date)
 		throws Exception
 	{
-		Calendar cal = Calendar.getInstance(Locale.getDefault());
-        cal.setTimeZone(TimeZone.getDefault());
+		Calendar cal = newCalendar();
 		cal.setTime(date);
 		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
 		cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -76,8 +75,7 @@ public class DateUtil
 	
 	public static int getYear(Date date) throws Exception
     {
-		Calendar cal = Calendar.getInstance(Locale.getDefault());
-        cal.setTimeZone(TimeZone.getDefault());
+		Calendar cal = newCalendar();
         cal.setTime(date);
         return cal.get(Calendar.YEAR);
 
@@ -85,16 +83,14 @@ public class DateUtil
 
 	public static int getMonth(Date date) throws Exception
     {
-		Calendar cal = Calendar.getInstance(Locale.getDefault());
-        cal.setTimeZone(TimeZone.getDefault());
+		Calendar cal = newCalendar();
         cal.setTime(date);
         return cal.get(Calendar.MONTH);
     }
 
 	public static int getDayOfMonth(Date date) throws Exception
     {
-		Calendar cal = Calendar.getInstance(Locale.getDefault());
-        cal.setTimeZone(TimeZone.getDefault());
+		Calendar cal = newCalendar();
         cal.setTime(date);
         return cal.get(Calendar.DAY_OF_MONTH);
     }
@@ -102,8 +98,7 @@ public class DateUtil
 	public static Date getDiffDay(Date date, int diff)
 		throws Exception
 	{
-		Calendar cal = Calendar.getInstance(Locale.getDefault());
-        cal.setTimeZone(TimeZone.getDefault());
+		Calendar cal = newCalendar();
         cal.setTime(date);
 		cal.add(Calendar.DAY_OF_WEEK, diff);
 		return cal.getTime();
@@ -115,8 +110,7 @@ public class DateUtil
 	
 	public static Date setTimeOfDate(Date date, TimeOfDay time)
 			throws Exception {
-		Calendar cal = Calendar.getInstance(Locale.getDefault());
-        cal.setTimeZone(TimeZone.getDefault());
+		Calendar cal = newCalendar();
 		cal.setTime(date);
 		cal.set(Calendar.HOUR_OF_DAY, time.getHour());
 		cal.set(Calendar.MINUTE, time.getMinute());
@@ -127,8 +121,7 @@ public class DateUtil
 	}
 	
 	public static Date round2Week(Date date) throws Exception {
-		Calendar cal = Calendar.getInstance(Locale.getDefault());
-        cal.setTimeZone(TimeZone.getDefault());
+		Calendar cal = newCalendar();
 		cal.setTime(date);
 		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
 		cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -139,8 +132,7 @@ public class DateUtil
 	}
 
 	public static Date round2Month(Date date) throws Exception {
-		Calendar cal = Calendar.getInstance(Locale.getDefault());
-        cal.setTimeZone(TimeZone.getDefault());
+		Calendar cal = newCalendar();
 		cal.setTime(date);
 		cal.set(Calendar.DAY_OF_MONTH, 1);
 		cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -150,6 +142,28 @@ public class DateUtil
 		return cal.getTime();
 	}
 	
+	public static Calendar newCalendar()
+		throws Exception
+	{
+		return calFactory.newCalendar();
+	}
+	
+	public static void setCalendarFactory(CalendarFactory factory)
+	{
+		calFactory = factory;
+	}
+	
+	private static class DefaultCalendarFactory
+		implements CalendarFactory
+	{
+		public Calendar newCalendar()
+		throws Exception
+		{
+			Calendar cal = Calendar.getInstance(LocaleBroker.getLocale());
+	        cal.setTimeZone(TimeZoneBroker.getTimeZone());
+			return cal;			
+		}
+	}
 	
 	
 }

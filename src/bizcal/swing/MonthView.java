@@ -70,7 +70,7 @@ public class MonthView
 		hLines.clear();
 		vLines.clear();
 						
-		Calendar cal = Calendar.getInstance(Locale.getDefault());
+		Calendar cal = DateUtil.newCalendar();
 		cal.setTime(getInterval().getStartDate());
 						
 		int month = cal.get(Calendar.MONTH);
@@ -269,7 +269,7 @@ public class MonthView
 	}
 	
 	protected String getHeaderText() throws Exception {
-		Calendar cal = Calendar.getInstance(Locale.getDefault());
+		Calendar cal = DateUtil.newCalendar();
 		cal.setTime(getInterval().getStartDate());
 		DateFormat format = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
 		return TextUtil.formatCase(format.format(cal.getTime()));

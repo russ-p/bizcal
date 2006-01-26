@@ -74,7 +74,7 @@ public class ColumnHeaderPanel
 		dateLines.clear();
 		panel.removeAll();
 		
-		Calendar calendar = Calendar.getInstance(LocaleBroker.getLocale());
+		Calendar calendar = DateUtil.newCalendar();
 		dayCount = DateUtil.getDateDiff(model.getInterval().getEndDate(),
 				model.getInterval().getStartDate());
 		if (fixedDayCount > 0)
@@ -303,7 +303,7 @@ public class ColumnHeaderPanel
 		throws Exception
 	{
 		DateFormat format = new SimpleDateFormat("EEEEE", LocaleBroker.getLocale());
-		Calendar cal = Calendar.getInstance(LocaleBroker.getLocale());
+		Calendar cal = DateUtil.newCalendar();
 		cal.set(Calendar.DAY_OF_WEEK, 1);
 		int maxWidth = 0;
 		for (int i=0; i < 7; i++) {
