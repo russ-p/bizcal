@@ -36,7 +36,7 @@ import bizcal.util.TimeOfDay;
 import bizcal.util.Tuple;
 
 public class DayView extends CalendarView {
-	public static final int PIXELS_PER_HOUR = 50;
+	public static final int PIXELS_PER_HOUR = 40;
 	
 	private static final int CAPTION_ROW_HEIGHT0 = 20;
 

@@ -116,12 +116,12 @@ public class FrameArea
 		Font timeFont = this.getFont().deriveFont(Font.BOLD);
 		g2.setPaint(fontColor);
 		g2.setFont(timeFont);
-		int ypos = 12;
+		int ypos = 15;
 		if (itsHeadLine != null) {
 			g2.drawString(itsHeadLine, xpos, ypos);
-			ypos += 12;
-		} else
-			ypos += 3;
+			ypos += 15;
+			xpos = 5;
+		} 
 		Font descriptionFont = this.getFont();
 		g2.setPaint(fontColor);
 		g2.setFont(descriptionFont);

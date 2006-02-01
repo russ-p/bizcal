@@ -21,7 +21,7 @@ public class ResourceIcon
 	private static byte[] getBytes(String path)
 		throws Exception
 	{
-		InputStream stream = ResourceIcon.class.getResourceAsStream("/bizcal/res/cancel.gif");
+		InputStream stream = ResourceIcon.class.getResourceAsStream(path);
         BufferedInputStream inputStream = new BufferedInputStream(stream);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         BufferedOutputStream outputStream = new BufferedOutputStream(byteArrayOutputStream);

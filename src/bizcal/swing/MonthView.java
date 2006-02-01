@@ -300,6 +300,7 @@ public class MonthView
 		public Dimension preferredLayoutSize(Container parent) {
 			try {
 				int width = 7 * getModel().getSelectedCalendars().size() * DayView.PREFERRED_DAY_WIDTH;
+				System.err.println("MonthView: getPreferredHeight=" + getPreferredHeight());
 				return new Dimension(width, getPreferredHeight());
 			} catch (Exception e) {
 				throw BizcalException.create(e);
@@ -354,7 +355,7 @@ public class MonthView
 	
 	private int getPreferredHeight()
 	{
-		return cells.size() * 100;		
+		return cells.size() * 40;		
 	}
 	
 	public JComponent getComponent()
