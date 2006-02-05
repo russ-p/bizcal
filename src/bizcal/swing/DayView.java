@@ -22,7 +22,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 
 import bizcal.common.DayViewConfig;
@@ -77,6 +76,8 @@ public class DayView extends CalendarView {
 	private JScrollPane scrollPane;
 	
 	private JLayeredPane calPanel;
+	
+	private boolean firstRefresh = true;
 
 	public DayView(DayViewConfig desc) throws Exception {
 		super(desc);
@@ -168,10 +169,12 @@ public class DayView extends CalendarView {
 		columnHeader.setPopupMenuCallback(popupMenuCallback);
 		columnHeader.refresh();
 		
-		initScroll();
+		if (firstRefresh)
+			initScroll();
+		firstRefresh = false;
 		// Hack to make to init scroll work
-		JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
-		scrollBar.setValue(scrollBar.getValue()-1);
+		//JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
+		//scrollBar.setValue(scrollBar.getValue()-1);
 		
 	}
 
