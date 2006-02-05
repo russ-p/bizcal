@@ -59,8 +59,8 @@ public interface CalendarModel
 		public BaseImpl()
 		{
 			try {
-				viewStart = new TimeOfDay(8, 0);
-				viewEnd = new TimeOfDay(17, 0);
+				viewStart = new TimeOfDay(7, 0);
+				viewEnd = new TimeOfDay(18, 0);
 			} catch (Exception e) {
 				throw BizcalException.create(e);
 			}

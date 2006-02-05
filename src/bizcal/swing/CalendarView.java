@@ -27,7 +27,6 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import bizcal.common.CalendarModel;
@@ -829,5 +828,10 @@ public abstract class CalendarView
 	}
 	
 	public abstract JComponent getComponent();
+	
+	public void clear()
+	{
+		_selectedEvents.clear();
+	}
 	
 }
