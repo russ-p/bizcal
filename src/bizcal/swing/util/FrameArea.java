@@ -54,6 +54,8 @@ public class FrameArea
 	
 	public void setAlphaValue(float aValue)
 	{
+		if (aValue > 1.0f)
+			aValue = 1.0f;
 		this.alphaValue = aValue;
 	}
 	public float getAlphaValue()
@@ -90,9 +92,10 @@ public class FrameArea
 				gbi.draw(new RoundRectangle2D.Double(1, 1, width-2, height-2, 17,17));
 			}		
 		}
-		else
-		{
-			AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.DST_OVER, alphaValue);
+		else			
+		{	
+			AlphaComposite ac = null;
+			ac = AlphaComposite.getInstance(AlphaComposite.DST_OVER, alphaValue);
 			gbi.setComposite(ac);
 			gbi.setPaint(this.getBackground());
 			gbi.fill(new Rectangle2D.Double(0, 0,

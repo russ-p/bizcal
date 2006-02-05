@@ -21,7 +21,6 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.fortuna.ical4j.model.component.VEvent;
 import bizcal.common.CalendarViewConfig;
 import bizcal.common.Event;
 import bizcal.swing.util.FrameArea;

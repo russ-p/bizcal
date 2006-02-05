@@ -50,6 +50,8 @@ public class DayView extends CalendarView {
 	
 	public static final int PREFERRED_DAY_WIDTH = 10;
 	
+	public static final Integer GRID_LEVEL = new Integer(1);
+	
 	private List frameAreaCols = new ArrayList();
 
 	private List eventColList = new ArrayList();
@@ -133,7 +135,7 @@ public class DayView extends CalendarView {
 			JLabel line = new JLabel();
 			line.setBackground(getDesc().getLineColor());
 			line.setOpaque(true);
-			calPanel.add(line, new Integer(1));
+			calPanel.add(line, GRID_LEVEL);
 			timeLines.put(new Tuple(date, "00"), line);
 
 			// Half hour line
@@ -142,7 +144,7 @@ public class DayView extends CalendarView {
 			line = new JLabel();
 			line.setBackground(getDesc().getLineColor());
 			line.setOpaque(true);
-			calPanel.add(line, new Integer(1));
+			calPanel.add(line, GRID_LEVEL);
 			timeLines.put(new Tuple(date, "30"), line);
 
 			pos += 3600 * 1000;
@@ -214,7 +216,7 @@ public class DayView extends CalendarView {
 					verticalLine.setBackground(LINE_COLOR_DARKER);
 				if (getSelectedCalendars().size() > 1 && it % dayCount == 0)
 					verticalLine.setBackground(LINE_COLOR_EVEN_DARKER);
-				calPanel.add(verticalLine, new Integer(1));
+				calPanel.add(verticalLine, GRID_LEVEL);
 				vLines.add(verticalLine);
 			}
 			

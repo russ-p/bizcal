@@ -224,10 +224,12 @@ public abstract class CalendarView
 	    public void mouseEntered(MouseEvent e) 
 	    {
 	    	try {
+	    		if (!_event.isSelectable())
+	    			return;
 	    		getComponent().setCursor(new Cursor(Cursor.HAND_CURSOR));
 				_frameArea.setAlphaValue(_frameArea.getAlphaValue()+0.2f);
 				//_frameArea.setBorder(true);
-				_frameArea.repaint();	    		
+				_frameArea.repaint();	    
 		    } catch (Exception exc) {
 	    		ErrorHandler.handleError(exc);
 		    }	    	
@@ -236,6 +238,8 @@ public abstract class CalendarView
 	    public void mouseExited(MouseEvent e) 
 	    {
 	    	try {
+	    		if (!_event.isSelectable())
+	    			return;
 	    		getComponent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 				_frameArea.setAlphaValue(_frameArea.getAlphaValue()-0.2f);
 				//_frameArea.setBorder(false);
