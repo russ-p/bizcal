@@ -34,6 +34,7 @@ public class TimeLabelPanel
 	private int width = 40;
 	private int hourCount;
 	private Color lineColor = Color.LIGHT_GRAY;
+	private int footerHeight = 0;
 	
 	public TimeLabelPanel(TimeOfDay start, TimeOfDay end) throws Exception {
 		hourCount = end.getHour() - start.getHour();
@@ -100,7 +101,7 @@ public class TimeLabelPanel
 		}
 
 		public Dimension preferredLayoutSize(Container parent) {
-			return new Dimension(width, DayView.PIXELS_PER_HOUR * hourCount);
+			return new Dimension(width, DayView.PIXELS_PER_HOUR * hourCount + footerHeight);
 		}
 
 		public Dimension minimumLayoutSize(Container parent) {
@@ -109,7 +110,7 @@ public class TimeLabelPanel
 
 		public void layoutContainer(Container parent) {
 			try {
-				double totHeight = parent.getHeight();
+				double totHeight = parent.getHeight() - footerHeight;
 				double rowHeight = totHeight / hourCount; 
 				double minuteRowHeight = rowHeight / 2;
 				int colWidth = width / 2;
@@ -161,5 +162,9 @@ public class TimeLabelPanel
 	public JComponent getComponent()
 	{
 		return panel;
+	}
+
+	public void setFooterHeight(int footerHeight) {
+		this.footerHeight = footerHeight;
 	}
 }

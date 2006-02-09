@@ -526,7 +526,7 @@ public abstract class CalendarView
 	{
 		return 0;
 	}
-
+	
 	public void setCursor(Cursor cursor)
 	{
 		//rootPanel.setCursor(cursor);

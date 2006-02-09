@@ -5,6 +5,7 @@ public class DayViewConfig
 {
 	private int dayCount = 1;
 	private boolean showExtraDateHeaders = false;
+	private boolean showDateFooter = false;
 	
 	public DayViewConfig()
 	{
@@ -29,6 +30,14 @@ public class DayViewConfig
 
 	public void setShowExtraDateHeaders(boolean showExtraDateHeaders) {
 		this.showExtraDateHeaders = showExtraDateHeaders;
+	}
+
+	public void setShowDateFooter(boolean showDateFooter) {
+		this.showDateFooter = showDateFooter;
+	}
+
+	public boolean isShowDateFooter() {
+		return showDateFooter;
 	}
 	
 }

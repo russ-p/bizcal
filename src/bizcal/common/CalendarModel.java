@@ -51,6 +51,9 @@ public interface CalendarModel
 	public String getDateHeader(Object calId, Date date)
 		throws Exception;
 
+	public String getDateFooter(Object calId, Date date)
+		throws Exception;
+	
 	public abstract class BaseImpl
 		implements CalendarModel
 	{
@@ -149,6 +152,13 @@ public interface CalendarModel
 		{
 			return null;
 		}
+		
+		public String getDateFooter(Object calId, Date date)
+		throws Exception
+		{
+			return null;
+		}
+
 		
 	}
 		
