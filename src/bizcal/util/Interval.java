@@ -122,6 +122,9 @@ public class Interval
         if (interval.contains(getStart()) &&
             interval.contains(getEnd()))
             return true;
+        if (NullSafe.equals(interval.getStart(), getStart()) &&
+        	NullSafe.equals(interval.getEnd(), getEnd()))
+			return true;
         return false;
     }
     
