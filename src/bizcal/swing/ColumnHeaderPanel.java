@@ -133,7 +133,7 @@ public class ColumnHeaderPanel
 					dateHeaders.add(header);
 					panel.add(header);
 					if (showExtraDateHeaders) {
-						header = new JLabel(model.getDateHeader(date), JLabel.CENTER);
+						header = new JLabel(model.getDateHeader(cal.getId(), date), JLabel.CENTER);
 						dateHeaders2.add(header);
 						panel.add(header);
 					}

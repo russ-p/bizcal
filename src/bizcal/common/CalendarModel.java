@@ -48,7 +48,7 @@ public interface CalendarModel
 	public TimeOfDay getViewEnd()
 		throws Exception;
 	
-	public String getDateHeader(Date date)
+	public String getDateHeader(Object calId, Date date)
 		throws Exception;
 
 	public abstract class BaseImpl
@@ -138,11 +138,13 @@ public interface CalendarModel
 			return interval;
 		}
 
-		public void setInterval(DateInterval interval) {
+		public void setInterval(DateInterval interval)
+			throws Exception
+		{
 			this.interval = interval;
 		}
 
-		public String getDateHeader(Date date)
+		public String getDateHeader(Object calId, Date date)
 		throws Exception
 		{
 			return null;
