@@ -39,6 +39,7 @@ public class ColumnHeaderPanel
 	private JPanel panel;
 	private List calHeaders = new ArrayList();
 	private List dateHeaders = new ArrayList();
+	private List dateHeaders2 = new ArrayList();
 	private List dateList = new ArrayList();
 	private List dateLines = new ArrayList();
 	private GradientArea gradientArea;
@@ -49,6 +50,7 @@ public class ColumnHeaderPanel
 	private Color lineColor = Color.LIGHT_GRAY;
 	private int fixedDayCount = -1;
 	private CalendarListener listener;
+	private boolean showExtraDateHeaders = false;
 	
 	public ColumnHeaderPanel()
 	{
@@ -70,6 +72,7 @@ public class ColumnHeaderPanel
 	{
 		calHeaders.clear();
 		dateHeaders.clear();
+		dateHeaders2.clear();
 		dateList.clear();
 		dateLines.clear();
 		panel.removeAll();
@@ -128,8 +131,13 @@ public class ColumnHeaderPanel
 					if (model.isRedDay(date))
 						header.setForeground(Color.RED);
 					dateHeaders.add(header);
-					dateList.add(date);
 					panel.add(header);
+					if (showExtraDateHeaders) {
+						header = new JLabel(model.getDateHeader(date), JLabel.CENTER);
+						dateHeaders2.add(header);
+						panel.add(header);
+					}
+					dateList.add(date);
 					if (i > 0 || j > 0) {
 						JLabel line = new JLabel();
 						line.setBackground(lineColor);
@@ -148,6 +156,9 @@ public class ColumnHeaderPanel
 			}
 		} else
 			rowCount = 0;
+		
+		if (showExtraDateHeaders)
+			rowCount++;
 
 		panel.add(gradientArea);
 		panel.updateUI();
@@ -231,6 +242,7 @@ public class ColumnHeaderPanel
 					dateYPos = rowHeight;
 				int dateI = 0;
 				int dateLineI = 0;
+				int dayRowCount = showExtraDateHeaders ? 2 : 1;
 				for (int i=0; i < model.getSelectedCalendars().size(); i++) {
 					if (calHeaders.size() > 0) {
 						JComponent label = (JComponent) calHeaders.get(i);
@@ -246,13 +258,20 @@ public class ColumnHeaderPanel
 								(int) dateYPos,
 								(int) dateColWidth, 
 								(int) rowHeight);
+						if (showExtraDateHeaders) {
+							dateLabel = (JLabel) dateHeaders2.get(dateI);
+							dateLabel.setBounds(xpos,
+									(int) (dateYPos + rowHeight),
+									(int) dateColWidth, 
+									(int) rowHeight);
+						}
 						if (j > 0 || i > 0) {
 							JLabel line = (JLabel) dateLines.get(dateLineI);
 							int ypos = (int) dateYPos;
-							int height = (int) rowHeight;
+							int height = (int) rowHeight * dayRowCount;
 							if (j == 0) {
 								ypos = 0;
-								height = (int) (2*rowHeight);
+								height = (int) (rowCount*(dayRowCount+1));
 							}
 							line.setBounds(xpos, 
 									ypos,
@@ -348,6 +367,10 @@ public class ColumnHeaderPanel
 				ErrorHandler.handleError(e);
 			}
 		}
+	}
+
+	public void setShowExtraDateHeaders(boolean showExtraDateHeaders) {
+		this.showExtraDateHeaders = showExtraDateHeaders;
 	}
 	
 }

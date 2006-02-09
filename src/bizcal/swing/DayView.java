@@ -97,7 +97,8 @@ public class DayView extends CalendarView {
         scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, createCorner(true, true));
         scrollPane.setCorner(JScrollPane.LOWER_LEFT_CORNER, createCorner(true, false));
         scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createCorner(false, true));
-		columnHeader = new ColumnHeaderPanel();			
+		columnHeader = new ColumnHeaderPanel();	
+		columnHeader.setShowExtraDateHeaders(desc.isShowExtraDateHeaders());
         scrollPane.setColumnHeaderView(columnHeader.getComponent());
 		rowHeader = new TimeLabelPanel(new TimeOfDay(0,0),
 				new TimeOfDay(24,0));

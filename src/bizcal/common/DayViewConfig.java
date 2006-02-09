@@ -4,6 +4,7 @@ public class DayViewConfig
 	extends CalendarViewConfig
 {
 	private int dayCount = 1;
+	private boolean showExtraDateHeaders = false;
 	
 	public DayViewConfig()
 	{
@@ -20,6 +21,14 @@ public class DayViewConfig
 	}
 	public void setDayCount(int dayCount) {
 		this.dayCount = dayCount;
+	}
+	
+	public boolean isShowExtraDateHeaders() {
+		return showExtraDateHeaders;
+	}
+
+	public void setShowExtraDateHeaders(boolean showExtraDateHeaders) {
+		this.showExtraDateHeaders = showExtraDateHeaders;
 	}
 	
 }
