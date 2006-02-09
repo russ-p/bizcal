@@ -557,6 +557,7 @@ public abstract class CalendarView
 			area.setSelected(flag);
 		_selectedEvents.add(event);
 		listener.eventsSelected(_selectedEvents);
+		listener.eventSelected(calId, event);
 	}
 		
 	public void deselect()
@@ -579,6 +580,7 @@ public abstract class CalendarView
 			}
 		}		
 		listener.eventsSelected(_selectedEvents);
+		listener.selectionReset();
 	}
 	
 	public void copy()
@@ -626,8 +628,9 @@ public abstract class CalendarView
 			Event event = (Event) i.next();
 			FrameArea area = getFrameArea(id, event); 
 			area.setSelected(true);
+			listener.eventSelected(id, event);
 		}
-		listener.eventsSelected(_selectedEvents);						
+		listener.eventsSelected(_selectedEvents);
 	}
 
 	private List getEditibleEvents(Object calId, DateInterval interval)

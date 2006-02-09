@@ -17,6 +17,10 @@ public interface CalendarListener
 	
 	public void eventsSelected(List list) throws Exception;
 	
+	public void selectionReset() throws Exception;
+	
+	public void eventSelected(Object id, Event event) throws Exception;
+	
 	public void showEvent(Object id, Event event) throws Exception;
 
 	public void newEvent(Object id, Date date) throws Exception;
@@ -47,6 +51,10 @@ public interface CalendarListener
 		}
 
 		public void eventsSelected(List list) throws Exception {	}
+		
+		public void selectionReset() throws Exception { }
+		
+		public void eventSelected(Object id, Event event) throws Exception { }
 		
 		public void showEvent(Object id, Event event) throws Exception
 		{			
