@@ -271,7 +271,7 @@ public class ColumnHeaderPanel
 							int height = (int) rowHeight * dayRowCount;
 							if (j == 0) {
 								ypos = 0;
-								height = (int) (rowCount*(dayRowCount+1));
+								height = (int) (rowHeight*(dayRowCount+1));
 							}
 							line.setBounds(xpos, 
 									ypos,
