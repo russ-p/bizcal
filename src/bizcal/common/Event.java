@@ -16,6 +16,7 @@ import bizcal.util.LocaleBroker;
  * @author Fredrik Bertilsson
  */
 public class Event 
+	implements Comparable
 {
 	private Object id;
 	private String summary;
@@ -168,5 +169,11 @@ public class Event
 	}
 	public void setOrgEvent(Object orgEvent) {
 		this.orgEvent = orgEvent;
+	}
+	
+	public int compareTo(Object other)
+	{
+		Event another = (Event) other;
+		return start.compareTo(another.start);
 	}
 }

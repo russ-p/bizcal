@@ -11,6 +11,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -218,6 +219,7 @@ public class DayView extends CalendarView {
 					.get(iCal);
 			Object calId = cal.getId();
 			events = broker.getEvents(calId);
+			Collections.sort(events);
 
 			if (it % dayCount == 0) 
 				interval2 = new DateInterval(interval);
