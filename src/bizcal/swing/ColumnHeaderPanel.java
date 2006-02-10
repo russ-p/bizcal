@@ -124,7 +124,8 @@ public class ColumnHeaderPanel
 				if (fixedDayCount > 0)
 					date = DateUtil.round2Week(date);
 				for (int i = 0; i < dayCount; i++) {
-					JLabel header = new JLabel(dateFormat.format(date), JLabel.CENTER);
+					String dateStr = dateFormat.format(date);
+					JLabel header = new JLabel(dateStr, JLabel.CENTER);
 					header.setAlignmentY(2);
 					//header.setFont(font);
 					header.setToolTipText(toolTipFormat.format(date));
@@ -295,6 +296,9 @@ public class ColumnHeaderPanel
 	{
 		if (dayCount != 5 && dayCount != 7)
 			return;
+
+		Date today = DateUtil.round2Day(new Date());
+		
 		FontMetrics metrics = refLabel.getFontMetrics(refLabel.getFont());
 		int charCount = 10;
 		if (maxWidth(charCount, metrics) > width) {
@@ -314,6 +318,8 @@ public class ColumnHeaderPanel
 			if (str.length() > charCount)
 				str = str.substring(0, charCount);
 			str = TextUtil.formatCase(str);
+			if (today.equals(DateUtil.round2Day(date)))
+				str = "<html><b>" + str + "</b></html>";
 			label.setText(str);
 		}
 	}
