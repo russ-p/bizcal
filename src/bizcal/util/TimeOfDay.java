@@ -25,6 +25,16 @@ public class TimeOfDay
     	_time = hours*3600*1000 + minutes*60*1000;	
     }
     
+    public TimeOfDay(Date date) throws Exception {
+		Calendar cal = Calendar.getInstance(LocaleBroker.getLocale());
+		cal.setTimeZone(TimeZoneBroker.getTimeZone());
+		cal.setTime(date);
+		_time = cal.get(Calendar.HOUR_OF_DAY) * 60;
+		_time += cal.get(Calendar.MINUTE);
+		_time *= 60 * 1000;
+
+	}
+    
     public String toString()
     {
         return "" + _time;

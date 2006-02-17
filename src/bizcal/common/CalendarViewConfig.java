@@ -3,6 +3,8 @@ package bizcal.common;
 import java.awt.Color;
 import java.awt.Font;
 
+import bizcal.util.TimeOfDay;
+
 public class CalendarViewConfig 
 {
 	private CalendarModel callback;
@@ -12,6 +14,15 @@ public class CalendarViewConfig
 	private Color secondaryColor = new Color(255,255,255);
 	private String caption;
 	private Color lineColor = Color.LIGHT_GRAY;
+	private TimeOfDay startView;
+	private TimeOfDay endView;
+	
+	public CalendarViewConfig()
+		throws Exception
+	{
+		startView = new TimeOfDay(6, 0);
+		endView = new TimeOfDay(18, 0);
+	}
 	
 	public String getCaption() {
 		return caption;
@@ -44,6 +55,8 @@ public class CalendarViewConfig
 		this.callback = other.callback;
 		this.font = other.font;
 		this.showTopHeader = other.showTopHeader;
+		this.startView = other.startView;
+		this.endView = other.endView;
 	}
 	
 	public Color getPrimaryColor() {
@@ -63,5 +76,17 @@ public class CalendarViewConfig
 	}
 	public void setLineColor(Color lineColor) {
 		this.lineColor = lineColor;
+	}
+	public TimeOfDay getEndView() {
+		return endView;
+	}
+	public void setEndView(TimeOfDay endView) {
+		this.endView = endView;
+	}
+	public TimeOfDay getStartView() {
+		return startView;
+	}
+	public void setStartView(TimeOfDay startView) {
+		this.startView = startView;
 	}
 }

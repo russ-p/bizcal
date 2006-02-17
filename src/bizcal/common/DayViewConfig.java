@@ -8,11 +8,13 @@ public class DayViewConfig
 	private boolean showDateFooter = false;
 	
 	public DayViewConfig()
+		throws Exception
 	{
 		setCaption("Calendar");
 	}
 	
 	public DayViewConfig(CalendarViewConfig calViewD)
+		throws Exception
 	{
 		copy(calViewD);
 	}

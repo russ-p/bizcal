@@ -540,7 +540,9 @@ public class DayView extends CalendarView {
 		return getCalendarId(getColumn(x));
 	}
 
-	private DayViewConfig getDesc() {
+	private DayViewConfig getDesc() 
+		throws Exception
+	{
 		DayViewConfig result = (DayViewConfig) getDescriptor();
 		if (result == null) {
 			result = new DayViewConfig();
