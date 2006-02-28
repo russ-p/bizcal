@@ -112,7 +112,7 @@ public class DaysHoursHeaderPanel
 				while (time < config.getEndView().getValue()) {					
 					dateStr = hourFormat.format(new TimeOfDay(time).getDate(date));
 					header = new JLabel(dateStr, JLabel.CENTER);
-					dateHeaders.add(header);
+					dateHeaders2.add(header);
 					panel.add(header);
 					if (i > 0 || time > config.getStartView().getValue()) {
 						JLabel line = new JLabel();
@@ -194,6 +194,7 @@ public class DaysHoursHeaderPanel
 				int height = refLabel.getPreferredSize().height;
 				height = rowCount * height;
 				int width = dayCount * model.getSelectedCalendars().size() * DayView.PREFERRED_DAY_WIDTH;
+				System.err.println("DayHoursHeaderPanel: height=" + height);
 				return new Dimension(width, height);
 			} catch (Exception e) {
 				throw BizcalException.create(e);
@@ -250,7 +251,8 @@ public class DaysHoursHeaderPanel
 									height);
 							dateLineI++;
 						}
-					}
+						time += 3600*1000;					
+					}					
 					dateI++;
 				}
 				gradientArea.setBounds(0, 0, parent.getWidth(), parent.getHeight());

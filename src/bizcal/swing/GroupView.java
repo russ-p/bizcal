@@ -50,6 +50,7 @@ public class GroupView
 	private List hLines = new ArrayList();
 	private JLayeredPane calPanel;
 	private JScrollPane scrollPane;
+	private DaysHoursHeaderPanel columnHeader;
 	
 	public GroupView(CalendarViewConfig config, CalendarModel model) throws Exception	
     {
@@ -67,7 +68,7 @@ public class GroupView
         scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, createCorner(true, true));
         scrollPane.setCorner(JScrollPane.LOWER_LEFT_CORNER, createCorner(true, false));
         scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createCorner(false, true));
-		DaysHoursHeaderPanel columnHeader = new DaysHoursHeaderPanel(config, model);	
+		columnHeader = new DaysHoursHeaderPanel(config, model);	
         scrollPane.setColumnHeaderView(columnHeader.getComponent());
 		CalendarRowHeader rowHeader = new CalendarRowHeader(model);
 		rowHeader.setFooterHeight(0);
@@ -158,6 +159,9 @@ public class GroupView
        
         calPanel.validate();
         calPanel.repaint();
+
+		columnHeader.setModel(getModel());
+		columnHeader.refresh();        
     }
 	
 	private int getWidth()
