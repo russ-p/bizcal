@@ -92,6 +92,7 @@ public class GroupView
         eventRows.clear();
         hLines.clear();
         vLines.clear();
+        calBackgrounds.clear();
 
 		dayCount = DateUtil.getDateDiff(getModel().getInterval().getEndDate(),
 				getModel().getInterval().getStartDate());
@@ -136,7 +137,7 @@ public class GroupView
             JLabel line = new JLabel();
             line.setBackground(getDescriptor().getLineColor2());
             line.setOpaque(true);
-            calPanel.add(line, new Integer(1));
+            calPanel.add(line, new Integer(2));
             vLines.put(date, line);
             System.err.println("GroupView: " + date + ", " + line.getBackground());
             
@@ -155,7 +156,7 @@ public class GroupView
 	            	line = new JLabel();
 	                line.setBackground(getDescriptor().getLineColor());
 	                line.setOpaque(true);
-	                calPanel.add(line, new Integer(1));
+	                calPanel.add(line, new Integer(2));
 	                vLines.put(cal.getTime(), line);
 	                System.err.println("GroupView: " + cal.getTime() + ", " + line.getBackground());	            	
 	            	cal.add(Calendar.HOUR, +1 * HOUR_RESOLUTION);
@@ -177,7 +178,7 @@ public class GroupView
 			JPanel calBackground = new JPanel();
 			calBackground.setBackground(calendar.getColor());
 			calBackgrounds.add(calBackground);
-			calPanel.add(calBackground);
+			calPanel.add(calBackground, new Integer(1));
 		}        
        
         calPanel.validate();
