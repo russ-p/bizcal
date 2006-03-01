@@ -54,6 +54,7 @@ public class GroupView
 	private DaysHoursHeaderPanel columnHeader;
 	private CalendarRowHeader rowHeader;
 	private List calBackgrounds = new ArrayList();
+	private int dayCount;
 	
 	public GroupView(CalendarViewConfig config, CalendarModel model) throws Exception	
     {
@@ -92,6 +93,9 @@ public class GroupView
         hLines.clear();
         vLines.clear();
 
+		dayCount = DateUtil.getDateDiff(getModel().getInterval().getEndDate(),
+				getModel().getInterval().getStartDate());
+        
         addDraggingComponents(calPanel);
         
         Iterator i = getModel().getSelectedCalendars().iterator();
@@ -134,24 +138,28 @@ public class GroupView
             line.setOpaque(true);
             calPanel.add(line, new Integer(1));
             vLines.put(date, line);
+            System.err.println("GroupView: " + date + ", " + line.getBackground());
             
-            TimeOfDay startTime = getDescriptor().getStartView();
-            cal.set(Calendar.HOUR_OF_DAY, startTime.getHour());
-            cal.set(Calendar.MINUTE, startTime.getMinute());
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            TimeOfDay endTime = getDescriptor().getEndView();
-            while (true) {
-                line = new JLabel();
-                line.setBackground(getDescriptor().getLineColor());
-                line.setOpaque(true);
-                calPanel.add(line, new Integer(1));
-                vLines.put(cal.getTime(), line);
-            	
-            	cal.add(Calendar.HOUR, +1 * HOUR_RESOLUTION);
-            	TimeOfDay timeOfDay = new TimeOfDay(cal.getTime());
-            	if (timeOfDay.getValue() >= endTime.getValue())
-            		break;
+            if (dayCount <= 7) {
+	            TimeOfDay startTime = getDescriptor().getStartView();
+	            cal.set(Calendar.HOUR_OF_DAY, startTime.getHour());
+	            cal.set(Calendar.MINUTE, startTime.getMinute());
+	            cal.set(Calendar.SECOND, 0);
+	            cal.set(Calendar.MILLISECOND, 0);
+	            TimeOfDay endTime = getDescriptor().getEndView();
+	            while (true) {
+	            	TimeOfDay timeOfDay = new TimeOfDay(cal.getTime());
+	            	if (timeOfDay.getValue() >= endTime.getValue())
+	            		break;
+
+	            	line = new JLabel();
+	                line.setBackground(getDescriptor().getLineColor());
+	                line.setOpaque(true);
+	                calPanel.add(line, new Integer(1));
+	                vLines.put(cal.getTime(), line);
+	                System.err.println("GroupView: " + cal.getTime() + ", " + line.getBackground());	            	
+	            	cal.add(Calendar.HOUR, +1 * HOUR_RESOLUTION);
+	            }
             }
             
             cal.add(Calendar.DAY_OF_YEAR, 1);
@@ -239,7 +247,7 @@ public class GroupView
 	{
 		long duration = getInterval().getDuration();
 		duration = duration / 24 / 3600 / 1000;
-		return (getTimeWidth() / duration);
+		return ((double) getTimeWidth() / (double) duration);
 	}
 	
 	protected LayoutManager getLayout()
@@ -315,26 +323,25 @@ public class GroupView
                     
                     JLabel line = (JLabel) vLines.get(date);
                     line.setBounds(xpos, 0, 1, height);
-                    if(cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY)
-                    	line.setBackground(Color.LIGHT_GRAY);
-                    
-                    TimeOfDay startTime = getDescriptor().getStartView();
-                    cal.set(Calendar.HOUR_OF_DAY, startTime.getHour());
-                    cal.set(Calendar.MINUTE, startTime.getMinute());
-                    cal.set(Calendar.SECOND, 0);
-                    cal.set(Calendar.MILLISECOND, 0);
-                    TimeOfDay endTime = getDescriptor().getEndView();
-                    while (true) {
-                        xpos = getXPos(cal.getTime());
-                        line = (JLabel) vLines.get(cal.getTime());
-                        line.setBounds(xpos, captionHeight, 1, height-captionHeight);                        
-                    	
-                    	cal.add(Calendar.HOUR, +1 * HOUR_RESOLUTION);
-                    	TimeOfDay timeOfDay = new TimeOfDay(cal.getTime());
-                    	if (timeOfDay.getValue() >= endTime.getValue())
-                    		break;
+
+                    if (dayCount <= 7) {
+	                    TimeOfDay startTime = getDescriptor().getStartView();
+	                    cal.set(Calendar.HOUR_OF_DAY, startTime.getHour());
+	                    cal.set(Calendar.MINUTE, startTime.getMinute());
+	                    cal.set(Calendar.SECOND, 0);
+	                    cal.set(Calendar.MILLISECOND, 0);
+	                    TimeOfDay endTime = getDescriptor().getEndView();
+	                    while (true) {
+	                    	TimeOfDay timeOfDay = new TimeOfDay(cal.getTime());
+	                    	if (timeOfDay.getValue() >= endTime.getValue())
+	                    		break;
+
+	                    	xpos = getXPos(cal.getTime());
+	                        line = (JLabel) vLines.get(cal.getTime());
+	                        line.setBounds(xpos, captionHeight, 1, height-captionHeight);	                    	
+	                    	cal.add(Calendar.HOUR, +1 * HOUR_RESOLUTION);
+	                    }
                     }
-                    
                     
                     cal.add(Calendar.DAY_OF_MONTH, 1);
                     cal.set(Calendar.HOUR_OF_DAY, 0);

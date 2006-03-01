@@ -96,8 +96,6 @@ public class DaysHoursHeaderPanel
 			for (int i = 0; i < dayCount; i++) {
 				String dateStr = dateFormat.format(date);
 				JLabel header = new JLabel(dateStr, JLabel.CENTER);
-				header.setOpaque(false);
-				header.setBackground(Color.RED);
 				header.setToolTipText(toolTipFormat.format(date));
 				if (model.isRedDay(date))
 					header.setForeground(Color.RED);
@@ -129,8 +127,8 @@ public class DaysHoursHeaderPanel
 							panel.add(line);
 							dateLines.add(line);
 						}					
-						time += 3600*1000;
-						hourCount++;
+						time += 3600*1000*GroupView.HOUR_RESOLUTION;
+						hourCount += GroupView.HOUR_RESOLUTION;
 					}
 				}
 				date = DateUtil.getDiffDay(date, +1);
