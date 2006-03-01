@@ -45,6 +45,7 @@ public class DaysHoursHeaderPanel
 	private JLabel refLabel = new JLabel("AAA");
 	private int rowCount;
 	private int dayCount;
+	private int hourCount;
 	private CalendarModel model;
 	private Color lineColor = Color.LIGHT_GRAY;
 	private int fixedDayCount = -1;
@@ -81,6 +82,8 @@ public class DaysHoursHeaderPanel
 		
 		if (dayCount > 1) {
 			rowCount = 1;
+			if (dayCount <= 7)
+				rowCount++;
 			DateFormat toolTipFormat = new SimpleDateFormat("EEEE d MMMM",
 					LocaleBroker.getLocale());
 			DateFormat dateFormat = 
@@ -97,6 +100,8 @@ public class DaysHoursHeaderPanel
 			for (int i = 0; i < dayCount; i++) {
 				String dateStr = dateFormat.format(date);
 				JLabel header = new JLabel(dateStr, JLabel.CENTER);
+				header.setOpaque(false);
+				header.setBackground(Color.RED);
 				header.setToolTipText(toolTipFormat.format(date));
 				if (model.isRedDay(date))
 					header.setForeground(Color.RED);
@@ -108,25 +113,36 @@ public class DaysHoursHeaderPanel
 					panel.add(header);
 				}*/
 				dateList.add(date);
-				long time = config.getStartView().getValue();
-				while (time < config.getEndView().getValue()) {					
-					dateStr = hourFormat.format(new TimeOfDay(time).getDate(date));
-					header = new JLabel(dateStr, JLabel.CENTER);
-					dateHeaders2.add(header);
-					panel.add(header);
-					if (i > 0 || time > config.getStartView().getValue()) {
-						JLabel line = new JLabel();
-						line.setBackground(lineColor);
-						line.setOpaque(true);
-						line.setBackground(lineColor);
-						if (DateUtil.getDayOfWeek(date) == calendar.getFirstDayOfWeek()) 
-							line.setBackground(DayView.LINE_COLOR_DARKER);
-						if (model.getSelectedCalendars().size() > 1 && i == 0)
-							line.setBackground(DayView.LINE_COLOR_EVEN_DARKER);						
-						panel.add(line);
-						dateLines.add(line);
-					}					
-					time += 3600*1000;
+				if (i > 0) {
+					JLabel line = new JLabel();
+					line.setBackground(lineColor);
+					line.setOpaque(true);
+					line.setBackground(lineColor);
+					if (DateUtil.getDayOfWeek(date) == calendar.getFirstDayOfWeek()) 
+						line.setBackground(DayView.LINE_COLOR_DARKER);
+					if (model.getSelectedCalendars().size() > 1 && i == 0)
+						line.setBackground(DayView.LINE_COLOR_EVEN_DARKER);						
+					panel.add(line);
+					dateLines.add(line);
+				}
+				if (dayCount <= 7) {
+					hourCount = 0;
+					long time = config.getStartView().getValue();
+					while (time < config.getEndView().getValue()) {					
+						dateStr = hourFormat.format(new TimeOfDay(time).getDate(date));
+						header = new JLabel(dateStr, JLabel.CENTER);
+						dateHeaders2.add(header);
+						panel.add(header);
+						if (time > config.getStartView().getValue()) {
+							JLabel line = new JLabel();
+							line.setBackground(lineColor);
+							line.setOpaque(true);
+							panel.add(line);
+							dateLines.add(line);
+						}					
+						time += 3600*1000;
+						hourCount++;
+					}
 				}
 				date = DateUtil.getDiffDay(date, +1);
 			}
@@ -194,7 +210,6 @@ public class DaysHoursHeaderPanel
 				int height = refLabel.getPreferredSize().height;
 				height = rowCount * height;
 				int width = dayCount * model.getSelectedCalendars().size() * DayView.PREFERRED_DAY_WIDTH;
-				System.err.println("DayHoursHeaderPanel: height=" + height);
 				return new Dimension(width, height);
 			} catch (Exception e) {
 				throw BizcalException.create(e);
@@ -211,8 +226,10 @@ public class DaysHoursHeaderPanel
 					return;
 				double totWidth = parent.getWidth();
 				double dateColWidth = totWidth / dateHeaders.size();
+				double hourWidth = dateColWidth / hourCount;
 				double rowHeight = parent.getHeight() / rowCount;
 				int dateI = 0;
+				int dateI2 = 0;
 				int dateLineI = 0;
 				int dayRowCount = showExtraDateHeaders ? 2 : 1;
 				for (int j=0; j < dayCount; j++) {
@@ -229,31 +246,42 @@ public class DaysHoursHeaderPanel
 								(int) dateColWidth, 
 								(int) rowHeight);
 					}*/
-					long time = config.getStartView().getValue();
-					while (time < config.getEndView().getValue()) {					
-						if (j > 0 || time > config.getStartView().getValue()) {
-							dateLabel = (JLabel) dateHeaders.get(dateI);
-							xpos = (int) (dateI*dateColWidth);
+					if (j > 0) {
+						JLabel line = (JLabel) dateLines.get(dateLineI);
+						int height = (int) rowHeight * dayRowCount;
+						int ypos = (int) rowHeight;
+						line.setBounds(xpos, 
+								0,
+								1,
+								height*rowCount);
+						dateLineI++;						
+					}
+					if (dayCount <= 7) {
+						int hourI = 0;
+						long time = config.getStartView().getValue();
+						while (time < config.getEndView().getValue()) {					
+							dateLabel = (JLabel) dateHeaders2.get(dateI2);
+							xpos = (int) (dateI*dateColWidth + hourI*hourWidth);
 							dateLabel.setBounds(xpos,
 									(int) rowHeight,
-									(int) dateColWidth, 
-									(int) rowHeight);							
-							JLabel line = (JLabel) dateLines.get(dateLineI);
-							int height = (int) rowHeight * dayRowCount;
-							int ypos = (int) rowHeight;
-							if (j == 0) {
-								ypos = 0;
-								height = (int) (rowHeight*(dayRowCount+1));
+									(int) hourWidth*GroupView.HOUR_RESOLUTION, 
+									(int) rowHeight);	
+							if (time > config.getStartView().getValue()) {
+								JLabel line = (JLabel) dateLines.get(dateLineI);
+								int height = (int) rowHeight * dayRowCount;
+								int ypos = (int) rowHeight;
+								line.setBounds(xpos, 
+										ypos,
+										1,
+										height);
+								dateLineI++;	
 							}
-							line.setBounds(xpos, 
-									ypos,
-									1,
-									height);
-							dateLineI++;
-						}
-						time += 3600*1000;					
-					}					
-					dateI++;
+							time += 3600*1000 * GroupView.HOUR_RESOLUTION;
+							hourI += GroupView.HOUR_RESOLUTION;
+							dateI2++;
+						}		
+					}
+					dateI++;					
 				}
 				gradientArea.setBounds(0, 0, parent.getWidth(), parent.getHeight());
 				resizeDates((int) dateColWidth);

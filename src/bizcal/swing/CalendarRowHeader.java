@@ -24,7 +24,7 @@ public class CalendarRowHeader
 	private List calLabels = new ArrayList();
 	private List calLines = new ArrayList();
 	private GradientArea gradientArea;
-	private int width = 40;
+	private int width = 100;
 	private Color lineColor = Color.LIGHT_GRAY;
 	private int footerHeight = 0;
 	private CalendarModel model;
@@ -35,7 +35,15 @@ public class CalendarRowHeader
 		this.model = model;
 		panel = new JPanel();
 		panel.setLayout(new Layout());
-
+	}
+	
+	public void refresh()
+		throws Exception
+	{
+		panel.removeAll();
+		calLabels.clear();
+		calLines.clear();
+		
 		Iterator i = model.getSelectedCalendars().iterator();
  		while (i.hasNext()) {
  			Calendar cal = (Calendar) i.next();  			
@@ -53,7 +61,7 @@ public class CalendarRowHeader
         		ColumnHeaderPanel.GRADIENT_COLOR);
         gradientArea.setOpaque(true);
 		gradientArea.setBorder(false);
-		panel.add(gradientArea);
+		panel.add(gradientArea);		
 	}
 	
 	private class Layout implements LayoutManager {
@@ -79,14 +87,12 @@ public class CalendarRowHeader
 			try {
 				double totHeight = parent.getHeight() - footerHeight;
 				double rowHeight = totHeight / model.getSelectedCalendars().size(); 
-				int colWidth = width / 2;
 				for (int i=0; i < calLabels.size(); i++) {
 					JLabel calLabel = (JLabel) calLabels.get(i);
-					calLabel.setBounds(0, 
+					calLabel.setBounds(5, 
 							(int) (i*rowHeight),
-							colWidth,
+							width-5,
 							(int) rowHeight);
-					System.err.println("y: " + (i*rowHeight) + ", width=" + colWidth + ", height=" + rowHeight);
 					JLabel calLine = (JLabel) calLines.get(i);
 					calLine.setBounds(0, 
 							(int) ((i+1)*rowHeight),

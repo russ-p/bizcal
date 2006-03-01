@@ -20,6 +20,7 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import bizcal.common.CalendarModel;
@@ -40,7 +41,7 @@ public class GroupView
 	extends CalendarView
 {
 	private static final int LABEL_COL_WIDTH = 70;
-	private static final int HOUR_RESOLUTION = 2;
+	public static final int HOUR_RESOLUTION = 2;
 	private static final int PREFERRED_HOUR_WIDTH = 10;
 	public static final int PREFERRED_ROW_HEIGHT = 20;
 	
@@ -51,6 +52,8 @@ public class GroupView
 	private JLayeredPane calPanel;
 	private JScrollPane scrollPane;
 	private DaysHoursHeaderPanel columnHeader;
+	private CalendarRowHeader rowHeader;
+	private List calBackgrounds = new ArrayList();
 	
 	public GroupView(CalendarViewConfig config, CalendarModel model) throws Exception	
     {
@@ -70,7 +73,7 @@ public class GroupView
         scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createCorner(false, true));
 		columnHeader = new DaysHoursHeaderPanel(config, model);	
         scrollPane.setColumnHeaderView(columnHeader.getComponent());
-		CalendarRowHeader rowHeader = new CalendarRowHeader(model);
+		rowHeader = new CalendarRowHeader(model);
 		rowHeader.setFooterHeight(0);
         scrollPane.setRowHeaderView(rowHeader.getComponent());
 		
@@ -156,12 +159,23 @@ public class GroupView
             //pos += 24 * 3600 * 1000;
             
         }
+        
+		i = getSelectedCalendars().iterator();
+		while (i.hasNext()) {
+			bizcal.common.Calendar calendar = (bizcal.common.Calendar) i.next();
+			JPanel calBackground = new JPanel();
+			calBackground.setBackground(calendar.getColor());
+			calBackgrounds.add(calBackground);
+			calPanel.add(calBackground);
+		}        
        
         calPanel.validate();
         calPanel.repaint();
 
 		columnHeader.setModel(getModel());
-		columnHeader.refresh();        
+		columnHeader.refresh(); 
+		rowHeader.refresh();
+		
     }
 	
 	private int getWidth()
@@ -212,17 +226,17 @@ public class GroupView
 		long dayViewDuration = getDescriptor().getEndView().getValue() -
 			getDescriptor().getStartView().getValue();
 		double ratio = ((double) x) / ((double) dayViewDuration);
-		int dayWidth = getDayWidth();
+		double dayWidth = getDayWidth();
 		int datediff = DateUtil.getDateDiff(date, getInterval().getStartDate());
 		return (int) (getXOffset() + datediff*dayWidth + ratio * dayWidth);
 	}
 	
-	private int getDayWidth()
+	private double getDayWidth()
 		throws Exception
 	{
 		long duration = getInterval().getDuration();
 		duration = duration / 24 / 3600 / 1000;
-		return (int) (getTimeWidth() / duration);
+		return (getTimeWidth() / duration);
 	}
 	
 	protected LayoutManager getLayout()
@@ -325,6 +339,17 @@ public class GroupView
                     cal.set(Calendar.SECOND, 0);
                     cal.set(Calendar.MILLISECOND, 0);
                 }
+                
+                yPos = yoffset;
+				for (int iCal = 0; iCal < calBackgrounds.size(); iCal++) {
+					int x1 = getXOffset();
+					int x2 = getWidth();
+					JPanel calBackground = (JPanel) calBackgrounds.get(iCal);
+					calBackground.setBounds(x1, yPos, x2 - x1,
+							rowHeight);
+					yPos += rowHeight;
+				}
+                
             } catch (Exception e) {
                 throw BizcalException.create(e);
             }
@@ -339,9 +364,9 @@ public class GroupView
 	protected Date getDate(int xPos, int yPos)
 		throws Exception
 	{
-		int daywidth = getDayWidth();
+		double daywidth = getDayWidth();
 		xPos -= getXOffset();
-		int dayno = xPos / daywidth;
+		int dayno = (int) (xPos / daywidth);
 		xPos -= dayno*daywidth;		
 		double ratio = (double) xPos / (double) daywidth;
 		Date date = getInterval().getStartDate();
