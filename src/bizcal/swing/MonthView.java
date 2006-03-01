@@ -58,7 +58,7 @@ public class MonthView
         scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, createCorner(true, true));
         scrollPane.setCorner(JScrollPane.LOWER_LEFT_CORNER, createCorner(true, false));
         scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createCorner(false, true));
-		columnHeader = new ColumnHeaderPanel(7);			
+		columnHeader = new ColumnHeaderPanel(desc, 7);			
         scrollPane.setColumnHeaderView(columnHeader.getComponent());		
 	}
 			
@@ -113,7 +113,7 @@ public class MonthView
 			line.setBackground(Color.LIGHT_GRAY);
 			line.setOpaque(true);
 			if ((i+1) % 7 == 0)
-				line.setBackground(DayView.LINE_COLOR_EVEN_DARKER);			
+				line.setBackground(getDescriptor().getLineColor3());			
 			calPanel.add(line);     
 			vLines.add(line);
         }

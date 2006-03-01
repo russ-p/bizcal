@@ -13,7 +13,9 @@ public class CalendarViewConfig
 	private Color primaryColor = new Color(182,202,184);
 	private Color secondaryColor = new Color(255,255,255);
 	private String caption;
-	private Color lineColor = Color.LIGHT_GRAY;
+	private Color lineColor = new Color(200, 200, 200);
+	private Color lineColor2 = new Color(150, 150, 150);
+	private Color lineColor3 = new Color(100, 100, 100);
 	private TimeOfDay startView;
 	private TimeOfDay endView;
 	
@@ -88,5 +90,21 @@ public class CalendarViewConfig
 	}
 	public void setStartView(TimeOfDay startView) {
 		this.startView = startView;
+	}
+
+	public Color getLineColor2() {
+		return lineColor2;
+	}
+
+	public void setLineColor2(Color lineColor2) {
+		this.lineColor2 = lineColor2;
+	}
+
+	public Color getLineColor3() {
+		return lineColor3;
+	}
+
+	public void setLineColor3(Color lineColor3) {
+		this.lineColor3 = lineColor3;
 	}
 }

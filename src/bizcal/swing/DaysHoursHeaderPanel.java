@@ -22,7 +22,6 @@ import javax.swing.JPopupMenu;
 
 import bizcal.common.CalendarModel;
 import bizcal.common.CalendarViewConfig;
-import bizcal.swing.util.ErrorHandler;
 import bizcal.swing.util.GradientArea;
 import bizcal.swing.util.TrueGridLayout;
 import bizcal.util.BizcalException;
@@ -47,9 +46,7 @@ public class DaysHoursHeaderPanel
 	private int dayCount;
 	private int hourCount;
 	private CalendarModel model;
-	private Color lineColor = Color.LIGHT_GRAY;
 	private int fixedDayCount = -1;
-	private CalendarListener listener;
 	private boolean showExtraDateHeaders = false;
 	private CalendarViewConfig config;
 	
@@ -74,7 +71,6 @@ public class DaysHoursHeaderPanel
 		dateLines.clear();
 		panel.removeAll();
 		
-		Calendar calendar = DateUtil.newCalendar();
 		dayCount = DateUtil.getDateDiff(model.getInterval().getEndDate(),
 				model.getInterval().getStartDate());
 		if (fixedDayCount > 0)
@@ -113,18 +109,11 @@ public class DaysHoursHeaderPanel
 					panel.add(header);
 				}*/
 				dateList.add(date);
-				if (i > 0) {
-					JLabel line = new JLabel();
-					line.setBackground(lineColor);
-					line.setOpaque(true);
-					line.setBackground(lineColor);
-					if (DateUtil.getDayOfWeek(date) == calendar.getFirstDayOfWeek()) 
-						line.setBackground(DayView.LINE_COLOR_DARKER);
-					if (model.getSelectedCalendars().size() > 1 && i == 0)
-						line.setBackground(DayView.LINE_COLOR_EVEN_DARKER);						
-					panel.add(line);
-					dateLines.add(line);
-				}
+				JLabel line = new JLabel();
+				line.setOpaque(true);
+				line.setBackground(config.getLineColor2());
+				panel.add(line);
+				dateLines.add(line);
 				if (dayCount <= 7) {
 					hourCount = 0;
 					long time = config.getStartView().getValue();
@@ -134,8 +123,8 @@ public class DaysHoursHeaderPanel
 						dateHeaders2.add(header);
 						panel.add(header);
 						if (time > config.getStartView().getValue()) {
-							JLabel line = new JLabel();
-							line.setBackground(lineColor);
+							line = new JLabel();
+							line.setBackground(config.getLineColor());
 							line.setOpaque(true);
 							panel.add(line);
 							dateLines.add(line);
@@ -246,16 +235,14 @@ public class DaysHoursHeaderPanel
 								(int) dateColWidth, 
 								(int) rowHeight);
 					}*/
-					if (j > 0) {
-						JLabel line = (JLabel) dateLines.get(dateLineI);
-						int height = (int) rowHeight * dayRowCount;
-						int ypos = (int) rowHeight;
-						line.setBounds(xpos, 
-								0,
-								1,
-								height*rowCount);
-						dateLineI++;						
-					}
+					JLabel line = (JLabel) dateLines.get(dateLineI);
+					int height = (int) rowHeight * dayRowCount;
+					int ypos = (int) rowHeight;
+					line.setBounds(xpos, 
+							0,
+							1,
+							height*rowCount);
+					dateLineI++;						
 					if (dayCount <= 7) {
 						int hourI = 0;
 						long time = config.getStartView().getValue();
@@ -267,9 +254,9 @@ public class DaysHoursHeaderPanel
 									(int) hourWidth*GroupView.HOUR_RESOLUTION, 
 									(int) rowHeight);	
 							if (time > config.getStartView().getValue()) {
-								JLabel line = (JLabel) dateLines.get(dateLineI);
-								int height = (int) rowHeight * dayRowCount;
-								int ypos = (int) rowHeight;
+								line = (JLabel) dateLines.get(dateLineI);
+								height = (int) rowHeight * dayRowCount;
+								ypos = (int) rowHeight;
 								line.setBounds(xpos, 
 										ypos,
 										1,
@@ -352,29 +339,8 @@ public class DaysHoursHeaderPanel
 	
 	public void addCalendarListener(CalendarListener listener)
 	{
-		this.listener = listener;
 	}
 	
-	private class CloseListener
-		extends MouseAdapter
-	{
-		private Object calId;
-		
-		public CloseListener(Object calId)
-		{
-			this.calId = calId;
-		}
-		
-		public void mouseClicked(MouseEvent event)
-		{
-			try {
-				listener.closeCalendar(calId);
-			} catch (Exception e) {
-				ErrorHandler.handleError(e);
-			}
-		}
-	}
-
 	public void setShowExtraDateHeaders(boolean showExtraDateHeaders) {
 		this.showExtraDateHeaders = showExtraDateHeaders;
 	}

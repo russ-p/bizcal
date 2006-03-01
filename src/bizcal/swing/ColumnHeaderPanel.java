@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import bizcal.common.CalendarModel;
+import bizcal.common.CalendarViewConfig;
 import bizcal.swing.util.ErrorHandler;
 import bizcal.swing.util.GradientArea;
 import bizcal.swing.util.ResourceIcon;
@@ -51,9 +52,11 @@ public class ColumnHeaderPanel
 	private int fixedDayCount = -1;
 	private CalendarListener listener;
 	private boolean showExtraDateHeaders = false;
+	private CalendarViewConfig config;
 	
-	public ColumnHeaderPanel()
+	public ColumnHeaderPanel(CalendarViewConfig config)
 	{
+		this.config = config;
 		panel = new JPanel();
 		panel.setLayout(new Layout());
 		gradientArea = new GradientArea(
@@ -61,9 +64,9 @@ public class ColumnHeaderPanel
 		gradientArea.setBorder(false);
 	}
 	
-	public ColumnHeaderPanel(int fixedDayCount)
+	public ColumnHeaderPanel(CalendarViewConfig config, int fixedDayCount)
 	{
-		this();
+		this(config);
 		this.fixedDayCount = fixedDayCount;
 	}
 	
@@ -145,9 +148,9 @@ public class ColumnHeaderPanel
 						line.setOpaque(true);
 						line.setBackground(lineColor);
 						if (DateUtil.getDayOfWeek(date) == calendar.getFirstDayOfWeek()) 
-							line.setBackground(DayView.LINE_COLOR_DARKER);
+							line.setBackground(config.getLineColor2());
 						if (model.getSelectedCalendars().size() > 1 && i == 0)
-							line.setBackground(DayView.LINE_COLOR_EVEN_DARKER);
+							line.setBackground(config.getLineColor3());
 						
 						panel.add(line);
 						dateLines.add(line);

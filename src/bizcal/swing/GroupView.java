@@ -62,6 +62,9 @@ public class GroupView
 		font = new Font("Verdana", Font.PLAIN, 10);	 
 		calPanel = new JLayeredPane();
 		calPanel.setLayout(new Layout());
+		ThisMouseListener mouseListener = new ThisMouseListener();
+        calPanel.addMouseListener(mouseListener);
+        calPanel.addMouseMotionListener(mouseListener);
         scrollPane = 
         	new JScrollPane(calPanel,
         			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -127,7 +130,7 @@ public class GroupView
 
             // Day line
             JLabel line = new JLabel();
-            line.setBackground(new Color(200, 200, 200));
+            line.setBackground(getDescriptor().getLineColor2());
             line.setOpaque(true);
             calPanel.add(line, new Integer(1));
             vLines.put(date, line);

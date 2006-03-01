@@ -17,6 +17,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import bizcal.common.CalendarViewConfig;
 import bizcal.swing.util.GradientArea;
 import bizcal.util.BizcalException;
 import bizcal.util.TimeOfDay;
@@ -33,10 +34,12 @@ public class TimeLabelPanel
 	private int height;
 	private int width = 40;
 	private int hourCount;
-	private Color lineColor = Color.LIGHT_GRAY;
 	private int footerHeight = 0;
+	private CalendarViewConfig config;
 	
-	public TimeLabelPanel(TimeOfDay start, TimeOfDay end) throws Exception {
+	public TimeLabelPanel(CalendarViewConfig config, TimeOfDay start, TimeOfDay end) throws Exception 
+	{
+		this.config = config;
 		hourCount = end.getHour() - start.getHour();
 		if (hourCount == 0)
 			hourCount = 24;
@@ -57,7 +60,7 @@ public class TimeLabelPanel
 			panel.add(timeLabel);
 			hourLabels.add(timeLabel);
 			JLabel line = new JLabel();
-			line.setBackground(lineColor);
+			line.setBackground(config.getLineColor());
 			line.setOpaque(true);
 			hourLines.add(line);
 			panel.add(line);
@@ -68,7 +71,7 @@ public class TimeLabelPanel
 			panel.add(timeLabel);
 			minuteLabels.add(timeLabel);
 			line = new JLabel();
-			line.setBackground(lineColor);
+			line.setBackground(config.getLineColor());
 			line.setOpaque(true);
 			minuteLines.add(line);
 			panel.add(line);			
@@ -79,7 +82,7 @@ public class TimeLabelPanel
 			panel.add(timeLabel);
 			minuteLabels.add(timeLabel);
 			line = new JLabel();
-			line.setBackground(lineColor);
+			line.setBackground(config.getLineColor());
 			line.setOpaque(true);
 			minuteLines.add(line);
 			panel.add(line);

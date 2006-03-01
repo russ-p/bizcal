@@ -39,14 +39,6 @@ public class DayView extends CalendarView {
 	public static final int PIXELS_PER_HOUR = 40;
 	
 	private static final int CAPTION_ROW_HEIGHT0 = 20;
-
-	public static final Color LINE_COLOR = new Color(230, 230, 230);
-
-	public static final Color LINE_COLOR_DARKER = new Color(200, 200, 200);
-
-	public static final Color LINE_COLOR_EVEN_DARKER = new Color(100, 100, 100);
-
-	public static final Color HOUR_LINE_COLOR = LINE_COLOR;
 	
 	public static final int PREFERRED_DAY_WIDTH = 10;
 	
@@ -103,10 +95,10 @@ public class DayView extends CalendarView {
         scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, createCorner(true, true));
         scrollPane.setCorner(JScrollPane.LOWER_LEFT_CORNER, createCorner(true, false));
         scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createCorner(false, true));
-		columnHeader = new ColumnHeaderPanel();	
+		columnHeader = new ColumnHeaderPanel(desc);	
 		columnHeader.setShowExtraDateHeaders(desc.isShowExtraDateHeaders());
         scrollPane.setColumnHeaderView(columnHeader.getComponent());
-		rowHeader = new TimeLabelPanel(new TimeOfDay(0,0),
+		rowHeader = new TimeLabelPanel(desc, new TimeOfDay(0,0),
 				new TimeOfDay(24,0));
 		rowHeader.setFooterHeight(getFooterHeight());
         scrollPane.setRowHeaderView(rowHeader.getComponent());
@@ -234,9 +226,9 @@ public class DayView extends CalendarView {
 				verticalLine.setOpaque(true);
 				verticalLine.setBackground(getDesc().getLineColor());
 				if (startdate.get(Calendar.DAY_OF_WEEK) == startdate.getFirstDayOfWeek()) 
-					verticalLine.setBackground(LINE_COLOR_DARKER);
+					verticalLine.setBackground(getDescriptor().getLineColor2());
 				if (getSelectedCalendars().size() > 1 && it % dayCount == 0)
-					verticalLine.setBackground(LINE_COLOR_EVEN_DARKER);
+					verticalLine.setBackground(getDescriptor().getLineColor3());
 				calPanel.add(verticalLine, GRID_LEVEL);
 				vLines.add(verticalLine);
 			}
