@@ -86,7 +86,8 @@ public class CalendarRowHeader
 		public void layoutContainer(Container parent) {
 			try {
 				double totHeight = parent.getHeight() - footerHeight;
-				double rowHeight = totHeight / model.getSelectedCalendars().size(); 
+				//double rowHeight = totHeight / model.getSelectedCalendars().size(); 
+				double rowHeight = GroupView.PREFERRED_ROW_HEIGHT; 
 				for (int i=0; i < calLabels.size(); i++) {
 					JLabel calLabel = (JLabel) calLabels.get(i);
 					calLabel.setBounds(5, 

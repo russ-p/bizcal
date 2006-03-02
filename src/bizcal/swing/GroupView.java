@@ -43,7 +43,7 @@ public class GroupView
 	private static final int LABEL_COL_WIDTH = 70;
 	public static final int HOUR_RESOLUTION = 2;
 	private static final int PREFERRED_HOUR_WIDTH = 10;
-	public static final int PREFERRED_ROW_HEIGHT = 20;
+	public static final int PREFERRED_ROW_HEIGHT = 40;
 	
 	private List frameAreaRows = new ArrayList();
 	private List eventRows = new ArrayList();
@@ -139,7 +139,6 @@ public class GroupView
             line.setOpaque(true);
             calPanel.add(line, new Integer(2));
             vLines.put(date, line);
-            System.err.println("GroupView: " + date + ", " + line.getBackground());
             
             if (dayCount <= 7) {
 	            TimeOfDay startTime = getDescriptor().getStartView();
@@ -158,7 +157,6 @@ public class GroupView
 	                line.setOpaque(true);
 	                calPanel.add(line, new Integer(2));
 	                vLines.put(cal.getTime(), line);
-	                System.err.println("GroupView: " + cal.getTime() + ", " + line.getBackground());	            	
 	            	cal.add(Calendar.HOUR, +1 * HOUR_RESOLUTION);
 	            }
             }
@@ -225,7 +223,8 @@ public class GroupView
 	private int getRowHeight()
 		throws Exception
 	{
-		return getTimeHeight() / getModel().getSelectedCalendars().size();
+		//return getTimeHeight() / getModel().getSelectedCalendars().size();
+		return PREFERRED_ROW_HEIGHT;
 	}
 	
 	private int getXPos(Date date)
@@ -273,7 +272,8 @@ public class GroupView
 	        	int dayCount = 
 	        		DateUtil.getDateDiff(interval.getEndDate(), interval.getStartDate());
 	        	int width = dayCount * getHourCount() * PREFERRED_HOUR_WIDTH; 
-	        	int height = getModel().getSelectedCalendars().size() * PREFERRED_ROW_HEIGHT;
+	        	//int height = getModel().getSelectedCalendars().size() * PREFERRED_ROW_HEIGHT;
+	        	int height = 10 * PREFERRED_ROW_HEIGHT;
 	            return new Dimension(width, height);
         	} catch (Exception e) {
         		throw BizcalException.create(e);
@@ -391,10 +391,12 @@ public class GroupView
 		return date;
 	}
 	
-	protected Object getCalendarId(int x, int y) throws Exception {
-		int height = getHeight() - getCaptionRowHeight();
-		double ratio = (double) y / (double) height;
-		int pos = (int) (ratio * (getSelectedCalendars().size()));
+	protected Object getCalendarId(int x, int y) 
+		throws Exception 
+	{
+		int pos = y / getRowHeight();
+		if (pos >= getSelectedCalendars().size())
+			return null;
 		bizcal.common.Calendar cal = 
 			(bizcal.common.Calendar) getSelectedCalendars().get(pos);
 		return cal.getId();
