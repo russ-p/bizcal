@@ -262,7 +262,7 @@ public class DayView extends CalendarView {
 			
 			if (config.isShowDateFooter()) {
 				JLabel footer = 
-					new JLabel(broker.getDateFooter(cal.getId(), interval2.getStartDate()));
+					new JLabel(broker.getDateFooter(cal.getId(), interval2.getStartDate(), events));
 				footer.setHorizontalAlignment(JLabel.CENTER);
 				dateFooters.add(footer);
 				calPanel.add(footer);
@@ -541,6 +541,12 @@ public class DayView extends CalendarView {
 			setDescriptor(result);
 		}
 		return result;
+	}
+	
+	public DayViewConfig getDayViewConfig()
+		throws Exception
+	{
+		return getDesc();
 	}
 
 	protected int getInitYPos() throws Exception {
