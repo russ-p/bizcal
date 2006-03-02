@@ -31,7 +31,6 @@ public class TimeLabelPanel
 	private List minuteLines = new ArrayList();
 	private Font font = new Font("Verdana", Font.PLAIN, 11);
 	private GradientArea gradientArea;
-	private int height;
 	private int width = 40;
 	private int hourCount;
 	private int footerHeight = 0;
@@ -96,6 +95,11 @@ public class TimeLabelPanel
 		panel.add(gradientArea);
 	}
 	
+	private int getPreferredHeight()
+	{
+		return DayView.PIXELS_PER_HOUR * hourCount + footerHeight;
+	}
+	
 	private class Layout implements LayoutManager {
 		public void addLayoutComponent(String name, Component comp) {
 		}
@@ -104,7 +108,7 @@ public class TimeLabelPanel
 		}
 
 		public Dimension preferredLayoutSize(Container parent) {
-			return new Dimension(width, DayView.PIXELS_PER_HOUR * hourCount + footerHeight);
+			return new Dimension(width, getPreferredHeight());
 		}
 
 		public Dimension minimumLayoutSize(Container parent) {
@@ -155,11 +159,6 @@ public class TimeLabelPanel
 				throw BizcalException.create(e);
 			}
 		}
-	}
-	
-	public void setHeight(int x)
-	{
-		height = x;
 	}
 	
 	public JComponent getComponent()

@@ -111,6 +111,8 @@ public class DayView extends CalendarView {
 		dayCount = (int) (getModel().getInterval().getDuration() / (24*3600*1000));
 		calPanel.removeAll();
 		calPanel.setBackground(Color.WHITE);
+		rowHeader.setFooterHeight(getFooterHeight());
+		rowHeader.getComponent().revalidate();
 
 		frameAreaCols.clear();
 		eventColList.clear();
@@ -181,6 +183,8 @@ public class DayView extends CalendarView {
 		if (firstRefresh)
 			initScroll();
 		firstRefresh = false;
+		calPanel.revalidate();
+		scrollPane.revalidate();
 		// Hack to make to init scroll work
 		//JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
 		//scrollBar.setValue(scrollBar.getValue()-1);
@@ -262,7 +266,7 @@ public class DayView extends CalendarView {
 			
 			if (config.isShowDateFooter()) {
 				JLabel footer = 
-					new JLabel(broker.getDateFooter(cal.getId(), interval2.getStartDate(), events));
+					new JLabel(broker.getDateFooter(cal.getId(), interval2.getStartDate(), colEvents));
 				footer.setHorizontalAlignment(JLabel.CENTER);
 				dateFooters.add(footer);
 				calPanel.add(footer);
