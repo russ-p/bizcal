@@ -11,7 +11,7 @@ import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.JLayeredPane;
 
 import bizcal.common.Calendar;
 import bizcal.common.CalendarModel;
@@ -20,7 +20,7 @@ import bizcal.util.BizcalException;
 
 public class CalendarRowHeader
 {
-	private JPanel panel;
+	private JLayeredPane panel;
 	private List calLabels = new ArrayList();
 	private List calLines = new ArrayList();
 	private GradientArea gradientArea;
@@ -33,7 +33,7 @@ public class CalendarRowHeader
 	throws Exception 
 	{
 		this.model = model;
-		panel = new JPanel();
+		panel = new JLayeredPane();
 		panel.setLayout(new Layout());
 	}
 	
@@ -49,19 +49,19 @@ public class CalendarRowHeader
  			Calendar cal = (Calendar) i.next();  			
  			JLabel label = new JLabel(cal.getSummary());
 			label.setVerticalTextPosition(JLabel.CENTER);
-			panel.add(label);
+			panel.add(label, new Integer(2));
 			calLabels.add(label);
 			JLabel line = new JLabel();
 			line.setBackground(lineColor);
 			line.setOpaque(true);
 			calLines.add(line);
-			panel.add(line);
+			panel.add(line, new Integer(2));
 		}		
         gradientArea = new GradientArea(GradientArea.LEFT_RIGHT, Color.WHITE,
         		ColumnHeaderPanel.GRADIENT_COLOR);
         gradientArea.setOpaque(true);
 		gradientArea.setBorder(false);
-		panel.add(gradientArea);		
+		panel.add(gradientArea, new Integer(1));		
 	}
 	
 	private class Layout implements LayoutManager {
@@ -85,8 +85,6 @@ public class CalendarRowHeader
 
 		public void layoutContainer(Container parent) {
 			try {
-				double totHeight = parent.getHeight() - footerHeight;
-				//double rowHeight = totHeight / model.getSelectedCalendars().size(); 
 				double rowHeight = GroupView.PREFERRED_ROW_HEIGHT; 
 				for (int i=0; i < calLabels.size(); i++) {
 					JLabel calLabel = (JLabel) calLabels.get(i);
