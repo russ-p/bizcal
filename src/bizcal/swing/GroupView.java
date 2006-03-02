@@ -7,10 +7,12 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.LayoutManager;
+import java.awt.Rectangle;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -116,6 +118,7 @@ public class GroupView
             frameAreaRows.add(frameAreas);
 
             List events = getModel().getEvents(calId);
+            Collections.sort(events);
              
             eventRows.add(events);
             Iterator j = events.iterator();
@@ -292,11 +295,17 @@ public class GroupView
                 int height = getHeight();
                 int yoffset = getCaptionRowHeight();
                 int rowHeight = getRowHeight();                
-
+                
                 int yPos = yoffset;
                 for (int i = 0; i < eventRows.size(); i++) {
                 	List areas = (List) frameAreaRows.get(i);
                 	List events = (List) eventRows.get(i);
+                	
+    				FrameArea prevArea = null;
+    				int overlapCol = 0;
+    				int overlapColCount = 0;
+    				int overlapCols[] = new int[events.size()];
+                	
                 	for (int j=0; j < areas.size(); j++) {
                 		FrameArea area = (FrameArea) areas.get(j);
                 		Event event = (Event) events.get(j);
@@ -305,8 +314,47 @@ public class GroupView
                 		area.setBounds(x1, 
                 				yPos, 
 								x2-x1, 
-								rowHeight);                		
+								rowHeight);  
+                		
+						// Overlap logic
+						if (!event.isBackground()) {
+							if (prevArea != null) {
+								Rectangle r = prevArea.getBounds();
+								int prevX2 = r.x + r.width;
+								if (prevX2 > x1) {
+									// Previous event overlap
+									overlapCol++;
+									if (prevX2 < x2) {
+										// This events finish later than previous
+										prevArea = area;
+									}
+								} else {
+									overlapCol = 0;
+									prevArea = area;
+								}
+							}  else
+								prevArea = area;
+							overlapCols[j] = overlapCol;
+							if (overlapCol > overlapColCount)
+								overlapColCount = overlapCol;
+						} else
+							overlapCols[j] = 0;						                		
                 	}
+					// Overlap logic. Loop the events/frameareas a second 
+					// time and set the xpos and widths
+					if (overlapColCount > 0) {
+						int slotHeight = rowHeight / (overlapColCount+1);
+						for (int j = 0; j < areas.size(); j++) {
+							Event event = (Event) events.get(j);
+							if (event.isBackground())
+								continue;
+							FrameArea area = (FrameArea) areas.get(j);
+							int index = overlapCols[j];
+							Rectangle r = area.getBounds();
+							area.setBounds(r.x, r.y+index*slotHeight, r.width, slotHeight);
+						}
+					}
+                	
                 	
                 	JLabel hLine = (JLabel) hLines.get(i);
                 	hLine.setBounds(0, yPos + rowHeight, width, 1);
