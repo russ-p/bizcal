@@ -77,7 +77,7 @@ public class GroupView
         scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createCorner(false, true));
 		columnHeader = new DaysHoursHeaderPanel(config, model);	
         scrollPane.setColumnHeaderView(columnHeader.getComponent());
-		rowHeader = new CalendarRowHeader(model);
+		rowHeader = new CalendarRowHeader(model, config);
 		rowHeader.setFooterHeight(0);
         scrollPane.setRowHeaderView(rowHeader.getComponent());
 		

@@ -15,6 +15,7 @@ import javax.swing.JLayeredPane;
 
 import bizcal.common.Calendar;
 import bizcal.common.CalendarModel;
+import bizcal.common.CalendarViewConfig;
 import bizcal.swing.util.GradientArea;
 import bizcal.util.BizcalException;
 
@@ -25,14 +26,15 @@ public class CalendarRowHeader
 	private List calLines = new ArrayList();
 	private GradientArea gradientArea;
 	private int width = 100;
-	private Color lineColor = Color.LIGHT_GRAY;
 	private int footerHeight = 0;
 	private CalendarModel model;
+	private CalendarViewConfig config;
 	
-	public CalendarRowHeader(CalendarModel model) 
+	public CalendarRowHeader(CalendarModel model, CalendarViewConfig config) 
 	throws Exception 
 	{
 		this.model = model;
+		this.config = config;
 		panel = new JLayeredPane();
 		panel.setLayout(new Layout());
 	}
@@ -44,6 +46,12 @@ public class CalendarRowHeader
 		calLabels.clear();
 		calLines.clear();
 		
+		JLabel line = new JLabel();
+		line.setBackground(config.getLineColor());
+		line.setOpaque(true);
+		calLines.add(line);
+		panel.add(line, new Integer(2));
+		
 		Iterator i = model.getSelectedCalendars().iterator();
  		while (i.hasNext()) {
  			Calendar cal = (Calendar) i.next();  			
@@ -51,8 +59,8 @@ public class CalendarRowHeader
 			label.setVerticalTextPosition(JLabel.CENTER);
 			panel.add(label, new Integer(2));
 			calLabels.add(label);
-			JLabel line = new JLabel();
-			line.setBackground(lineColor);
+			line = new JLabel();
+			line.setBackground(config.getLineColor());
 			line.setOpaque(true);
 			calLines.add(line);
 			panel.add(line, new Integer(2));
@@ -85,14 +93,19 @@ public class CalendarRowHeader
 
 		public void layoutContainer(Container parent) {
 			try {
-				double rowHeight = GroupView.PREFERRED_ROW_HEIGHT; 
+				double rowHeight = GroupView.PREFERRED_ROW_HEIGHT;
+				JLabel calLine = (JLabel) calLines.get(0);
+				calLine.setBounds(0, 
+						0,
+						width,
+						1);				
 				for (int i=0; i < calLabels.size(); i++) {
 					JLabel calLabel = (JLabel) calLabels.get(i);
 					calLabel.setBounds(5, 
 							(int) (i*rowHeight),
 							width-5,
 							(int) rowHeight);
-					JLabel calLine = (JLabel) calLines.get(i);
+					calLine = (JLabel) calLines.get(i+1);
 					calLine.setBounds(0, 
 							(int) ((i+1)*rowHeight),
 							width,
