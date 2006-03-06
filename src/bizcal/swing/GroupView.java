@@ -100,6 +100,12 @@ public class GroupView
 				getModel().getInterval().getStartDate());
         
         addDraggingComponents(calPanel);
+
+        JLabel hLine = new JLabel();
+        hLine.setBackground(getDescriptor().getLineColor());
+        hLine.setOpaque(true);
+        calPanel.add(hLine, new Integer(1));
+        hLines.add(hLine);
         
         Iterator i = getModel().getSelectedCalendars().iterator();
         while (i.hasNext()) {
@@ -108,7 +114,7 @@ public class GroupView
         	String calHeader = cal.getSummary();
         	calHeader = StringLengthFormater.formatNameString(calHeader, font, LABEL_COL_WIDTH-5);
                     	            	            
-            JLabel hLine = new JLabel();
+            hLine = new JLabel();
             hLine.setBackground(getDescriptor().getLineColor());
             hLine.setOpaque(true);
             calPanel.add(hLine, new Integer(1));
@@ -296,6 +302,9 @@ public class GroupView
                 int yoffset = getCaptionRowHeight();
                 int rowHeight = getRowHeight();                
                 
+            	JLabel hLine = (JLabel) hLines.get(0);
+            	hLine.setBounds(0, 0, width, 1);
+                
                 int yPos = yoffset;
                 for (int i = 0; i < eventRows.size(); i++) {
                 	List areas = (List) frameAreaRows.get(i);
@@ -356,7 +365,7 @@ public class GroupView
 					}
                 	
                 	
-                	JLabel hLine = (JLabel) hLines.get(i);
+                	hLine = (JLabel) hLines.get(i+1);
                 	hLine.setBounds(0, yPos + rowHeight, width, 1);
                 	
 					yPos += rowHeight;
