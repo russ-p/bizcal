@@ -255,35 +255,37 @@ public class ColumnHeaderPanel
 								(int) calColWidth,
 								(int) rowHeight);
 					}
-					for (int j=0; j < dayCount; j++) {
-						JLabel dateLabel = (JLabel) dateHeaders.get(dateI);
-						int xpos = (int) (dateI*dateColWidth);
-						dateLabel.setBounds(xpos,
-								(int) dateYPos,
-								(int) dateColWidth, 
-								(int) rowHeight);
-						if (showExtraDateHeaders) {
-							dateLabel = (JLabel) dateHeaders2.get(dateI);
+					if (dayCount > 1) {
+						for (int j=0; j < dayCount; j++) {
+							JLabel dateLabel = (JLabel) dateHeaders.get(dateI);
+							int xpos = (int) (dateI*dateColWidth);
 							dateLabel.setBounds(xpos,
-									(int) (dateYPos + rowHeight),
+									(int) dateYPos,
 									(int) dateColWidth, 
 									(int) rowHeight);
-						}
-						if (j > 0 || i > 0) {
-							JLabel line = (JLabel) dateLines.get(dateLineI);
-							int ypos = (int) dateYPos;
-							int height = (int) rowHeight * dayRowCount;
-							if (j == 0) {
-								ypos = 0;
-								height = (int) (rowHeight*(dayRowCount+1));
+							if (showExtraDateHeaders) {
+								dateLabel = (JLabel) dateHeaders2.get(dateI);
+								dateLabel.setBounds(xpos,
+										(int) (dateYPos + rowHeight),
+										(int) dateColWidth, 
+										(int) rowHeight);
 							}
-							line.setBounds(xpos, 
-									ypos,
-									1,
-									height);
-							dateLineI++;
+							if (j > 0 || i > 0) {
+								JLabel line = (JLabel) dateLines.get(dateLineI);
+								int ypos = (int) dateYPos;
+								int height = (int) rowHeight * dayRowCount;
+								if (j == 0) {
+									ypos = 0;
+									height = (int) (rowHeight*(dayRowCount+1));
+								}
+								line.setBounds(xpos, 
+										ypos,
+										1,
+										height);
+								dateLineI++;
+							}
+							dateI++;
 						}
-						dateI++;
 					}
 				}
 				gradientArea.setBounds(0, 0, parent.getWidth(), parent.getHeight());
