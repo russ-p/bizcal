@@ -82,6 +82,7 @@ public class ErrorHandler
             dd.setDetailsText(getStackTrace(t));
             dd.setLocationRelativeTo(comp);
             dd.setVisible(true);
+            dd.requestFocus();
         }
         else {
             showError(comp, title, msg);
@@ -133,6 +134,7 @@ public class ErrorHandler
 
         private void setup(int icon_type)
         {
+        	setModal(true);
             msg = new JLabel();
             msg.setIcon(getIconForType(icon_type));
             details = new JTextArea();
@@ -140,14 +142,14 @@ public class ErrorHandler
             details.setWrapStyleWord(false);
             final JScrollPane dpane = new JScrollPane(details);
             dpane.setVisible(false);            
-            final JButton ok = new JButton(translate("ok"));
+            final JButton ok = new JButton(translate("OK"));
             ok.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     dispose();
                 }
             });
-            final String showDetails = translate("showDetails");
-            final String hideDetails = translate("hideDetails");
+            final String showDetails = translate("Show details");
+            final String hideDetails = translate("Hide details");
             final JButton dbutton = new JButton(showDetails);
             dbutton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
