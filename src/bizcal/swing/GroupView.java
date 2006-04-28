@@ -44,7 +44,7 @@ public class GroupView
 {
 	private static final int LABEL_COL_WIDTH = 70;
 	public static final int HOUR_RESOLUTION = 2;
-	private static final int PREFERRED_HOUR_WIDTH = 10;
+	public static final int PREFERRED_HOUR_WIDTH = 10;
 	public static final int PREFERRED_ROW_HEIGHT = 40;
 	
 	private List frameAreaRows = new ArrayList();

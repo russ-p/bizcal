@@ -183,8 +183,8 @@ public class DayView extends CalendarView {
 		if (firstRefresh)
 			initScroll();
 		firstRefresh = false;
-		calPanel.revalidate();
-		scrollPane.revalidate();
+		scrollPane.validate();
+		scrollPane.repaint();
 		// Hack to make to init scroll work
 		//JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
 		//scrollBar.setValue(scrollBar.getValue()-1);

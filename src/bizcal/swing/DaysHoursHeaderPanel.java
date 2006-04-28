@@ -196,7 +196,9 @@ public class DaysHoursHeaderPanel
 			try {
 				int height = refLabel.getPreferredSize().height;
 				height = rowCount * height;
-				int width = dayCount * model.getSelectedCalendars().size() * DayView.PREFERRED_DAY_WIDTH;
+				//int width = dayCount * model.getSelectedCalendars().size() * DayView.PREFERRED_DAY_WIDTH;
+				//int width = dayCount * DayView.PREFERRED_DAY_WIDTH;
+	        	int width = dayCount * getHourCount() * GroupView.PREFERRED_HOUR_WIDTH; 
 				return new Dimension(width, height);
 			} catch (Exception e) {
 				throw BizcalException.create(e);
@@ -342,5 +344,11 @@ public class DaysHoursHeaderPanel
 	public void setShowExtraDateHeaders(boolean showExtraDateHeaders) {
 		this.showExtraDateHeaders = showExtraDateHeaders;
 	}
+	
+	private int getHourCount() throws Exception {
+		return config.getEndView().getHour()
+				- config.getStartView().getHour();
+	}
+	
 	
 }
