@@ -10,19 +10,20 @@ import java.util.TimeZone;
 
 import javax.swing.ImageIcon;
 
+import bizcal.util.DateUtil;
 import bizcal.util.LocaleBroker;
 
 /**
  * @author Fredrik Bertilsson
  */
-public class Event 
+public class Event
 	implements Comparable
 {
 	private Object id;
 	private String summary;
 	private String description;
 	private Date start;
-	private Date end;	
+	private Date end;
 	private int level = 0;
 	private Color color = Color.LIGHT_GRAY;
 	private boolean frame = true;
@@ -35,14 +36,14 @@ public class Event
 	private boolean selectable = true;
 	private ImageIcon icon = null;
 	private Object orgEvent;
-	
+
 	public Object getId() {
 		return id;
 	}
 	public void setId(Object id) {
 		this.id = id;
 	}
-	
+
 	public String getDescription() {
 		return description;
 	}
@@ -98,17 +99,17 @@ public class Event
 	public void setEditable(boolean editable) {
 		this.editable = editable;
 	}
-	
+
 	public boolean equals(Event event)
 	{
 		return getId().equals(event.getId());
 	}
-	
+
 	public void set(String property, Object value)
 	{
 		props.put(property, value);
 	}
-	
+
 	public Object get(String property)
 	{
 		return props.get(property);
@@ -120,60 +121,76 @@ public class Event
 	public void setShowTime(boolean showTime) {
 		this.showTime = showTime;
 	}
-	
+
 	public String getToolTip()
 		throws Exception
 	{
 		if (toolTip != null)
 			return toolTip;
 		DateFormat format = DateFormat.getTimeInstance(DateFormat.SHORT, LocaleBroker.getLocale());
-		return "[" + format.format(getStart()) + 
-			"-" + format.format(getEnd()) + "] " + 
+		return "[" + format.format(getStart()) +
+			"-" + format.format(getEnd()) + "] " +
 			summary;
 	}
 	public void setToolTip(String toolTip) {
 		this.toolTip = toolTip;
 	}
-	
+
 	public boolean isBackground() {
 		return background;
 	}
 	public void setBackground(boolean background) {
 		this.background = background;
 	}
-	
+
 	public boolean isSelectable() {
 		return selectable;
 	}
 	public void setSelectable(boolean selectable) {
 		this.selectable = selectable;
-	}	
-	
+	}
+
 	public String toString()
 	{
-		DateFormat format = 
-			DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, new Locale("sv")); 
+		DateFormat format =
+			DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, new Locale("sv"));
 		format.setTimeZone(TimeZone.getTimeZone("CET"));
-		return format.format(start) + " - " + format.format(end) + " : " + summary; 
+		return format.format(start) + " - " + format.format(end) + " : " + summary;
 	}
-	
+
 	public ImageIcon getIcon() {
 		return icon;
 	}
 	public void setIcon(ImageIcon icon) {
 		this.icon = icon;
 	}
-	
+
 	public Object getOrgEvent() {
 		return orgEvent;
 	}
 	public void setOrgEvent(Object orgEvent) {
 		this.orgEvent = orgEvent;
 	}
-	
+
 	public int compareTo(Object other)
 	{
 		Event another = (Event) other;
 		return start.compareTo(another.start);
 	}
+
+
+	/**
+	 * Moves the Event to a new startdate.
+	 *
+	 * @param newStartDate
+	 */
+	public void move(Date newStartDate) {
+		/* ================================================== */
+		setEnd(new Date(getEnd().getTime() + DateUtil.getDiffDay(getStart(), newStartDate)));
+		setStart(newStartDate);
+		/* ================================================== */
+	}
+
+
+
 }

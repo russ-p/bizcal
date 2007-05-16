@@ -5,12 +5,13 @@ import java.awt.Font;
 
 import bizcal.util.TimeOfDay;
 
-public class CalendarViewConfig 
+public class CalendarViewConfig
 {
 	private CalendarModel callback;
 	private boolean showTopHeader = true;
 	private Font font = new Font("Verdana", Font.PLAIN, 10);
-	private Color primaryColor = new Color(182,202,184);
+//	private Color primaryColor = new Color(182,202,184);
+	private Color primaryColor = new Color(100,100,245);
 	private Color secondaryColor = new Color(255,255,255);
 	private String caption;
 	private Color lineColor = new Color(200, 200, 200);
@@ -18,14 +19,14 @@ public class CalendarViewConfig
 	private Color lineColor3 = new Color(100, 100, 100);
 	private TimeOfDay startView;
 	private TimeOfDay endView;
-	
+
 	public CalendarViewConfig()
 		throws Exception
 	{
-		startView = new TimeOfDay(6, 0);
+		startView = new TimeOfDay(7, 0);
 		endView = new TimeOfDay(18, 0);
 	}
-	
+
 	public String getCaption() {
 		return caption;
 	}
@@ -51,7 +52,7 @@ public class CalendarViewConfig
 	public void setFont(Font font) {
 		this.font = font;
 	}
-	
+
 	public void copy(CalendarViewConfig other)
 	{
 		this.callback = other.callback;
@@ -60,7 +61,7 @@ public class CalendarViewConfig
 		this.startView = other.startView;
 		this.endView = other.endView;
 	}
-	
+
 	public Color getPrimaryColor() {
 		return primaryColor;
 	}

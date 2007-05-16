@@ -33,9 +33,9 @@ import bizcal.util.DateUtil;
 import bizcal.util.LocaleBroker;
 import bizcal.util.TextUtil;
 
-public class ColumnHeaderPanel 
+public class ColumnHeaderPanel
 {
-	public static final Color GRADIENT_COLOR = new Color(230, 230, 230);	
+	public static final Color GRADIENT_COLOR = new Color(230, 230, 230);
 	private PopupMenuCallback popupMenuCallback;
 	private JPanel panel;
 	private List calHeaders = new ArrayList();
@@ -53,7 +53,7 @@ public class ColumnHeaderPanel
 	private CalendarListener listener;
 	private boolean showExtraDateHeaders = false;
 	private CalendarViewConfig config;
-	
+
 	public ColumnHeaderPanel(CalendarViewConfig config)
 	{
 		this.config = config;
@@ -63,13 +63,13 @@ public class ColumnHeaderPanel
 				GradientArea.TOP_BOTTOM, Color.WHITE, GRADIENT_COLOR);
 		gradientArea.setBorder(false);
 	}
-	
+
 	public ColumnHeaderPanel(CalendarViewConfig config, int fixedDayCount)
 	{
 		this(config);
 		this.fixedDayCount = fixedDayCount;
 	}
-	
+
 	public void refresh()
 		throws Exception
 	{
@@ -79,29 +79,37 @@ public class ColumnHeaderPanel
 		dateList.clear();
 		dateLines.clear();
 		panel.removeAll();
-		
+
 		Calendar calendar = DateUtil.newCalendar();
 		dayCount = DateUtil.getDateDiff(model.getInterval().getEndDate(),
 				model.getInterval().getStartDate());
 		if (fixedDayCount > 0)
 			dayCount = fixedDayCount;
-		
+
 		int calCount = model.getSelectedCalendars().size();
-		if (dayCount > 1 || calCount > 1) {
+		if (dayCount >= 1 || calCount > 1) {
 			if (dayCount > 1 && calCount > 1)
 				rowCount = 2;
 			else
 				rowCount = 1;
 			DateFormat toolTipFormat = new SimpleDateFormat("EEEE d MMMM",
 					LocaleBroker.getLocale());
-			DateFormat dateFormat = 
-				DateFormat.getDateInstance(DateFormat.SHORT, LocaleBroker.getLocale());
-			if (dayCount == 5 || dayCount == 7) {
-			}
+
+			DateFormat dateFormat = new SimpleDateFormat("EE - d MMMM yyyy",
+					LocaleBroker.getLocale());
+			DateFormat longDateFormat = new SimpleDateFormat("EEEE - d MMMM yyyy",
+					LocaleBroker.getLocale());
+
+//			DateFormat dateFormat =
+//				DateFormat.getDateInstance(DateFormat.SHORT, LocaleBroker.getLocale());
+
+			// TODO ??????
+//			if (dayCount == 5 || dayCount == 7) {
+//			}
 			for (int j = 0; j < calCount; j++) {
 				bizcal.common.Calendar cal = (bizcal.common.Calendar) model
 						.getSelectedCalendars().get(j);
-				if (calCount > 1) {
+				if (calCount >= 1) {
 					JLabel headerLabel = new JLabel(cal.getSummary(), JLabel.CENTER);
 					headerLabel.addMouseListener(new CalHeaderMouseListener(cal
 							.getId()));
@@ -116,7 +124,7 @@ public class ColumnHeaderPanel
 						iconLabel.addMouseListener(new CloseListener(cal.getId()));
 						panel.add(iconLabel, BorderLayout.EAST);
 						header = panel;
-					} 
+					}
 					calHeaders.add(header);
 					panel.add(header);
 				}
@@ -127,7 +135,13 @@ public class ColumnHeaderPanel
 				if (fixedDayCount > 0)
 					date = DateUtil.round2Week(date);
 				for (int i = 0; i < dayCount; i++) {
-					String dateStr = dateFormat.format(date);
+					/* ------------------------------------------------------- */
+					String dateStr = "";
+					if (dayCount == 1)
+						dateStr = longDateFormat.format(date);
+					else
+						dateStr = dateFormat.format(date);
+					/* ------------------------------------------------------- */
 					JLabel header = new JLabel(dateStr, JLabel.CENTER);
 					header.setAlignmentY(2);
 					//header.setFont(font);
@@ -147,27 +161,27 @@ public class ColumnHeaderPanel
 						line.setBackground(lineColor);
 						line.setOpaque(true);
 						line.setBackground(lineColor);
-						if (DateUtil.getDayOfWeek(date) == calendar.getFirstDayOfWeek()) 
+						if (DateUtil.getDayOfWeek(date) == calendar.getFirstDayOfWeek())
 							line.setBackground(config.getLineColor2());
 						if (model.getSelectedCalendars().size() > 1 && i == 0)
 							line.setBackground(config.getLineColor3());
-						
+
 						panel.add(line);
 						dateLines.add(line);
-					}					
+					}
 					date = DateUtil.getDiffDay(date, +1);
 				}
 			}
 		} else
 			rowCount = 0;
-		
+
 		if (showExtraDateHeaders)
 			rowCount++;
 
 		panel.add(gradientArea);
 		panel.updateUI();
 	}
-	
+
 	public JComponent getComponent()
 	{
 		return panel;
@@ -210,7 +224,7 @@ public class ColumnHeaderPanel
 			//rootPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		}
 	}
-	
+
 	private class Layout implements LayoutManager {
 		public void addLayoutComponent(String name, Component comp) {
 		}
@@ -250,24 +264,24 @@ public class ColumnHeaderPanel
 				for (int i=0; i < model.getSelectedCalendars().size(); i++) {
 					if (calHeaders.size() > 0) {
 						JComponent label = (JComponent) calHeaders.get(i);
-						label.setBounds((int) (i*calColWidth), 
+						label.setBounds((int) (i*calColWidth),
 								0,
 								(int) calColWidth,
 								(int) rowHeight);
 					}
-					if (dayCount > 1) {
+					if (dayCount >= 1) {
 						for (int j=0; j < dayCount; j++) {
 							JLabel dateLabel = (JLabel) dateHeaders.get(dateI);
 							int xpos = (int) (dateI*dateColWidth);
 							dateLabel.setBounds(xpos,
 									(int) dateYPos,
-									(int) dateColWidth, 
+									(int) dateColWidth,
 									(int) rowHeight);
 							if (showExtraDateHeaders) {
 								dateLabel = (JLabel) dateHeaders2.get(dateI);
 								dateLabel.setBounds(xpos,
 										(int) (dateYPos + rowHeight),
-										(int) dateColWidth, 
+										(int) dateColWidth,
 										(int) rowHeight);
 							}
 							if (j > 0 || i > 0) {
@@ -278,7 +292,7 @@ public class ColumnHeaderPanel
 									ypos = 0;
 									height = (int) (rowHeight*(dayRowCount+1));
 								}
-								line.setBounds(xpos, 
+								line.setBounds(xpos,
 										ypos,
 										1,
 										height);
@@ -295,7 +309,7 @@ public class ColumnHeaderPanel
 			}
 		}
 	}
-	
+
 	private void resizeDates(int width)
 		throws Exception
 	{
@@ -303,7 +317,7 @@ public class ColumnHeaderPanel
 			return;
 
 		Date today = DateUtil.round2Day(new Date());
-		
+
 		FontMetrics metrics = refLabel.getFontMetrics(refLabel.getFont());
 		int charCount = 10;
 		if (maxWidth(charCount, metrics) > width) {
@@ -328,7 +342,7 @@ public class ColumnHeaderPanel
 			label.setText(str);
 		}
 	}
-	
+
 	private int maxWidth(int charCount, FontMetrics metrics)
 		throws Exception
 	{
@@ -347,29 +361,29 @@ public class ColumnHeaderPanel
 		}
 		return maxWidth;
 	}
-	
+
 	public void setModel(CalendarModel model) {
 		this.model = model;
 	}
 	public void setPopupMenuCallback(PopupMenuCallback popupMenuCallback) {
 		this.popupMenuCallback = popupMenuCallback;
 	}
-	
+
 	public void addCalendarListener(CalendarListener listener)
 	{
 		this.listener = listener;
 	}
-	
+
 	private class CloseListener
 		extends MouseAdapter
 	{
 		private Object calId;
-		
+
 		public CloseListener(Object calId)
 		{
 			this.calId = calId;
 		}
-		
+
 		public void mouseClicked(MouseEvent event)
 		{
 			try {
@@ -383,5 +397,5 @@ public class ColumnHeaderPanel
 	public void setShowExtraDateHeaders(boolean showExtraDateHeaders) {
 		this.showExtraDateHeaders = showExtraDateHeaders;
 	}
-	
+
 }

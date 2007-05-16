@@ -9,6 +9,9 @@ import java.awt.Font;
 import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -36,14 +39,14 @@ import bizcal.util.TimeOfDay;
 import bizcal.util.Tuple;
 
 public class DayView extends CalendarView {
-	public static final int PIXELS_PER_HOUR = 40;
-	
+	public static final int PIXELS_PER_HOUR = 80;
+
 	private static final int CAPTION_ROW_HEIGHT0 = 20;
-	
+
 	public static final int PREFERRED_DAY_WIDTH = 10;
-	
+
 	public static final Integer GRID_LEVEL = new Integer(1);
-	
+
 	private List frameAreaCols = new ArrayList();
 
 	private List eventColList = new ArrayList();
@@ -63,17 +66,17 @@ public class DayView extends CalendarView {
 	private ColumnHeaderPanel columnHeader;
 
 	private TimeLabelPanel rowHeader;
-	
+
 	private int dayCount;
-	
+
 	private JScrollPane scrollPane;
-	
+
 	private JLayeredPane calPanel;
-	
+
 	private boolean firstRefresh = true;
-		
+
 	private DayViewConfig config;
-	
+
 	private List dateFooters = new ArrayList();
 
 	public DayView(DayViewConfig desc) throws Exception {
@@ -85,8 +88,10 @@ public class DayView extends CalendarView {
         ThisKeyListener keyListener = new ThisKeyListener();
         calPanel.addMouseListener(mouseListener);
         calPanel.addMouseMotionListener(mouseListener);
-        calPanel.addKeyListener(keyListener);		
-        scrollPane = 
+        calPanel.addKeyListener(keyListener);
+//        calPanel.setPreferredSize(new Dimension(calPanel.getPreferredSize().width,
+//        										calPanel.getPreferredSize().height+200));
+        scrollPane =
         	new JScrollPane(calPanel,
         			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -95,19 +100,36 @@ public class DayView extends CalendarView {
         scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, createCorner(true, true));
         scrollPane.setCorner(JScrollPane.LOWER_LEFT_CORNER, createCorner(true, false));
         scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createCorner(false, true));
-		columnHeader = new ColumnHeaderPanel(desc);	
+		columnHeader = new ColumnHeaderPanel(desc);
 		columnHeader.setShowExtraDateHeaders(desc.isShowExtraDateHeaders());
         scrollPane.setColumnHeaderView(columnHeader.getComponent());
 		rowHeader = new TimeLabelPanel(desc, new TimeOfDay(0,0),
 				new TimeOfDay(24,0));
 		rowHeader.setFooterHeight(getFooterHeight());
         scrollPane.setRowHeaderView(rowHeader.getComponent());
+
+//        scrollPane.setPreferredSize(new Dimension(scrollPane.getWidth(), scrollPane.getHeight()+400));
+
+        calPanel.addComponentListener(new ComponentAdapter() {
+        	@Override
+			public void componentResized(ComponentEvent e) {
+				/* ====================================================== */
+        		try {
+//        			DayView.this.refresh();
+//					DayView.this.refresh0();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+				/* ====================================================== */
+			}
+        });
+
 	}
 
 	public void refresh0() throws Exception {
 		if (calPanel == null)
 			return;
-		
+
 		dayCount = (int) (getModel().getInterval().getDuration() / (24*3600*1000));
 		calPanel.removeAll();
 		calPanel.setBackground(Color.WHITE);
@@ -141,15 +163,38 @@ public class DayView extends CalendarView {
 			line.setOpaque(true);
 			calPanel.add(line, GRID_LEVEL);
 			timeLines.put(new Tuple(date, "00"), line);
-
+			addHorizontalLine(line);
+			/* ------------------------------------------------------- */
+			// Quarter hour line
+			//ev lï¿½gga denna loop efter att vi placerat ut aktiviteterna
+			//dï¿½ kommer den hamna lï¿½ngst bak men ï¿½ndï¿½ synas
+			line = new JLabel();
+			line.setBackground(getDesc().getLineColor());
+			line.setOpaque(true);
+			calPanel.add(line, GRID_LEVEL);
+			timeLines.put(new Tuple(date, "15"), line);
+			addHorizontalLine(line);
+			/* ------------------------------------------------------- */
 			// Half hour line
-			//ev lägga denna loop efter att vi placerat ut aktiviteterna
-			//då kommer den hamna längst bak men ändå synas
+			//ev lï¿½gga denna loop efter att vi placerat ut aktiviteterna
+			//dï¿½ kommer den hamna lï¿½ngst bak men ï¿½ndï¿½ synas
 			line = new JLabel();
 			line.setBackground(getDesc().getLineColor());
 			line.setOpaque(true);
 			calPanel.add(line, GRID_LEVEL);
 			timeLines.put(new Tuple(date, "30"), line);
+			addHorizontalLine(line);
+
+//
+			// 3*Quarter hour line
+			//ev lï¿½gga denna loop efter att vi placerat ut aktiviteterna
+			//dï¿½ kommer den hamna lï¿½ngst bak men ï¿½ndï¿½ synas
+			line = new JLabel();
+			line.setBackground(getDesc().getLineColor());
+			line.setOpaque(true);
+			calPanel.add(line, GRID_LEVEL);
+			timeLines.put(new Tuple(date, "45"), line);
+			addHorizontalLine(line);
 
 			pos += 3600 * 1000;
 		}
@@ -158,12 +203,12 @@ public class DayView extends CalendarView {
 			line.setBackground(getDesc().getLineColor());
 			line.setOpaque(true);
 			calPanel.add(line, GRID_LEVEL);
-			timeLines.put(new Tuple(new Date(pos), "00"), line);			
+			timeLines.put(new Tuple(new Date(pos), "00"), line);
 		}
-		
+
 
 		createColumns();
-		
+
 		Iterator i = getSelectedCalendars().iterator();
 		while (i.hasNext()) {
 			bizcal.common.Calendar cal = (bizcal.common.Calendar) i.next();
@@ -175,49 +220,63 @@ public class DayView extends CalendarView {
 
 		calPanel.validate();
 		calPanel.repaint();
-		
+
 		columnHeader.setModel(getModel());
 		columnHeader.setPopupMenuCallback(popupMenuCallback);
 		columnHeader.refresh();
-		
+
 		if (firstRefresh)
 			initScroll();
 		firstRefresh = false;
 		scrollPane.validate();
 		scrollPane.repaint();
 		// Hack to make to init scroll work
-		//JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
-		//scrollBar.setValue(scrollBar.getValue()-1);
-		
+//		JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
+//		scrollBar.setValue(scrollBar.getValue()-1);
+
 	}
 
-	private int getColCount() 
+	private int getColCount()
 		throws Exception
 	{
 		return dayCount * getSelectedCalendars().size();
 	}
 
+	/**
+	 * Returns the first interval to show.
+	 * Start day plus one.
+	 * @return
+	 * @throws Exception
+	 */
 	private DateInterval getFirstInterval() throws Exception {
 		Date start = getInterval().getStartDate();
 		Date end = DateUtil.getDiffDay(start, +1);
 		return new DateInterval(start, end);
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private void createColumns() throws Exception {
 		DateInterval interval = getFirstInterval();
 		int cols = getColCount();
 
+		frameAreaHash.clear();
 		List events = null;
 		DateInterval interval2 = null;
+		/* ------------------------------------------------------- */
+		// iterate over all columns
 		for (int it = 0; it < cols; it++) {
+			/* ------------------------------------------------------- */
 			int iCal = it / dayCount;
 			bizcal.common.Calendar cal = (bizcal.common.Calendar) getSelectedCalendars()
 					.get(iCal);
 			Object calId = cal.getId();
+			// obtain all events for the calendar
 			events = broker.getEvents(calId);
 			Collections.sort(events);
 
-			if (it % dayCount == 0) 
+			if (it % dayCount == 0)
 				interval2 = new DateInterval(interval);
 
 			_dateList.add(interval2.getStartDate());
@@ -229,18 +288,18 @@ public class DayView extends CalendarView {
 				JLabel verticalLine = new JLabel();
 				verticalLine.setOpaque(true);
 				verticalLine.setBackground(getDesc().getLineColor());
-				if (startdate.get(Calendar.DAY_OF_WEEK) == startdate.getFirstDayOfWeek()) 
+				if (startdate.get(Calendar.DAY_OF_WEEK) == startdate.getFirstDayOfWeek())
 					verticalLine.setBackground(getDescriptor().getLineColor2());
 				if (getSelectedCalendars().size() > 1 && it % dayCount == 0)
 					verticalLine.setBackground(getDescriptor().getLineColor3());
 				calPanel.add(verticalLine, GRID_LEVEL);
 				vLines.add(verticalLine);
 			}
-			
+
 			List frameAreas = new ArrayList();
-			//lägger till en framearea-lista för varje dag
+			//lï¿½gger till en framearea-lista fï¿½r varje dag
 			frameAreaCols.add(frameAreas);
-			//får alla event för personen inom intervallet
+			//fï¿½r alla event fï¿½r personen inom intervallet
 			if (calId == null)
 				continue;
 			Interval currDayInterval = getInterval(it % dayCount);
@@ -257,15 +316,28 @@ public class DayView extends CalendarView {
 						event.getEnd());
 				if (!currDayInterval.overlap(eventInterv))
 					continue;
+
 				FrameArea area = createFrameArea(calId, event);
+
+				area.setBackground(config.getPrimaryColor());
+
 				frameAreas.add(area);
 				colEvents.add(event);
 				calPanel.add(area, new Integer(event.getLevel()));
 				iEvent++;
+
+				/* ------------------------------------------------------- */
+				if (!frameAreaHash.containsKey(event))
+					frameAreaHash.put(event, area);
+				else {
+					frameAreaHash.get(event).addChild(area);
+
+				}
+
 			}
-			
+
 			if (config.isShowDateFooter()) {
-				JLabel footer = 
+				JLabel footer =
 					new JLabel(broker.getDateFooter(cal.getId(), interval2.getStartDate(), colEvents));
 				footer.setHorizontalAlignment(JLabel.CENTER);
 				dateFooters.add(footer);
@@ -278,8 +350,8 @@ public class DayView extends CalendarView {
 
 	}
 
-	//Får in ett events start- eller slutdatum, höjden på fönstret samt
-	//intervallet som positionen ska beräknas utifrån
+	//Fï¿½r in ett events start- eller slutdatum, hï¿½jden pï¿½ fï¿½nstret samt
+	//intervallet som positionen ska berï¿½knas utifrï¿½n
 	private int getYPos(Date aDate, int dayNo) throws Exception {
 		long time = aDate.getTime();
 		return getYPos(time, dayNo);
@@ -302,14 +374,21 @@ public class DayView extends CalendarView {
 				- getDesc().getViewStartTime().getValue();
 	}*/
 
+	/* (non-Javadoc)
+	 * @see bizcal.swing.CalendarView#getDate(int, int)
+	 */
 	protected Date getDate(int xPos, int yPos) throws Exception {
 		int colNo = getColumn(xPos);
-		int dayNo = colNo % dayCount;
+		int dayNo = 0;
+		if (dayCount != 0)
+			dayNo = colNo % dayCount;
+
 		DateInterval interval = getInterval(dayNo);
 		yPos -= getCaptionRowHeight();
 		double ratio = ((double) yPos) / ((double) getTimeHeight());
 		long time = (long) (interval.getDuration() * ratio);
 		time += interval.getStartDate().getTime();
+
 		return new Date(time);
 	}
 
@@ -320,7 +399,7 @@ public class DayView extends CalendarView {
 		return interval;
 	}
 
-	private int getColumn(int xPos) 
+	private int getColumn(int xPos)
 	throws Exception
 	{
 		xPos -= getXOffset();
@@ -329,10 +408,13 @@ public class DayView extends CalendarView {
 		return (int) (ratio * getColCount());
 	}
 
-	private Object getCalendarId(int colNo) 
+	private Object getCalendarId(int colNo)
 	throws Exception
 	{
-		int pos = colNo / dayCount;
+		int pos = 0;
+//		dayCount = 1;
+		if (dayCount != 0)
+			pos = colNo / dayCount;
 		bizcal.common.Calendar cal = (bizcal.common.Calendar) getSelectedCalendars()
 				.get(pos);
 		return cal.getId();
@@ -343,7 +425,7 @@ public class DayView extends CalendarView {
 		return 0;
 	}
 
-	private int getXPos(int colno) 
+	private int getXPos(int colno)
 	throws Exception
 	{
 		double x = getWidth();
@@ -367,7 +449,7 @@ public class DayView extends CalendarView {
 	private int getTimeHeight() throws Exception {
 		return getHeight() - getCaptionRowHeight() - getFooterHeight();
 	}
-	
+
 	private int getFooterHeight()
 	{
 		if (config.isShowDateFooter())
@@ -411,8 +493,8 @@ public class DayView extends CalendarView {
 					int captionYOffset = getCaptionRowHeight()
 							- CAPTION_ROW_HEIGHT0;
 					int colWidth = getXPos(i + 1) - getXPos(i);
-					//Obs. temporär lösning med korrigering med +2. Lägg till korrigeringen på rätt ställe
-					//kan höra ihop synkning av tidsaxel och muslyssnare
+					//Obs. temporï¿½r lï¿½sning med korrigering med +2. Lï¿½gg till korrigeringen pï¿½ rï¿½tt stï¿½lle
+					//kan hï¿½ra ihop synkning av tidsaxel och muslyssnare
 					int vLineTop = captionYOffset + CAPTION_ROW_HEIGHT0 + 2;
 					if (dayNo == 0 && (getSelectedCalendars().size() > 1)) {
 						vLineTop = 0;
@@ -422,13 +504,15 @@ public class DayView extends CalendarView {
 					Calendar startinterv = Calendar.getInstance(Locale
 							.getDefault());
 					startinterv.setTime(day.getStartDate());
-					
+
 					if (i > 0) {
 						JLabel verticalLine = (JLabel) vLines.get(i-1);
-						int vLineHeight = height - vLineTop;					
+						int vLineHeight = height - vLineTop;
 						verticalLine.setBounds(xpos, vLineTop, 1, vLineHeight);
+						// add the line position to the list
+						addVerticalLine(verticalLine);
 					}
-					
+
 					if (config.isShowDateFooter()) {
 						JLabel dayFooter = (JLabel) dateFooters.get(i);
 						dayFooter.setBounds(xpos, getTimeHeight(), colWidth, getFooterHeight());
@@ -457,7 +541,7 @@ public class DayView extends CalendarView {
 						int dy = y2 - y1;
 						int x1 = xpos;
 						area.setBounds(x1, y1, colWidth, dy);
-						
+
 						// Overlap logic
 						if (!event.isBackground()) {
 							if (prevArea != null) {
@@ -480,9 +564,9 @@ public class DayView extends CalendarView {
 							if (overlapCol > overlapColCount)
 								overlapColCount = overlapCol;
 						} else
-							overlapCols[j] = 0;						
+							overlapCols[j] = 0;
 					}
-					// Overlap logic. Loop the events/frameareas a second 
+					// Overlap logic. Loop the events/frameareas a second
 					// time and set the xpos and widths
 					if (overlapColCount > 0) {
 						int slotWidth = colWidth / (overlapColCount+1);
@@ -496,11 +580,11 @@ public class DayView extends CalendarView {
 							area.setBounds(r.x + index*slotWidth, r.y, slotWidth, r.height);
 						}
 					}
-					
+
 					if (dayCount > 1)
 						day = incDay(day);
 				}
-				
+
 
 				Iterator i = timeLines.keySet().iterator();
 				while (i.hasNext()) {
@@ -518,7 +602,7 @@ public class DayView extends CalendarView {
 					}
 					line.setBounds(x1, y1, width, lineheight);
 				}
-				
+
 				for (int iCal = 0; iCal < calBackgrounds.size(); iCal++) {
 					int x1 = getXPos(iCal * dayCount);
 					int x2 = getXPos((iCal + 1) * dayCount);
@@ -536,7 +620,7 @@ public class DayView extends CalendarView {
 		return getCalendarId(getColumn(x));
 	}
 
-	private DayViewConfig getDesc() 
+	private DayViewConfig getDesc()
 		throws Exception
 	{
 		DayViewConfig result = (DayViewConfig) getDescriptor();
@@ -546,7 +630,7 @@ public class DayView extends CalendarView {
 		}
 		return result;
 	}
-	
+
 	public DayViewConfig getDayViewConfig()
 		throws Exception
 	{
@@ -558,28 +642,28 @@ public class DayView extends CalendarView {
 		double ratio = viewStart / (24*3600*1000);
 		return (int) (ratio * 24 * PIXELS_PER_HOUR);
 	}
-		
+
 	private int getPreferredHeight()
 	{
-		int hours = 24;				
-		return hours * PIXELS_PER_HOUR + getFooterHeight();		
+		int hours = 24;
+		return hours * PIXELS_PER_HOUR + getFooterHeight();
 	}
-	
+
 	public JComponent getComponent()
 	{
 		return scrollPane;
 	}
-	
+
 	public void initScroll() throws Exception {
 		scrollPane.getViewport().setViewPosition(new Point(0, getInitYPos()));
 	}
-	
+
 	public void addListener(CalendarListener listener)
 	{
 		super.addListener(listener);
 		columnHeader.addCalendarListener(listener);
 	}
-	
-	
-		
+
+
+
 }
