@@ -1,14 +1,39 @@
+/*******************************************************************************
+ * Bizcal is a component library for calendar widgets written in java using swing.
+ * Copyright (C) 2007  Frederik Bertilsson 
+ * Contributors:       Martin Heinemann martin.heinemann(at)tudor.lu
+ * 
+ * http://sourceforge.net/projects/bizcal/
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ * [Java is a trademark or registered trademark of Sun Microsystems, Inc. 
+ * in the United States and other countries.]
+ * 
+ *******************************************************************************/
 package bizcal.swing.util;
-
-import java.awt.Component;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.swing.JPanel;
 
 import info.clearthought.layout.TableLayout;
 import info.clearthought.layout.TableLayoutConstraints;
+
+import java.awt.Component;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JPanel;
 
 public class TableLayoutPanel
     extends JPanel
@@ -25,15 +50,15 @@ public class TableLayoutPanel
     public static final int FULL = TableLayout.FULL;
 
     private TableLayout _layout;
-    private java.util.List _columns = new ArrayList();
-    private java.util.List _rows = new ArrayList();
+    private java.util.List<Column> _columns = new ArrayList<Column>();
+    private java.util.List<Row> _rows = new ArrayList<Row>();
 
     public TableLayoutPanel()
     {
         _layout = new TableLayout();
         setLayout(_layout);
     }
-
+    
     public Column createColumn(double size)
     {
         Column col = new Column(this, size);
@@ -114,7 +139,7 @@ public class TableLayoutPanel
             _rowNo = table._layout.getNumRow();
             table._layout.insertRow(_rowNo, size);
         }
-
+        
         public Cell createCell(Component component)
         {
             Cell cell = createCell(component, FULL, LEFT);

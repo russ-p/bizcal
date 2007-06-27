@@ -1,3 +1,28 @@
+/*******************************************************************************
+ * Bizcal is a component library for calendar widgets written in java using swing.
+ * Copyright (C) 2007  Frederik Bertilsson 
+ * Contributors:       Martin Heinemann martin.heinemann(at)tudor.lu
+ * 
+ * http://sourceforge.net/projects/bizcal/
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ * [Java is a trademark or registered trademark of Sun Microsystems, Inc. 
+ * in the United States and other countries.]
+ * 
+ *******************************************************************************/
 package bizcal.swing;
 
 import java.awt.BorderLayout;
@@ -53,6 +78,18 @@ public class ColumnHeaderPanel
 	private CalendarListener listener;
 	private boolean showExtraDateHeaders = false;
 	private CalendarViewConfig config;
+	private boolean isMonthView = false;
+
+	// formater for month view
+	DateFormat monthDateFormat = new SimpleDateFormat("EEEE",
+			LocaleBroker.getLocale());
+	// formater for week view
+	DateFormat weekDateFormat = new SimpleDateFormat("EE - dd.MM.",
+			LocaleBroker.getLocale());
+	// formater for day view
+	DateFormat dayFormat = new SimpleDateFormat("EEEE dd.MM.yyyy",
+			LocaleBroker.getLocale());
+
 
 	public ColumnHeaderPanel(CalendarViewConfig config)
 	{
@@ -70,6 +107,7 @@ public class ColumnHeaderPanel
 		this.fixedDayCount = fixedDayCount;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void refresh()
 		throws Exception
 	{
@@ -95,12 +133,12 @@ public class ColumnHeaderPanel
 			DateFormat toolTipFormat = new SimpleDateFormat("EEEE d MMMM",
 					LocaleBroker.getLocale());
 
-			DateFormat dateFormat = new SimpleDateFormat("EE - d MMMM yyyy",
-					LocaleBroker.getLocale());
-			DateFormat longDateFormat = new SimpleDateFormat("EEEE - d MMMM yyyy",
-					LocaleBroker.getLocale());
-
-//			DateFormat dateFormat =
+//			DateFormat dateFormat = new SimpleDateFormat("EE - d MMMM yyyy",
+//					LocaleBroker.getLocale());
+//			DateFormat longDateFormat = new SimpleDateFormat("EEEE - d MMMM yyyy",
+//					LocaleBroker.getLocale());
+//
+//			DateFormat shortDateFormat =
 //				DateFormat.getDateInstance(DateFormat.SHORT, LocaleBroker.getLocale());
 
 			// TODO ??????
@@ -136,24 +174,33 @@ public class ColumnHeaderPanel
 					date = DateUtil.round2Week(date);
 				for (int i = 0; i < dayCount; i++) {
 					/* ------------------------------------------------------- */
+					// ==========================================================
+					// Bullshit here.
+					// the final text of the column is set in the method
+					// resizeDates(int width)  !!!!!!!!!!!!!
+					// ===========================================================
+					//
 					String dateStr = "";
 					if (dayCount == 1)
-						dateStr = longDateFormat.format(date);
+						dateStr = TextUtil.formatCase(dayFormat.format(date));
+					else if (isMonthView)
+						dateStr = monthDateFormat.format(date);
 					else
-						dateStr = dateFormat.format(date);
+						dateStr = weekDateFormat.format(date);
 					/* ------------------------------------------------------- */
 					JLabel header = new JLabel(dateStr, JLabel.CENTER);
 					header.setAlignmentY(2);
 					//header.setFont(font);
 					header.setToolTipText(toolTipFormat.format(date));
+
 					if (model.isRedDay(date))
 						header.setForeground(Color.RED);
 					dateHeaders.add(header);
 					panel.add(header);
 					if (showExtraDateHeaders) {
-						header = new JLabel(model.getDateHeader(cal.getId(), date), JLabel.CENTER);
-						dateHeaders2.add(header);
-						panel.add(header);
+						JLabel header2 = new JLabel(model.getDateHeader(cal.getId(), date), JLabel.CENTER);
+						dateHeaders2.add(header2);
+						panel.add(header2);
 					}
 					dateList.add(date);
 					if (i > 0 || j > 0) {
@@ -329,16 +376,20 @@ public class ColumnHeaderPanel
 				}
 			}
 		}
-		DateFormat format = new SimpleDateFormat("EEEEE");
+
 		for (int i=0; i < dateHeaders.size(); i++) {
 			JLabel label = (JLabel) dateHeaders.get(i);
 			Date date = (Date) dateList.get(i);
-			String str = format.format(date);
+			String str = "";
+			if (isMonthView)
+				str = monthDateFormat.format(date);
+			else
+				str = weekDateFormat.format(date);
 			if (str.length() > charCount)
 				str = str.substring(0, charCount);
 			str = TextUtil.formatCase(str);
 			if (today.equals(DateUtil.round2Day(date)))
-				str = "<html><b>" + str + "</b></html>";
+				str = "<html><b>" + str + "</b> </html>";
 			label.setText(str);
 		}
 	}
@@ -396,6 +447,20 @@ public class ColumnHeaderPanel
 
 	public void setShowExtraDateHeaders(boolean showExtraDateHeaders) {
 		this.showExtraDateHeaders = showExtraDateHeaders;
+	}
+
+	/**
+	 * @return the isMonthView
+	 */
+	public boolean isMonthView() {
+		return isMonthView;
+	}
+
+	/**
+	 * @param isMonthView the isMonthView to set
+	 */
+	public void setMonthView(boolean isMonthView) {
+		this.isMonthView = isMonthView;
 	}
 
 }

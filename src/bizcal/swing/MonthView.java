@@ -1,3 +1,28 @@
+/*******************************************************************************
+ * Bizcal is a component library for calendar widgets written in java using swing.
+ * Copyright (C) 2007  Frederik Bertilsson 
+ * Contributors:       Martin Heinemann martin.heinemann(at)tudor.lu
+ * 
+ * http://sourceforge.net/projects/bizcal/
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ * [Java is a trademark or registered trademark of Sun Microsystems, Inc. 
+ * in the United States and other countries.]
+ * 
+ *******************************************************************************/
 package bizcal.swing;
 
 import java.awt.Color;
@@ -27,29 +52,30 @@ import javax.swing.JScrollPane;
 import bizcal.common.CalendarViewConfig;
 import bizcal.common.Event;
 import bizcal.swing.util.ErrorHandler;
+import bizcal.swing.util.FrameArea;
 import bizcal.swing.util.TableLayoutPanel;
 import bizcal.swing.util.TableLayoutPanel.Row;
 import bizcal.util.BizcalException;
 import bizcal.util.DateUtil;
 import bizcal.util.TextUtil;
 
-public class MonthView
-	extends CalendarView
+public class MonthView extends CalendarView
 {
 	private ColumnHeaderPanel columnHeader;
-	private List cells = new ArrayList();
+	private List<List> cells = new ArrayList<List>();
 	private List hLines = new ArrayList();
 	private List vLines = new ArrayList();
 	private JScrollPane scrollPane;
 	private JPanel calPanel;
-	
+
 	public MonthView(CalendarViewConfig desc)
 		throws Exception
 	{
 		super(desc);
 		calPanel = new JPanel();
 		calPanel.setLayout(new Layout());
-        scrollPane = 
+
+        scrollPane =
         	new JScrollPane(calPanel,
         			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -58,10 +84,14 @@ public class MonthView
         scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, createCorner(true, true));
         scrollPane.setCorner(JScrollPane.LOWER_LEFT_CORNER, createCorner(true, false));
         scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, createCorner(false, true));
-		columnHeader = new ColumnHeaderPanel(desc, 7);			
-        scrollPane.setColumnHeaderView(columnHeader.getComponent());		
+		columnHeader = new ColumnHeaderPanel(desc, 7);
+
+		columnHeader.setShowExtraDateHeaders(true);
+		columnHeader.setMonthView(true);
+        scrollPane.setColumnHeaderView(columnHeader.getComponent());
 	}
-			
+
+	@SuppressWarnings("unchecked")
 	public void refresh0()
 		throws Exception
 	{
@@ -69,12 +99,13 @@ public class MonthView
 		cells.clear();
 		hLines.clear();
 		vLines.clear();
-						
+
 		Calendar cal = DateUtil.newCalendar();
+
 		cal.setTime(getInterval().getStartDate());
-						
+		cal.add(Calendar.DAY_OF_YEAR, 15);
 		int month = cal.get(Calendar.MONTH);
-		
+
     	int lastDayOfWeek = cal.getFirstDayOfWeek();
     	lastDayOfWeek--;
     	if (lastDayOfWeek < 1)
@@ -84,14 +115,14 @@ public class MonthView
     	while (j.hasNext()) {
     		bizcal.common.Calendar calInfo = (bizcal.common.Calendar) j.next();
     		cal.setTime(getInterval().getStartDate());
-    		cal.set(Calendar.DAY_OF_MONTH, 1);		
+    		cal.set(Calendar.DAY_OF_MONTH, 1);
     		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
 	    	Map eventMap = createEventsPerDay(calInfo.getId());
 	    	int rowno = 0;
 	        while (true) {
-		    	List row;
+		    	List<JComponent> row;
 		    	if (cells.size() <= rowno) {
-		    		row = new ArrayList();
+		    		row = new ArrayList<JComponent>();
 		    		cells.add(row);
 		    	} else
 		    		row = (List) cells.get(rowno);
@@ -113,11 +144,11 @@ public class MonthView
 			line.setBackground(Color.LIGHT_GRAY);
 			line.setOpaque(true);
 			if ((i+1) % 7 == 0)
-				line.setBackground(getDescriptor().getLineColor3());			
-			calPanel.add(line);     
+				line.setBackground(getDescriptor().getLineColor3());
+			calPanel.add(line);
 			vLines.add(line);
         }
-        
+
         int rowCount = cells.size()-1;
         for (int i=0; i < rowCount; i++) {
 			JLabel line = new JLabel();
@@ -126,22 +157,30 @@ public class MonthView
 			calPanel.add(line);
 			hLines.add(line);
         }
-        
+
 		columnHeader.setModel(getModel());
 		columnHeader.setPopupMenuCallback(popupMenuCallback);
-		columnHeader.refresh();       
+		columnHeader.refresh();
 	}
-	
-	
+
+
+	/**
+	 * @param cal
+	 * @param eventMap
+	 * @param month
+	 * @param calId
+	 * @return
+	 * @throws Exception
+	 */
 	private JComponent createDayCell(Calendar cal, Map eventMap, int month, Object calId)
 		throws Exception
-	{ 	
+	{
 		Font eventFont = this.font;
 		TableLayoutPanel panel = new TableLayoutPanel();
-		panel.addMouseListener(new DayMouseListener(calId, cal.getTime()));
-		if (cal.get(Calendar.MONTH) == month) { 
+		
+		if (cal.get(Calendar.MONTH) == month) {
 			panel.setBackground(Color.WHITE);
-		} else  
+		} else
 			panel.setBackground(new Color(230, 230, 230));
 		panel.createColumn(TableLayoutPanel.FILL);
 		//panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
@@ -156,10 +195,10 @@ public class MonthView
 		label.setFont(font.deriveFont(Font.BOLD));
 		row.createCell(label);
 		panel.createRow(TableLayoutPanel.FILL);
-		
+
 		DateFormat format = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
 		List events = (List) eventMap.get(DateUtil.round2Day(cal.getTime()));
-		
+
 		if(events != null) {
 			Iterator i = events.iterator();
 			while (i.hasNext()) {
@@ -171,36 +210,68 @@ public class MonthView
 					summary = event.getSummary();
 				JLabel eventLabel = new JLabel(time + " " + summary);
 				eventLabel.setFont(eventFont);
-				time += "-" + format.format(event.getEnd());				
+				time += "-" + format.format(event.getEnd());
 				eventLabel.setToolTipText(time + " " + summary);
 				eventLabel.setOpaque(true);
 				eventLabel.setBackground(event.getColor());
+				/* ------------------------------------------------------- */
+				// set foreground color
+				eventLabel.setForeground(FrameArea.computeForeground(event.getColor()));
+				/* ------------------------------------------------------- */
 				eventLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 				if (event.getIcon() != null)
 					eventLabel.setIcon(event.getIcon());
 				eventLabel.addMouseListener(new EventMouseListener(event, calId));
-				row.createCell(eventLabel, TableLayoutPanel.TOP, TableLayoutPanel.FULL);							
+				row.createCell(eventLabel, TableLayoutPanel.TOP, TableLayoutPanel.FULL);
 			}
 		}
-		JScrollPane scrollPanel = 
+		panel.addMouseListener(new DayMouseListener(calId, cal.getTime()));
+		JScrollPane scrollPanel =
 			new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPanel.setPreferredSize(new Dimension(100,100));
 		//return scrollPanel;
 		return panel;
 	}
 
+	/**
+	 * @author martin.heinemann@tudor.lu
+	 * 15.06.2007
+	 * 15:41:10
+	 *
+	 *
+	 * @version
+	 * <br>$Log: MonthView.java,v $
+	 * <br>Revision 1.16  2007/06/27 15:22:18  heine_
+	 * <br>nearly Stable
+	 * <br>added LGPL license headers
+	 * <br>
+	 * <br>Revision 1.9  2007/06/22 13:14:49  heinemann
+	 * <br>*** empty log message ***
+	 * <br>
+	 * <br>Revision 1.8  2007/06/20 12:08:08  heinemann
+	 * <br>*** empty log message ***
+	 * <br>
+	 * <br>Revision 1.7  2007/06/18 11:41:32  heinemann
+	 * <br>bug fixes and alpha optimations
+	 * <br>
+	 *
+	 */
 	private class EventMouseListener
 		extends MouseAdapter
 	{
 		private Event event;
 		private Object calId;
-		
+
+		/**
+		 * @param event
+		 * @param calId
+		 */
 		public EventMouseListener(Event event, Object calId)
 		{
 			this.calId = calId;
 			this.event = event;
 		}
-		
+
 		public void mouseClicked(MouseEvent mevent)
 		{
 			try {
@@ -211,27 +282,27 @@ public class MonthView
 			}
 		}
 	}
-	
+
 	private class DayMouseListener
 	extends MouseAdapter
 	{
 		private Object calId;
 		private Date date;
-		
+
 		public DayMouseListener(Object calId, Date date)
 		{
 			this.calId = calId;
 			this.date = date;
 		}
-		
+
 		public void mouseEntered(MouseEvent e)
 		{
 			JPanel label = (JPanel) e.getSource();
 			label.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			label.setBackground(label.getBackground().darker());
-			label.setForeground(Color.LIGHT_GRAY);			
+			label.setForeground(Color.LIGHT_GRAY);
 		}
-		
+
 		public void mouseExited(MouseEvent e)
 		{
 			JPanel label = (JPanel) e.getSource();
@@ -239,56 +310,62 @@ public class MonthView
 			label.setBackground(label.getBackground().brighter());
 			label.setForeground(Color.BLACK);
 		}
-		
+
 		public void mouseClicked(MouseEvent e)
 		{
 			try {
-				if (e.getClickCount() < 2)
+				/* ------------------------------------------------------- */
+				if (listener == null)
 					return;
-	    		if (listener == null)
-	    			return;
+				/* ------------------------------------------------------- */
+				if (e.getClickCount() < 2) {
+					listener.dateSelected(date);
+					return;
+				}
+				/* ------------------------------------------------------- */
 	    		if (!getModel().isInsertable(calId, date))
 	    			return;
 	    		listener.newEvent(calId, date);
+	    		/* ------------------------------------------------------- */
 			} catch (Exception exc) {
 				ErrorHandler.handleError(exc);
 			}
 		}
 	}
-		
-	protected Date getDate(int xPos, int yPos) 
-	throws Exception 
+
+	protected Date getDate(int xPos, int yPos)
+	throws Exception
 	{
 		return null;
 	}
-	
+
 	public long getTimeInterval()
 	throws Exception
 	{
 		return 24*3600*1000*30;
 	}
-	
+
 	protected String getHeaderText() throws Exception {
 		Calendar cal = DateUtil.newCalendar();
 		cal.setTime(getInterval().getStartDate());
 		DateFormat format = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
 		return TextUtil.formatCase(format.format(cal.getTime()));
 	}
-	
-	protected JComponent createCalendarPanel()
-	throws Exception
-	{
-		calPanel = new JPanel();
-		calPanel.setLayout(new Layout());
-		calPanel.setBackground(Color.WHITE);
-		return calPanel;
-	}
-	
+
+//	protected JComponent createCalendarPanel()
+//	throws Exception
+//	{
+//		calPanel = new JPanel();
+//		calPanel.setLayout(new Layout());
+//		calPanel.setBackground(Color.WHITE);
+//		return calPanel;
+//	}
+
 	protected boolean supportsDrag()
 	{
 		return false;
 	}
-		
+
 
 	private class Layout implements LayoutManager {
 		public void addLayoutComponent(String name, Component comp) {
@@ -300,7 +377,6 @@ public class MonthView
 		public Dimension preferredLayoutSize(Container parent) {
 			try {
 				int width = 7 * getModel().getSelectedCalendars().size() * DayView.PREFERRED_DAY_WIDTH;
-				System.err.println("MonthView: getPreferredHeight=" + getPreferredHeight());
 				return new Dimension(width, getPreferredHeight());
 			} catch (Exception e) {
 				throw BizcalException.create(e);
@@ -311,7 +387,10 @@ public class MonthView
 			return new Dimension(50, 100);
 		}
 
-		public void layoutContainer(Container parent) 
+		/* (non-Javadoc)
+		 * @see java.awt.LayoutManager#layoutContainer(java.awt.Container)
+		 */
+		public void layoutContainer(Container parent)
 		{
 			try {
 				double width = parent.getWidth();
@@ -329,45 +408,53 @@ public class MonthView
 								(int) height-1);
 					}
 				}
-				
+
 		        int colCount = getModel().getSelectedCalendars().size()*7;
-		        for (int i=0; i < colCount-1; i++) {		        	
-					JLabel line = (JLabel) vLines.get(i);
-					line.setBounds((int) ((i+1)*width), 
-							0,
-							1,
-							parent.getHeight());
+		        for (int i=0; i < colCount-1; i++) {
+		        	try {
+						JLabel line = (JLabel) vLines.get(i);
+						line.setBounds((int) ((i+1)*width),
+								0,
+								1,
+								parent.getHeight());
+		        	} catch (Exception e) {
+//		        		e.printStackTrace();
+					}
 		        }
 		        int rowCount = cells.size()-1;
 		        for (int i=0; i < rowCount; i++) {
+		        	try {
 					JLabel line = (JLabel) hLines.get(i);
-					line.setBounds(0, 
+					line.setBounds(0,
 							(int) ((i+1)*height),
 							parent.getWidth(),
 							1);
+		        	} catch (Exception e) {
+
+					}
 		        }
-				
+
 			} catch (Exception e) {
 				throw BizcalException.create(e);
 			}
 		}
 	}
-	
+
 	private int getPreferredHeight()
 	{
-		return cells.size() * 40;		
+		return cells.size() * 40;
 	}
-	
+
 	public JComponent getComponent()
 	{
 		return scrollPane;
 	}
-	
+
 	public void addListener(CalendarListener listener)
 	{
 		super.addListener(listener);
 		columnHeader.addCalendarListener(listener);
 	}
-	
-	
+
+
 }

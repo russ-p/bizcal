@@ -1,3 +1,28 @@
+/*******************************************************************************
+ * Bizcal is a component library for calendar widgets written in java using swing.
+ * Copyright (C) 2007  Frederik Bertilsson 
+ * Contributors:       Martin Heinemann martin.heinemann(at)tudor.lu
+ * 
+ * http://sourceforge.net/projects/bizcal/
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ * [Java is a trademark or registered trademark of Sun Microsystems, Inc. 
+ * in the United States and other countries.]
+ * 
+ *******************************************************************************/
 package bizcal.common;
 
 import java.awt.Color;
@@ -105,6 +130,7 @@ public class Event
 		return getId().equals(event.getId());
 	}
 
+	@SuppressWarnings("unchecked")
 	public void set(String property, Object value)
 	{
 		props.put(property, value);
@@ -123,14 +149,14 @@ public class Event
 	}
 
 	public String getToolTip()
-		throws Exception
 	{
 		if (toolTip != null)
 			return toolTip;
 		DateFormat format = DateFormat.getTimeInstance(DateFormat.SHORT, LocaleBroker.getLocale());
-		return "[" + format.format(getStart()) +
-			"-" + format.format(getEnd()) + "] " +
-			summary;
+		return "<html>[" + format.format(getStart()) +
+			"-" + format.format(getEnd()) + "] <b>" +
+			summary+"</b><br><hr><br><table width=\"300\"><tr><td>"
+			+description+"</td></tr></table>";
 	}
 	public void setToolTip(String toolTip) {
 		this.toolTip = toolTip;
@@ -186,8 +212,47 @@ public class Event
 	 */
 	public void move(Date newStartDate) {
 		/* ================================================== */
-		setEnd(new Date(getEnd().getTime() + DateUtil.getDiffDay(getStart(), newStartDate)));
-		setStart(newStartDate);
+		if (newStartDate != null) {
+			setEnd(new Date(getEnd().getTime() + DateUtil.getDiffDay(getStart(), newStartDate)));
+			setStart(newStartDate);
+		}
+		/* ================================================== */
+	}
+
+
+	/**
+	 * Duplicate this object
+	 *
+	 * @return
+	 */
+	public Event copy() {
+		/* ================================================== */
+		Event e = new Event();
+
+		e.setBackground(isBackground());
+		e.setColor(getColor());
+		e.setDescription(getDescription());
+
+		e.setEditable(isEditable());
+		e.setEnd(getEnd());
+		e.setFrame(isFrame());
+
+		e.setIcon(getIcon());
+		e.setId(getId());
+		e.setLevel(getLevel());
+
+		e.setOrgEvent(getOrgEvent());
+		e.setRoundedCorner(isRoundedCorner());
+		e.setSelectable(isSelectable());
+
+		e.setShowTime(isShowTime());
+		e.setStart(getStart());
+		e.setSummary(getSummary());
+
+		e.setToolTip(getToolTip());
+
+		return e;
+
 		/* ================================================== */
 	}
 

@@ -1,4 +1,31 @@
+/*******************************************************************************
+ * Bizcal is a component library for calendar widgets written in java using swing.
+ * Copyright (C) 2007  Frederik Bertilsson 
+ * Contributors:       Martin Heinemann martin.heinemann(at)tudor.lu
+ * 
+ * http://sourceforge.net/projects/bizcal/
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ * [Java is a trademark or registered trademark of Sun Microsystems, Inc. 
+ * in the United States and other countries.]
+ * 
+ *******************************************************************************/
 package bizcal.swing.util;
+
+import static java.lang.Math.pow;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -8,7 +35,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
@@ -18,31 +44,35 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
 import bizcal.common.Event;
-import bizcal.util.DateUtil;
 
-
-
-public class FrameArea
-	extends JComponent
-{
+public class FrameArea extends JComponent {
 	private static final long serialVersionUID = 1L;
 
 	private String itsHeadLine;
+
 	private String itsDescription;
+
 	private Color fontColor;
-	private Shape itsShape;
-	private List listeners = new ArrayList();
+
+//	private Shape itsShape;
+
+	private List<Listener> listeners = new ArrayList<Listener>();
+
 	private boolean border;
+
 	private boolean roundedRectangle;
+
 	private boolean selected;
-	private float alphaValue;
+
 	private ImageIcon icon;
-	//private Color selectionColor = new Color(196, 0, 0);
+
+	// private Color selectionColor = new Color(196, 0, 0);
 	private Color selectionColor = Color.BLACK;
 
 	private Date endTime = null;
@@ -56,41 +86,90 @@ public class FrameArea
 	private Date moveDate;
 
 	private Event event = null;
+
 	private List<FrameArea> children = null;
 
+	private Color bgColor;
 
-	public static final DateFormat timeFormat = new SimpleDateFormat("HH:mm");//,;
-//			Translatrix.getLocale());
+	public double xPosition = 0.0;
+
+	public double yPosition = 54.0;
+
+	private double angle = 0.0;
+
+	private Color alphaFontColor;
+
+//	private Font alphaFont;
+
+	private Font normalFont;
+
+	private float ALPHA_DEFAULT = 0.6f;
+
+	private float SELECT_OFFSET = 0.2f;
 
 
-	public FrameArea()
-	throws Exception
-	{
-		this.setFont(new Font("Verdana", Font.PLAIN, 10));
+	private float alphaValue = ALPHA_DEFAULT;
+
+
+
+	public static final DateFormat timeFormat = new SimpleDateFormat("HH:mm",
+			Locale.getDefault());
+
+	/**
+	 * @throws Exception
+	 */
+	public FrameArea() throws Exception {
+		/* ================================================== */
+		this.normalFont = new Font("Verdana", Font.PLAIN, 10);
+		this.setFont(normalFont);
 		// change color for drag
-		this.setBackground(new Color(100,100,245));
+		this.setBackground(new Color(100, 100, 245));
 		this.fontColor = Color.WHITE;
-		this.alphaValue = 0.7f;
+		this.alphaFontColor = fontColor;
+
 		this.border = true;
 		this.roundedRectangle = true;
-		this.alphaValue = 0.7f;
 		this.selected = false;
+		/* ================================================== */
 	}
 
-
+	/**
+	 * Set the Event object for the FrameArea
+	 * @param event
+	 */
 	public void setEvent(Event event) {
 		/* ================================================== */
 		this.event = event;
+		// compute colors
+		this.bgColor = event.getColor();
+
+		if (this.event != null && this.event.isBackground()) {
+			/* ------------------------------------------------------- */
+			this.fontColor = Color.BLACK;
+			/* ------------------------------------------------------- */
+		}
+		else {
+			/* ------------------------------------------------------- */
+			this.fontColor = computeForeground(this.bgColor);
+			/* ------------------------------------------------------- */
+		}
+		/* ------------------------------------------------------- */
+		this.alphaFontColor = new Color(fontColor.getRed(), fontColor.getGreen(), fontColor.getBlue(), 220);
 		/* ================================================== */
 	}
 
+	/**
+	 * @return
+	 */
 	public Event getEvent() {
 		/* ================================================== */
 		return this.event;
 		/* ================================================== */
 	}
 
-
+	/**
+	 * @param fa
+	 */
 	public void addChild(FrameArea fa) {
 		/* ================================================== */
 		if (this.children == null)
@@ -100,6 +179,9 @@ public class FrameArea
 		/* ================================================== */
 	}
 
+	/**
+	 * @param fa
+	 */
 	public void removeChild(FrameArea fa) {
 		/* ================================================== */
 		if (this.children != null)
@@ -107,6 +189,9 @@ public class FrameArea
 		/* ================================================== */
 	}
 
+	/**
+	 * @return
+	 */
 	public List<FrameArea> getChildren() {
 		/* ================================================== */
 		if (this.children == null)
@@ -116,10 +201,12 @@ public class FrameArea
 		/* ================================================== */
 	}
 
-
+	/**
+	 * @param b
+	 */
 	public void setIsMoving(boolean b) {
 		/* ================================================== */
-		this.isMoving  = b;
+		this.isMoving = b;
 		/* ================================================== */
 	}
 
@@ -128,195 +215,288 @@ public class FrameArea
 	 *
 	 * @param str
 	 */
-	public void setMovingTimeString(Date moveDate, Date endDate) {
+	public void setMovingTimeString(Date moveStartDate, Date moveEndDate) {
 		/* ================================================== */
-		this.moveDate = moveDate;
-		this.movingString = timeFormat.format(moveDate)
-			+ " - " +
-			timeFormat.format(new Date(endDate.getTime() + DateUtil.getDiffDay(endDate, moveDate)));
+		this.moveDate = moveStartDate;
+		this.movingString = timeFormat.format(moveDate) + " - "
+				+ timeFormat.format(moveEndDate);
 		/* ================================================== */
 	}
 
+	/**
+	 * @param endTime
+	 */
 	public void setEndTime(Date endTime) {
 		/* ================================================== */
 		this.endTime = endTime;
 		/* ================================================== */
 	}
 
+	/**
+	 * @param startTime
+	 */
 	public void setStartTime(Date startTime) {
 		/* ================================================== */
 		this.startTime = startTime;
 		/* ================================================== */
 	}
 
-	public void setAlphaValue(float aValue)
-	{
-		if (aValue > 1.0f)
-			aValue = 1.0f;
-		this.alphaValue = aValue;
+
+	/**
+	 * @param aValue
+	 */
+	@Deprecated
+	public void setAlphaValue(float aValue) {
+//		if (aValue > 1.0f)
+//			aValue = 1.0f;
+//		this.alphaValue = aValue - SELECT_OFFSET;
 	}
-	public float getAlphaValue()
-	{
+
+	/**
+	 * @return
+	 */
+	public float getAlphaValue() {
 		return this.alphaValue;
 	}
 
-	//The toolkit will invoke this method when it's time to paint
-	public void paint(Graphics g)
-	{
+	// The toolkit will invoke this method when it's time to paint
+	public void paint(Graphics g) {
+		/* ================================================== */
+		try {
+			setBackground(event.getColor());
+		} catch (Exception e) {
+		}
+		/* ------------------------------------------------------- */
+		// increase the alpha value if the event is a background event
+		if (event != null && event.isBackground())
+			this.alphaValue = ALPHA_DEFAULT + SELECT_OFFSET + 0.2f;
+		/* ------------------------------------------------------- */
 		Graphics2D g2 = (Graphics2D) g;
-		//makes the graphics smoother
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
+		// makes the graphics smoother
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+				RenderingHints.VALUE_ANTIALIAS_ON);
+		/* ------------------------------------------------------- */
 		int width = (int) getWidth();
 		int height = (int) getHeight();
 		BufferedImage buffImg = null;
 		try {
-			buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+			/* ------------------------------------------------------- */
+			buffImg = new BufferedImage(width, height,
+						  				BufferedImage.TYPE_INT_ARGB);
+			/* ------------------------------------------------------- */
 		} catch (Exception e) {
-			// TODO: handle exception
 			System.out.println("W: " + width + " H: " + height);
-
 		}
-        Graphics2D gbi = buffImg.createGraphics();
-        gbi.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        gbi.setStroke(new BasicStroke(1.0f));
-
-		if(this.roundedRectangle)
-		{
-			AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.DST_OVER, alphaValue);
+		/* ------------------------------------------------------- */
+		Graphics2D gbi = buffImg.createGraphics();
+		gbi.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+									RenderingHints.VALUE_ANTIALIAS_ON);
+		gbi.setStroke(new BasicStroke(1.0f));
+		// ===========================================================
+		// draw round rectangle
+		//
+		// ===========================================================
+		if (this.roundedRectangle) {
+			AlphaComposite ac = AlphaComposite.getInstance(
+					AlphaComposite.DST_OVER, alphaValue);
 			gbi.setComposite(ac);
 			gbi.setPaint(this.getBackground());
-			gbi.fill(new RoundRectangle2D.Double(0, 0,
-	              width,
-				  height,
-	              20, 20));
-			if(this.border)
-			{
+			/* ------------------------------------------------------- */
+			if (this.event != null && this.event.isBackground())
+				drawHatchedRect(gbi, 0, 0, width, height, false);
+			else
+				gbi.fill(new RoundRectangle2D.Double(0, 0, width, height, 20, 20));
+			/* ------------------------------------------------------- */
+			if (this.border && (this.event == null || !this.event.isBackground())) {
 				gbi.setPaint(Color.black);
-				gbi.draw(new RoundRectangle2D.Double(1, 1, width-2, height-2, 17,17));
+				gbi.draw(new RoundRectangle2D.Double(1, 1, width - 2,
+						height - 2, 17, 17));
 			}
 		}
-		else
-		{
+		// ============================================================
+		// draw non-round rectangle
+		// ============================================================
+		else {
+			/* ------------------------------------------------------- */
 			AlphaComposite ac = null;
 			ac = AlphaComposite.getInstance(AlphaComposite.DST_OVER, alphaValue);
 			gbi.setComposite(ac);
 			gbi.setPaint(this.getBackground());
-			gbi.fill(new Rectangle2D.Double(0, 0,
-		              width,
-					  height));
-			if(this.border)
-			{
+			/* ------------------------------------------------------- */
+			if (this.event != null && this.event.isBackground())
+				drawHatchedRect(gbi, 0, 0, width, height, false);
+			else
+				gbi.fill(new Rectangle2D.Double(0, 0, width, height));
+			/* ------------------------------------------------------- */
+			if (this.border && (this.event == null || !this.event.isBackground())) {
 				gbi.setPaint(Color.black);
-				gbi.draw(new Rectangle2D.Double(1, 1, width-2, height-2));
+				gbi.draw(new Rectangle2D.Double(1, 1, width - 2, height - 2));
 			}
+			/* ------------------------------------------------------- */
 		}
 
 		g2.drawImage(buffImg, null, 0, 0);
 		/* ------------------------------------------------------- */
-		// create darker header
-		BufferedImage buffImgHeader = new BufferedImage(width, 20, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D gbiHeader = buffImgHeader.createGraphics();
-        gbiHeader.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        gbiHeader.setStroke(new BasicStroke(1.0f));
+		// ==============================================================
+		// creation of the darker header starts here
+		//
+		// background events do not have a darker header
+		// ==============================================================
+		Graphics2D gbiHeader = null;
 
-
-//        AlphaComposite ac = null;
-//		ac = AlphaComposite.getInstance(AlphaComposite.DST_OVER, alphaValue);
-//		gbiHeader.setComposite(ac);
-
-        gbiHeader.setPaint(this.getBackground());
-        gbiHeader.fill(new RoundRectangle2D.Double(0, 0,
-	              width,
-				  20,
-	              20, 20));
-
-
-        g2.drawImage(buffImgHeader, null, 0, 0);
+		if (event == null || !event.isBackground()) {
+			/* ------------------------------------------------------- */
+			// create darker header
+			BufferedImage buffImgHeader = new BufferedImage(width, 20,
+					BufferedImage.TYPE_INT_ARGB);
+			gbiHeader = buffImgHeader.createGraphics();
+			/* ------------------------------------------------------- */
+			gbiHeader.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON);
+			gbiHeader.setStroke(new BasicStroke(1.0f));
+			/* ------------------------------------------------------- */
+			gbiHeader.setPaint(this.getBackground());
+			gbiHeader.fill(new RoundRectangle2D.Double(0, 0, width, 20, 20, 20));
+			/* ------------------------------------------------------- */
+			// paint
+			g2.drawImage(buffImgHeader, null, 0, 0);
+			/* ------------------------------------------------------- */
+		}
 
 		/* ------------------------------------------------------- */
 		int xpos = 5;
 		if (icon != null) {
-			g2.drawImage(icon.getImage(), xpos, 3, this);
+			g2.drawImage(icon.getImage(), xpos, 2, this);
 			xpos += icon.getIconWidth() + 3;
 		}
-		//actions below this point will be placed on top of the "colored glass"
+
+		// =================================================================================
+		// actions below this point will be placed on top of the "colored glass"
+		//
+		// =================================================================================
+
+		// ============================================================
+		// paint the header, normally the time periode
+		// ============================================================
 		Font timeFont = this.getFont().deriveFont(Font.BOLD);
-		g2.setPaint(fontColor);
+		/* ------------------------------------------------------- */
+		// set alpha fontColor for backgroudn events
+		if (this.event == null || !this.event.isBackground())
+			g2.setPaint(fontColor);
+		else
+			g2.setPaint(alphaFontColor);
+		/* ------------------------------------------------------- */
 		g2.setFont(timeFont);
 		int ypos = 15;
-
 		if (itsHeadLine != null) {
 			g2.drawString(itsHeadLine, xpos, ypos);
 			ypos += 15;
 			xpos = 5;
 		}
 		Font descriptionFont = this.getFont();
-		g2.setPaint(fontColor);
 		g2.setFont(descriptionFont);
-		if (itsDescription != null)
-			g2.drawString(itsDescription, xpos, ypos);
 
 
+		// ============================================================
+		// paint the summary
+		//
+		// if the event is a background event, the summary is painted
+		// in a diagonale
+		// ============================================================
+		if (itsDescription != null) {
+			if (this.event != null && this.event.isBackground()) {
+				/* ------------------------------------------------------- */
+				// compute angle
+				// first the diagonale, normal Pythagoras
+				try {
+					double diagonale =
+						Math.sqrt(Math.pow(this.getBounds().width, 2)
+								+ Math.pow(this.getBounds().height-ypos-10, 2));
+					/* ------------------------------------------------------- */
+					Double temp = Math.asin(this.getBounds().height / diagonale);
+
+						if (!temp.equals(Double.NaN)) {
+						this.angle = temp;
+					}
+				} catch (Exception e) {}
+				/* ------------------------------------------------------- */
+				g2.rotate(angle-0.3, this.xPosition, this.yPosition);
+				g2.drawString(itsDescription, xpos, ypos+10);
+				// back
+				g2.rotate(-angle+0.3, this.xPosition, this.yPosition);
+				/* ------------------------------------------------------- */
+			} else
+				g2.drawString(itsDescription, xpos, ypos);
+		}
 		/* ------------------------------------------------------- */
 		// draw end time at the bottom
-		if (this.endTime != null) {
+		Date eTime = null;
+		if (this.endTime != null)
+			eTime = endTime;
+		else {
+			try {
+				eTime = this.event.getEnd();
+			} catch (Exception e) {
+			}
+
+		}
+		if (eTime != null) {
 			/* ------------------------------------------------------- */
 			g2.setFont(timeFont);
-			g2.drawString(timeFormat.format(endTime)
-//					+ " "+
-//					Translatrix.getTranslationString("bizcal.clock"),
-					,xpos + this.getBounds().width - 75, ypos + this.getBounds().height - 20);
+			g2.drawString(timeFormat.format(eTime) + " ",
+					xpos
+					+ this.getBounds().width - 40, ypos
+					+ this.getBounds().height - 20);
 			/* ------------------------------------------------------- */
 		}
 		/* ------------------------------------------------------- */
-
 
 		/* ------------------------------------------------------- */
 		// draw start time at the top
 		if (this.startTime != null) {
 			/* ------------------------------------------------------- */
 			g2.setFont(timeFont);
-			g2.drawString(timeFormat.format(startTime)
-//					+ " "+
-//					Translatrix.getTranslationString("bizcal.clock"),
-					,xpos, ypos);
+			g2.drawString(timeFormat.format(startTime) + " ",
+					xpos,
+					ypos);
 			/* ------------------------------------------------------- */
 		}
-		/* ------------------------------------------------------- */
 		/* ------------------------------------------------------- */
 		// if an event is moving, draw the new time period at the bottom
 		if (this.isMoving) {
 			/* ------------------------------------------------------- */
 
 			g2.setFont(timeFont);
-			g2.drawString(movingString,
-					xpos + this.getBounds().width - 85, ypos + this.getBounds().height - 35);
+			g2.drawString(movingString, xpos + this.getBounds().width - 85,
+					ypos + this.getBounds().height - 35);
 			/* ------------------------------------------------------- */
 		}
 
+		// ===============================================================
+		// draw selection border on this frame area
+		//
+		// background events do not get this
+		// ===============================================================
+		if (this.selected && (this.event == null || !this.event.isBackground())) {
+			/* ------------------------------------------------------- */
+			// ??
+			// float dash1[] = { 1.0f };
+			// BasicStroke dashed = new BasicStroke(10.0f, BasicStroke.CAP_BUTT,
+			// BasicStroke.JOIN_BEVEL, 10.0f, dash1, 0.0f);
 
-
-		if(this.selected)
-		{
-
-			float dash1[] = {1.0f};
-			BasicStroke dashed = new BasicStroke(10.0f, BasicStroke.CAP_BUTT,
-													BasicStroke.JOIN_BEVEL,
-			 										10.0f, dash1, 0.0f);
 			g2.setPaint(selectionColor);
 			g2.setStroke(new BasicStroke(1.5f));
-			if(this.roundedRectangle)
-				g2.draw(new RoundRectangle2D.Double(1, 1, width-2, height-2, 17,17));
+			if (this.roundedRectangle)
+				g2.draw(new RoundRectangle2D.Double(1, 1, width - 2,
+						height - 2, 17, 17));
 			else
-				g2.draw(new Rectangle2D.Double(1, 1, width-2, height-2));
+				g2.draw(new Rectangle2D.Double(1, 1, width - 2, height - 2));
+			/* ------------------------------------------------------- */
 		}
-		super.paint(gbiHeader);
+		if (gbiHeader != null)
+			super.paint(gbiHeader);
 		super.paint(g2);
 		super.paint(gbi);
-
-
-//		System.out.println("Start: " + startTime + " - End: "+ endTime);
 	}
 
 	/**
@@ -325,97 +505,314 @@ public class FrameArea
 	public boolean isBorder() {
 		return border;
 	}
+
 	/**
-	 * @param border The border to set.
+	 * @param border
+	 *            The border to set.
 	 */
 	public void setBorder(boolean border) {
 		this.border = border;
 	}
 
-	public void setRoundedRectangle(boolean rounded)
-	{
+	public void setRoundedRectangle(boolean rounded) {
 		this.roundedRectangle = rounded;
 	}
 
-	public boolean isRoundedRectangle()
-	{
+	public boolean isRoundedRectangle() {
 		return this.roundedRectangle;
 	}
 
 	/**
-	 * Label text placed on the first line in the FrameArea.
-	 * Example value: "08:00-11.30"
+	 * Label text placed on the first line in the FrameArea. Example value:
+	 * "08:00-11.30"
+	 *
 	 * @param aHeadLine
 	 */
-	public void setHeadLine(String aHeadLine)
-	{
+	public void setHeadLine(String aHeadLine) {
 		itsHeadLine = aHeadLine;
-		if(aHeadLine == null)
+		if (aHeadLine == null)
 			itsHeadLine = "";
 	}
 
 	/**
-	 * Label text placed below HeadLine in the FrameArea.
-	 * Example value: "Meeting with group C"
+	 * Label text placed below HeadLine in the FrameArea. Example value:
+	 * "Meeting with group C"
+	 *
 	 * @param aDescription
 	 */
-	public void setDescription(String aDescription)
-	{
+	public void setDescription(String aDescription) {
 		itsDescription = aDescription;
 		if (aDescription == null)
 			itsDescription = "";
 	}
 
-	public void setFontColor(Color aColor)
-	{
+	public void setFontColor(Color aColor) {
 		fontColor = aColor;
 	}
 
-	public Color getFontColor()
-	{
+	public Color getFontColor() {
 		return fontColor;
 	}
 
-
-	public void addListener(Listener listener)
-	{
+	public void addListener(Listener listener) {
 		listeners.add(listener);
 	}
 
-	public static interface Listener
-	extends EventListener
-	{
-		public void selected(FrameArea source)
-		 	throws Exception;
+	public static interface Listener extends EventListener {
+		public void selected(FrameArea source) throws Exception;
 
-		public void mouseOver(FrameArea source)
-			throws Exception;
+		public void mouseOver(FrameArea source) throws Exception;
 
-		public void mouseOut(FrameArea source)
-			throws Exception;
+		public void mouseOut(FrameArea source) throws Exception;
 
-		public void popupMenu(FrameArea source)
-			throws Exception;
+		public void popupMenu(FrameArea source) throws Exception;
 
-		public void moved(Point pos1, Point pos2)
-			throws Exception;
+		public void moved(Point pos1, Point pos2) throws Exception;
 	}
 
-	public void setSelected(boolean flag)
-	{
+	public void setSelected(boolean flag) {
 		this.selected = flag;
+		this.setBrightness(flag);
 		repaint();
 	}
 
-	public boolean isSelected()
-	{
+	public boolean isSelected() {
 		return this.selected;
 	}
+
+	/**
+	 * Switches the brightnes of a frame area
+	 * to bright or darker
+	 *
+	 * true - brighter
+	 * false - darker
+	 * @param b
+	 */
+	public void setBrightness(boolean b) {
+		/* ================================================== */
+		if (b)
+			this.alphaValue = ALPHA_DEFAULT + SELECT_OFFSET;
+		else
+			this.alphaValue = ALPHA_DEFAULT - SELECT_OFFSET;
+		/* ================================================== */
+	}
+
+
 	public ImageIcon getIcon() {
 		return icon;
 	}
+
 	public void setIcon(ImageIcon icon) {
 		this.icon = icon;
+	}
+
+
+	  /**
+	   * Draw nice lines in the area
+	   *
+	 * @param g
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @param round round rectangle or not
+	 */
+	public void drawHatchedRect(Graphics g, int x, int y, int width, int height, boolean round)
+	  {
+		final int DST = 2;
+		if (round)
+			g.drawRoundRect(x, y, width, height, 20, 20);
+		else
+			g.drawRect(x, y, width, height);
+
+//		for (int i = DST; i < width + height; i += DST) {
+//		  int p1x = (i <= height) ? x : x + i - height;
+//		  int p1y = (i <= height) ? y + i : y + height;
+//		  int p2x = (i <= width) ? x + i : x + width;
+//		  int p2y = (i <= width) ? y : y + i - width;
+//		  g.drawLine(p1x, p1y, p2x, p2y);
+//		}
+
+//		for (int i = DST; i < width + height; i += DST) {
+//			int p1x = (i <= height) ? x : x + i -height;
+//			int p1y = (i <= height) ? y + height - i : y;
+//
+//			int p2x = (i <= width) ? x + i : x + width;
+//			int p2y = (i <= width) ? y + height : y + height - i;
+//			g.drawLine(p1x, p1y, p2x, p2y);
+//		}
+
+
+		// ||||||
+		for (int i = DST; i < width; i +=DST) {
+			int p1x = x + i;
+			int p1y = y;
+			int p2x = p1x;
+			int p2y = y + height;
+			g.drawLine(p1x, p1y, p2x, p2y);
+		}
+		// ----
+		// ----
+		// ----
+		for (int i = DST; i < height; i +=DST) {
+			int p1x = x;
+			int p1y = y + i;
+			int p2x = x + width;
+			int p2y = p1y;
+			g.drawLine(p1x, p1y, p2x, p2y);
+		}
+
+
+	  }
+
+
+
+
+
+
+	/* (non-Javadoc)
+	 * @see javax.swing.JComponent#isOptimizedDrawingEnabled()
+	 */
+	@Override
+	public boolean isOptimizedDrawingEnabled() {
+		/* ====================================================== */
+		return false;
+		/* ====================================================== */
+	}
+
+	/**
+	 * Computes the color of the font. If the bg color is to dark, white is
+	 * choosen, otherwise its black.
+	 *
+	 * @param bg
+	 * @return
+	 */
+	public static Color computeForeground(Color bg) {
+		/* ================================================== */
+		if (bg == null) {
+			return Color.WHITE;
+		}
+		// Δe = sqrt(pow(ΔL) + pow(Δa) + pow(Δb))
+		//
+		// a well trained human can detect colors that have a Δe=2
+		// so we must choose a Δe that fits the capability of John Doe
+		// ============================================================
+		// first we must convert the RGB colors to LAB
+
+		// LAB of white
+		int[] labWhite = new int[3];
+		int[] labBlack = new int[3];
+		int[] labBg = new int[3];
+		/* ------------------------------------------------------- */
+		// lab of white
+		rgb2lab(Color.WHITE.getRed(), Color.WHITE.getGreen(), Color.WHITE
+				.getBlue(), labWhite);
+		// lab of black
+		rgb2lab(Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK
+				.getBlue(), labBlack);
+		// lab of bg
+		rgb2lab(bg.getRed(), bg.getGreen(), bg.getBlue(), labBg);
+		/* ------------------------------------------------------- */
+
+		int deltaBgWhite = deltaE(labBg, labWhite);
+		int deltaBgBlack = deltaE(labBg, labBlack);
+
+		// choose the biggest deltaE
+		if (deltaBgBlack > deltaBgWhite)
+			return Color.BLACK;
+		else
+			return Color.WHITE;
+		/* ================================================== */
+	}
+
+	private static int deltaE(int[] lab1, int[] lab2) {
+		/* ================================================== */
+		int deltaE = 0;
+
+		double deltaL = lab2[0] - lab1[0];
+		double deltaA = lab2[1] - lab1[1];
+		double deltaB = lab2[2] - lab1[2];
+
+		deltaE = (int) Math.sqrt(pow(deltaL, 2.0) + pow(deltaA, 2.0)
+				+ pow(deltaB, 2.0));
+
+		return deltaE;
+		/* ================================================== */
+	}
+
+	/**
+	 * Convert RGB color to LAB color mode taken from
+	 * http://www.f4.fhtw-berlin.de/~barthel/ImageJ/ColorInspector//HTMLHelp/farbraumJava.htm
+	 *
+	 * @param R
+	 * @param G
+	 * @param B
+	 * @param lab
+	 */
+	public static void rgb2lab(int R, int G, int B, int[] lab) {
+		// http://www.brucelindbloom.com
+
+		float r, g, b, X, Y, Z, fx, fy, fz, xr, yr, zr;
+		float Ls, as, bs;
+		float eps = 216.f / 24389.f;
+		float k = 24389.f / 27.f;
+
+		float Xr = 0.964221f; // reference white D50
+		float Yr = 1.0f;
+		float Zr = 0.825211f;
+
+		// RGB to XYZ
+		r = R / 255.f; // R 0..1
+		g = G / 255.f; // G 0..1
+		b = B / 255.f; // B 0..1
+
+		// assuming sRGB (D65)
+		if (r <= 0.04045)
+			r = r / 12;
+		else
+			r = (float) Math.pow((r + 0.055) / 1.055, 2.4);
+
+		if (g <= 0.04045)
+			g = g / 12;
+		else
+			g = (float) Math.pow((g + 0.055) / 1.055, 2.4);
+
+		if (b <= 0.04045)
+			b = b / 12;
+		else
+			b = (float) Math.pow((b + 0.055) / 1.055, 2.4);
+
+		X = 0.436052025f * r + 0.385081593f * g + 0.143087414f * b;
+		Y = 0.222491598f * r + 0.71688606f * g + 0.060621486f * b;
+		Z = 0.013929122f * r + 0.097097002f * g + 0.71418547f * b;
+
+		// XYZ to Lab
+		xr = X / Xr;
+		yr = Y / Yr;
+		zr = Z / Zr;
+
+		if (xr > eps)
+			fx = (float) Math.pow(xr, 1 / 3.);
+		else
+			fx = (float) ((k * xr + 16.) / 116.);
+
+		if (yr > eps)
+			fy = (float) Math.pow(yr, 1 / 3.);
+		else
+			fy = (float) ((k * yr + 16.) / 116.);
+
+		if (zr > eps)
+			fz = (float) Math.pow(zr, 1 / 3.);
+		else
+			fz = (float) ((k * zr + 16.) / 116);
+
+		Ls = (116 * fy) - 16;
+		as = 500 * (fx - fy);
+		bs = 200 * (fy - fz);
+
+		lab[0] = (int) (2.55 * Ls + .5);
+		lab[1] = (int) (as + .5);
+		lab[2] = (int) (bs + .5);
 	}
 
 }

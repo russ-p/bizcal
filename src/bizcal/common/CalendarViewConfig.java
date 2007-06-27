@@ -1,3 +1,28 @@
+/*******************************************************************************
+ * Bizcal is a component library for calendar widgets written in java using swing.
+ * Copyright (C) 2007  Frederik Bertilsson 
+ * Contributors:       Martin Heinemann martin.heinemann(at)tudor.lu
+ * 
+ * http://sourceforge.net/projects/bizcal/
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ * [Java is a trademark or registered trademark of Sun Microsystems, Inc. 
+ * in the United States and other countries.]
+ * 
+ *******************************************************************************/
 package bizcal.common;
 
 import java.awt.Color;
@@ -21,9 +46,8 @@ public class CalendarViewConfig
 	private TimeOfDay endView;
 
 	public CalendarViewConfig()
-		throws Exception
 	{
-		startView = new TimeOfDay(7, 0);
+		startView = new TimeOfDay(2, 0);
 		endView = new TimeOfDay(18, 0);
 	}
 
@@ -107,5 +131,11 @@ public class CalendarViewConfig
 
 	public void setLineColor3(Color lineColor3) {
 		this.lineColor3 = lineColor3;
+	}
+
+	public int getMinimumTimeSlotHeight() {
+		/* ====================================================== */
+		return 20;
+		/* ====================================================== */
 	}
 }

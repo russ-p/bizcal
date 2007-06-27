@@ -1,3 +1,28 @@
+/*******************************************************************************
+ * Bizcal is a component library for calendar widgets written in java using swing.
+ * Copyright (C) 2007  Frederik Bertilsson 
+ * Contributors:       Martin Heinemann martin.heinemann(at)tudor.lu
+ * 
+ * http://sourceforge.net/projects/bizcal/
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ * [Java is a trademark or registered trademark of Sun Microsystems, Inc. 
+ * in the United States and other countries.]
+ * 
+ *******************************************************************************/
 package bizcal.common;
 
 import java.util.ArrayList;
@@ -11,49 +36,49 @@ import bizcal.util.DateUtil;
 import bizcal.util.TimeOfDay;
 
 public interface CalendarModel
-{	
-	public List getEvents(Object calId)
+{
+	public List<Event> getEvents(Object calId)
 		throws Exception;
-	
+
 	public List getCalendars()
 		throws Exception;
 
 	public List getSelectedCalendars()
 		throws Exception;
-	
+
 	public void refresh()
 		throws Exception;
-	
+
 	public void deleteCalendar(Object id)
 		throws Exception;
-	
+
 	public long getResolution()
 		throws Exception;
-	
+
 	public DateInterval getInterval()
 		throws Exception;
-	
+
 	public List getColorDescriptions()
 		throws Exception;
-		
-	public boolean isInsertable(Object id, Date date) 
+
+	public boolean isInsertable(Object id, Date date)
 		throws Exception;
-	
+
 	public boolean isRedDay(Date date)
 		throws Exception;
-	
+
 	public TimeOfDay getViewStart()
 		throws Exception;
-	
+
 	public TimeOfDay getViewEnd()
 		throws Exception;
-	
+
 	public String getDateHeader(Object calId, Date date)
 		throws Exception;
 
 	public String getDateFooter(Object calId, Date date, List events)
 		throws Exception;
-	
+
 	public abstract class BaseImpl
 		implements CalendarModel
 	{
@@ -61,7 +86,7 @@ public interface CalendarModel
 		private TimeOfDay viewStart;
 		private TimeOfDay viewEnd;
 		private DateInterval interval;
-		
+
 		public BaseImpl()
 		{
 			try {
@@ -71,39 +96,39 @@ public interface CalendarModel
 				throw BizcalException.create(e);
 			}
 		}
-		
+
 		public List getCalendars() throws Exception
 		{
 			return new ArrayList();
 		}
-		
+
 		public List getSelectedCalendars()
 			throws Exception
 		{
-			return new ArrayList();			
+			return new ArrayList();
 		}
-		
+
 
 		public void refresh() throws Exception
-		{			
+		{
 		}
 
 		public void deleteCalendar(Object id) throws Exception
-		{			
+		{
 		}
-		
+
 		public long getResolution()
 		{
 			return 15 * 60 * 1000;
 		}
-		
+
 		public List getColorDescriptions() throws Exception
 
 		{
 			return new ArrayList();
 		}
 
-		public boolean isInsertable(Object id, Date date) 
+		public boolean isInsertable(Object id, Date date)
 		throws Exception
 		{
 			return true;
@@ -120,13 +145,13 @@ public interface CalendarModel
 		{
 			return viewStart;
 		}
-	
+
 		public TimeOfDay getViewEnd()
 		throws Exception
 		{
-			return viewEnd;			
+			return viewEnd;
 		}
-		
+
 		public void setViewStart(TimeOfDay value)
 		{
 			viewStart = value;
@@ -150,16 +175,16 @@ public interface CalendarModel
 		public String getDateHeader(Object calId, Date date)
 		throws Exception
 		{
-			return null;
+			return "mops";
 		}
-		
+
 		public String getDateFooter(Object calId, Date date, List events)
 		throws Exception
 		{
-			return null;
+			return "Puuups";
 		}
 
-		
+
 	}
-		
+
 }
