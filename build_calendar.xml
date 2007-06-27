@@ -1,0 +1,47 @@
+<project name="java_bizcal" default="jar" basedir=".">
+
+   <property name="app.name"    value="bizcal_santec"/>
+   <property name="app.version"    value="0.5"/>
+   <property name="dist.dir"          value="dist"/>
+   <property name="lib.dir"            value="lib"/>
+   <property name="bin.dir"           value="bin"/>
+   <property name="jar.file"           value="${dist.dir}/lu.tudor.santec.bizcal.jar"/>
+
+	   <path id="libs">
+	      <fileset dir="lib">
+	         <include name="**/*.jar" />
+	      </fileset>
+	   </path>
+
+	<!-- clean up -->
+   <target name="clean">
+   	<mkdir dir="${dist.dir}"/>
+     <delete>
+       <fileset dir="${dist.dir}" includes="**/*"/>
+     </delete>
+   </target>
+
+	<!-- Build bizcal library jar file -->
+  <target name="jar" description="Build bizcal library jar file">
+      <mkdir dir="${dist.dir}"/>
+      	<!-- generate the manifest-file -->
+      <fileset dir="${lib.dir}" id="lib.files">
+      		  <include name="**/*.jar" />
+      </fileset>
+  	<pathconvert pathsep=" " property="jars" refid="lib.files">
+  		  <filtermapper>
+  		   <replacestring from="${basedir}/" to= ""/>
+  		  	<replacestring from="${basedir}\" to= ""/>
+  		   <replacestring from="\" to= "/"/>
+  		  </filtermapper>
+  	</pathconvert>
+  	  <jar jarfile="${jar.file}" basedir="${bin.dir}" >
+  	  		<manifest>
+  	        		  <attribute name="Main-Class" value="lu.tudor.santec.bizcal.CalendarDemo" />
+  	        		  <attribute name="Class-Path" value="${jars}" />
+  	        </manifest>
+  	  </jar>
+   </target>
+
+
+</project>
