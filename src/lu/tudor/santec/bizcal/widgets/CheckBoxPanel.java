@@ -33,6 +33,7 @@ import java.util.Vector;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class CheckBoxPanel extends JPanel implements MouseListener {
 
@@ -57,6 +58,9 @@ public class CheckBoxPanel extends JPanel implements MouseListener {
 		this.setLayout(new BorderLayout());
 		this.cb = new ColoredCheckBox("",c);
 		this.add(cb, BorderLayout.WEST);
+		
+		cb.requestFocus(false);
+		
 		this.label = new  JLabel(text);
 		this.add(label);
 		this.addMouseListener(this);
@@ -101,10 +105,6 @@ public class CheckBoxPanel extends JPanel implements MouseListener {
 			this.setSelected(! this.isSelected());
 		else if (! this.isSelected)
 			this.setSelected(! this.isSelected());
-		for (Iterator iter = listeners.iterator(); iter.hasNext();) {
-			ActionListener element = (ActionListener) iter.next();
-			element.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "selection changed"));
-		}
 	}
 
 	public void mouseEntered(MouseEvent e) {}
@@ -124,7 +124,12 @@ public class CheckBoxPanel extends JPanel implements MouseListener {
 	 */
 	public void setSelected(boolean isSelected) {
 		this.isSelected = isSelected;
-		this.repaint();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				repaint();
+			}
+		});
+		asynchInformActionListeners();
 	}
 
 	public void setColor(Color c) {
@@ -146,5 +151,24 @@ public class CheckBoxPanel extends JPanel implements MouseListener {
 		this.label.updateUI();
 		/* ================================================== */
 	}
-
+	
+	
+	/**
+	 * Inform action listeners asynchronous to speedup the gui
+	 */
+	private void asynchInformActionListeners() {
+		/* ================================================== */
+		Thread t = new Thread() {
+			public void run() {
+				for (Iterator iter = listeners.iterator(); iter.hasNext();) {
+					ActionListener element = (ActionListener) iter.next();
+					element.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "selection changed"));
+				}
+			}
+		};
+		t.start();
+		/* ================================================== */
+	}
+	
+	
 }

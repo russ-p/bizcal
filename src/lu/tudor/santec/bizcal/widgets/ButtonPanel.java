@@ -25,6 +25,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
@@ -37,6 +38,9 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
+
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 
 /**
  * creates a buttonpanel to show on a PatientNaviBar
@@ -83,6 +87,42 @@ public class ButtonPanel extends JPanel {
 		}
 		createPanel(title, color, columns, buttons);
 	}
+	
+	
+	/**
+	 * creates a new buttonpanel
+	 * @param title the title of the buttonpanel
+	 * @param color the background color of the title of the buttonpanel
+	 * @param columns the number of button columns
+	 * @param actions the actions to show on the buttonpanel
+	 * @param toggleActions show actions as togglebuttons
+	 * @param captionOnTop the label is in the north
+	 */
+	public ButtonPanel(String title, Color color, int columns, Vector<Action> actions, boolean toggleActions, boolean captionOnTop) {
+		Vector<AbstractButton> buttons = new Vector<AbstractButton>();
+		for (Iterator iter = actions.iterator(); iter.hasNext();) {
+			Action action = (Action) iter.next();
+			if (toggleActions) {
+				buttons.add(new JToggleButton(action));
+			} else {
+				buttons.add(new JButton(action));
+			}
+		}
+		createPanel(title, color, columns, buttons, captionOnTop);
+	}
+	
+
+	/**
+	 * @param title
+	 * @param color
+	 * @param columns
+	 * @param buttons
+	 */
+	private void createPanel (String title, Color color, int columns, Vector<AbstractButton> buttons) {
+		/* ================================================== */
+		createPanel (title, color, columns, buttons, false);
+		/* ================================================== */
+	}
 
 	/**
 	 * creates a new buttonpanel
@@ -91,11 +131,14 @@ public class ButtonPanel extends JPanel {
 	 * @param columns the number of button columns
 	 * @param buttons the buttons to show on the buttonpanel
 	 */
-	private void createPanel (String title, Color color, int columns, Vector<AbstractButton> buttons) {
+	private void createPanel (String title, Color color, int columns, 
+							  Vector<AbstractButton> buttons, boolean captionOnTop) {
+		/* ================================================== */
 		this.columns = columns;
 		this.setLayout(new BorderLayout(0,2));
 		this.setOpaque(false);
 		JLabel label = new BubbleLabel(" " + title + ":");
+		
 //		label.setOpaque(true);
 		color = new Color(color.getRed(),color.getGreen(),color.getBlue(),200);
 		label.setBackground(color);
@@ -107,7 +150,19 @@ public class ButtonPanel extends JPanel {
 			AbstractButton element = (AbstractButton) iter.next();
 			addButton(element);
 		}
-		this.add(content, BorderLayout.CENTER);
+		/* ------------------------------------------------------- */
+		if (captionOnTop) {
+			/* ------------------------------------------------------- */
+			JPanel stretchPanel = new JPanel(new FormLayout("fill:pref", "fill:pref:grow,pref"));
+			stretchPanel.setOpaque(false);
+			CellConstraints cc = new CellConstraints();
+			stretchPanel.add(content, cc.xy(1, 2));
+			this.add(stretchPanel, BorderLayout.CENTER);
+			/* ------------------------------------------------------- */
+		}
+		else
+			this.add(content, BorderLayout.CENTER);
+		/* ================================================== */
 	}
 
 	/**
@@ -188,5 +243,19 @@ public class ButtonPanel extends JPanel {
 		map.remove(a);
 		removeButton(b);
 	}
+	
+	
+	/**
+	 * Sets the layout of the content panel.
+	 * Use carefully!
+	 * 
+	 * @param layout
+	 */
+	public void setContentLayout(LayoutManager layout) {
+		/* ================================================== */
+		this.content.setLayout(layout);
+		/* ================================================== */
+	}
+	
 
 }

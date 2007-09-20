@@ -31,10 +31,13 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
@@ -51,7 +54,7 @@ import javax.swing.JComponent;
 
 import bizcal.common.Event;
 
-public class FrameArea extends JComponent {
+public class FrameArea extends JComponent implements ComponentListener {
 	private static final long serialVersionUID = 1L;
 
 	private String itsHeadLine;
@@ -59,8 +62,6 @@ public class FrameArea extends JComponent {
 	private String itsDescription;
 
 	private Color fontColor;
-
-//	private Shape itsShape;
 
 	private List<Listener> listeners = new ArrayList<Listener>();
 
@@ -71,6 +72,8 @@ public class FrameArea extends JComponent {
 	private boolean selected;
 
 	private ImageIcon icon;
+	
+	private ImageIcon upperRightIcon;
 
 	// private Color selectionColor = new Color(196, 0, 0);
 	private Color selectionColor = Color.BLACK;
@@ -99,8 +102,6 @@ public class FrameArea extends JComponent {
 
 	private Color alphaFontColor;
 
-//	private Font alphaFont;
-
 	private Font normalFont;
 
 	private float ALPHA_DEFAULT = 0.6f;
@@ -110,15 +111,25 @@ public class FrameArea extends JComponent {
 
 	private float alphaValue = ALPHA_DEFAULT;
 
+	
+	private int lineDistance = 4;
+	
+	private static int HEADER_HEIGHT = 20;
+	
+	private boolean showHeader = true;
 
+	private int lineWrap = -1;
 
+	private boolean isBackgroundMarker 	= false;
+	private static Color   backgroundMarkColor = new Color(205, 207, 255);
+	
 	public static final DateFormat timeFormat = new SimpleDateFormat("HH:mm",
 			Locale.getDefault());
 
 	/**
 	 * @throws Exception
 	 */
-	public FrameArea() throws Exception {
+	public FrameArea() {
 		/* ================================================== */
 		this.normalFont = new Font("Verdana", Font.PLAIN, 10);
 		this.setFont(normalFont);
@@ -130,9 +141,25 @@ public class FrameArea extends JComponent {
 		this.border = true;
 		this.roundedRectangle = true;
 		this.selected = false;
+		
+		this.addComponentListener(this);
 		/* ================================================== */
 	}
-
+	
+	
+	/**
+	 * Paints just a light blue background, no round corners
+	 * no time, no borders
+	 * 
+	 * @param backgroundMarker
+	 */
+	public FrameArea(boolean backgroundMarker) {
+		/* ================================================== */
+		this();
+		this.isBackgroundMarker  = backgroundMarker;
+		/* ================================================== */
+	}
+	
 	/**
 	 * Set the Event object for the FrameArea
 	 * @param event
@@ -247,8 +274,8 @@ public class FrameArea extends JComponent {
 	 */
 	@Deprecated
 	public void setAlphaValue(float aValue) {
-//		if (aValue > 1.0f)
-//			aValue = 1.0f;
+		if (aValue > 1.0f)
+			aValue = 1.0f;
 //		this.alphaValue = aValue - SELECT_OFFSET;
 	}
 
@@ -269,7 +296,7 @@ public class FrameArea extends JComponent {
 		/* ------------------------------------------------------- */
 		// increase the alpha value if the event is a background event
 		if (event != null && event.isBackground())
-			this.alphaValue = ALPHA_DEFAULT + SELECT_OFFSET + 0.2f;
+			this.alphaValue = ALPHA_DEFAULT + SELECT_OFFSET - 0.3f;
 		/* ------------------------------------------------------- */
 		Graphics2D g2 = (Graphics2D) g;
 		// makes the graphics smoother
@@ -292,6 +319,40 @@ public class FrameArea extends JComponent {
 		gbi.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 									RenderingHints.VALUE_ANTIALIAS_ON);
 		gbi.setStroke(new BasicStroke(1.0f));
+		
+		// ===========================================================
+		// draw backgorund marker event
+		//
+		// ===========================================================
+		if (isBackgroundMarker) {
+			/* ------------------------------------------------------- */
+			// do some modifications
+			setBackground(backgroundMarkColor);
+			event.setSelectable(false);
+			event.setBackground(true);
+			/* ------------------------------------------------------- */
+			AlphaComposite ac = null;
+			ac = AlphaComposite.getInstance(AlphaComposite.DST_OVER, alphaValue);
+			gbi.setComposite(ac);
+			gbi.setPaint(this.getBackground());
+			/* ------------------------------------------------------- */
+			
+			gbi.fill(new Rectangle2D.Double(0, 0, width, height));
+			/* ------------------------------------------------------- */
+//			if (this.border && (this.event == null || !this.event.isBackground())) {
+//				gbi.setPaint(Color.black);
+//				gbi.draw(new Rectangle2D.Double(1, 1, width - 2, height - 2));
+//			}
+			
+			
+			g2.drawImage(buffImg, null, 0, 0);
+			super.paint(g2);
+			super.paint(gbi);
+			return;
+			/* ------------------------------------------------------- */
+		}
+		
+		
 		// ===========================================================
 		// draw round rectangle
 		//
@@ -344,10 +405,11 @@ public class FrameArea extends JComponent {
 		// ==============================================================
 		Graphics2D gbiHeader = null;
 
-		if (event == null || !event.isBackground()) {
+		if (showHeader)
+			if (event == null || !event.isBackground()) {
 			/* ------------------------------------------------------- */
 			// create darker header
-			BufferedImage buffImgHeader = new BufferedImage(width, 20,
+			BufferedImage buffImgHeader = new BufferedImage(width, HEADER_HEIGHT,
 					BufferedImage.TYPE_INT_ARGB);
 			gbiHeader = buffImgHeader.createGraphics();
 			/* ------------------------------------------------------- */
@@ -369,7 +431,16 @@ public class FrameArea extends JComponent {
 			g2.drawImage(icon.getImage(), xpos, 2, this);
 			xpos += icon.getIconWidth() + 3;
 		}
-
+		/* ------------------------------------------------------- */
+		// upper right icon
+		if (upperRightIcon != null) {
+			/* ------------------------------------------------------- */
+			g2.drawImage(upperRightIcon.getImage(), getWidth() - 20, 2, this);
+//			xpos += icon.getIconWidth() + 3;
+			/* ------------------------------------------------------- */
+		}
+		
+		
 		// =================================================================================
 		// actions below this point will be placed on top of the "colored glass"
 		//
@@ -380,7 +451,7 @@ public class FrameArea extends JComponent {
 		// ============================================================
 		Font timeFont = this.getFont().deriveFont(Font.BOLD);
 		/* ------------------------------------------------------- */
-		// set alpha fontColor for backgroudn events
+		// set alpha fontColor for background events
 		if (this.event == null || !this.event.isBackground())
 			g2.setPaint(fontColor);
 		else
@@ -404,6 +475,8 @@ public class FrameArea extends JComponent {
 		// in a diagonale
 		// ============================================================
 		if (itsDescription != null) {
+			if (showHeader && itsHeadLine == null)
+				ypos = HEADER_HEIGHT + 15;
 			if (this.event != null && this.event.isBackground()) {
 				/* ------------------------------------------------------- */
 				// compute angle
@@ -425,8 +498,63 @@ public class FrameArea extends JComponent {
 				// back
 				g2.rotate(-angle+0.3, this.xPosition, this.yPosition);
 				/* ------------------------------------------------------- */
-			} else
-				g2.drawString(itsDescription, xpos, ypos);
+			} else {
+				/* ------------------------------------------------------- */
+				int fontHeight =	(int) this.getFont().getSize2D();
+				// get the optimal width
+				int itsW = g2.getFontMetrics().stringWidth(itsDescription);
+				FontMetrics fm = g2.getFontMetrics();
+				if (itsW > this.getWidth()) {
+					/* ------------------------------------------------------- */
+					// check if the width of the frame area has changed and we
+					// must find a new fitting length to split the string
+					int splitWidth = getWidth()-15;
+					if (lineWrap < 0 
+							|| fm.stringWidth(itsDescription.substring(0, lineWrap)) < splitWidth - 15 
+							|| fm.stringWidth(itsDescription.substring(0, lineWrap)) > splitWidth) {
+						/* ------------------------------------------------------- */
+						// wrap the lines
+						String s = itsDescription;
+						this.lineWrap = s.length()-1;
+						/* ------------------------------------------------------- */
+						// shorten the string as often as its painted length
+						// fits into the framearea
+						while (fm.stringWidth(s)> splitWidth && lineWrap > -1) {
+							s = itsDescription.substring(0, lineWrap);
+							lineWrap--;
+						}
+						if (lineWrap < 0) {
+							lineWrap = 0;
+						}
+						/* ------------------------------------------------------- */
+					}
+					/* ------------------------------------------------------- */
+					// paint the string
+					int pos 		= 0;
+					int yposString  = ypos;
+					
+					while (pos < itsDescription.length()) {
+						if (pos+lineWrap >= itsDescription.length())
+							g2.drawString(itsDescription.substring(pos, itsDescription.length()-1).trim(), xpos, yposString);
+						else
+							try {
+							g2.drawString(itsDescription.substring(pos, pos+lineWrap).trim(), xpos, yposString);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						pos = pos+lineWrap;
+						yposString = yposString + fontHeight + 5;
+					}
+					
+					/* ------------------------------------------------------- */
+				} else {
+					// just print
+					/* ------------------------------------------------------- */
+					g2.drawString(itsDescription, xpos, ypos);
+					/* ------------------------------------------------------- */
+				}
+				/* ------------------------------------------------------- */
+			}
 		}
 		/* ------------------------------------------------------- */
 		// draw end time at the bottom
@@ -557,7 +685,49 @@ public class FrameArea extends JComponent {
 	public void addListener(Listener listener) {
 		listeners.add(listener);
 	}
+	
+	
+	// ========================================================================
+	// Methods for the component listener
+	// ------------------------------------------------------------------------
 
+	public void componentResized(ComponentEvent e) {
+		/* ====================================================== */
+		
+//		this.lineWrap = -1;
+		/* ====================================================== */
+	}
+
+	public void componentHidden(ComponentEvent e) {}
+	public void componentMoved(ComponentEvent e) {}
+	public void componentShown(ComponentEvent e) {}
+	
+	
+	/**
+	 * @author martin.heinemann@tudor.lu
+	 * 18.07.2007
+	 * 09:45:33
+	 *
+	 *
+	 * @version
+	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.7  2007/09/20 07:23:16  heine_
+	 * <br>new version commit
+	 * <br>
+	 * <br>Revision 1.25  2007-09-18 09:52:33  heinemann
+	 * <br>*** empty log message ***
+	 * <br>
+	 * <br>Revision 1.24  2007/08/22 11:58:23  heinemann
+	 * <br>*** empty log message ***
+	 * <br>
+	 * <br>Revision 1.23  2007/08/06 11:21:59  heinemann
+	 * <br>*** empty log message ***
+	 * <br>
+	 * <br>Revision 1.22  2007/07/18 07:27:19  heinemann
+	 * <br>line wrap for description string
+	 * <br>
+	 *   
+	 */
 	public static interface Listener extends EventListener {
 		public void selected(FrameArea source) throws Exception;
 
@@ -598,15 +768,75 @@ public class FrameArea extends JComponent {
 	}
 
 
+	/**
+	 * Get the icon that is painted in the upper left corner
+	 * 
+	 * @return
+	 */
 	public ImageIcon getIcon() {
 		return icon;
 	}
 
+	/**
+	 * Set the icon for the upper left corner
+	 * 
+	 * @param icon
+	 */
 	public void setIcon(ImageIcon icon) {
 		this.icon = icon;
 	}
 
+	
+	/**
+	 * Get the icon that is painted in the upper right corner
+	 * 
+	 * @return
+	 */
+	public ImageIcon getUpperRightIcon() {
+		return upperRightIcon;
+	}
 
+	/**
+	 * Set an icon for the upper right corner.
+	 * 
+	 * @param upperRightIcon
+	 */
+	public void setUpperRightIcon(ImageIcon upperRightIcon) {
+		this.upperRightIcon = upperRightIcon;
+	}
+	
+	/**
+	 * Set the line distance for the diagonal lined background of
+	 * background events
+	 * 
+	 * @param dst
+	 */
+	public void setLineDistance (int dst) {
+		this.lineDistance = dst;
+	}
+	
+	/**
+	 * Get the line distance for the diagonal lined background of
+	 * background events
+	 * @return
+	 */
+	public int getLineDistance() {
+		return this.lineDistance;
+	}
+	
+	
+	/**
+	 * Show the darker header
+	 * 
+	 * @param b
+	 */
+	public void showHeader(boolean b) {
+		/* ================================================== */
+		this.showHeader = b;
+		/* ================================================== */
+	}
+	
+	
 	  /**
 	   * Draw nice lines in the area
 	   *
@@ -619,19 +849,19 @@ public class FrameArea extends JComponent {
 	 */
 	public void drawHatchedRect(Graphics g, int x, int y, int width, int height, boolean round)
 	  {
-		final int DST = 2;
+		final int DST = this.lineDistance;
 		if (round)
 			g.drawRoundRect(x, y, width, height, 20, 20);
 		else
 			g.drawRect(x, y, width, height);
 
-//		for (int i = DST; i < width + height; i += DST) {
-//		  int p1x = (i <= height) ? x : x + i - height;
-//		  int p1y = (i <= height) ? y + i : y + height;
-//		  int p2x = (i <= width) ? x + i : x + width;
-//		  int p2y = (i <= width) ? y : y + i - width;
-//		  g.drawLine(p1x, p1y, p2x, p2y);
-//		}
+		for (int i = DST; i < width + height; i += DST) {
+		  int p1x = (i <= height) ? x : x + i - height;
+		  int p1y = (i <= height) ? y + i : y + height;
+		  int p2x = (i <= width) ? x + i : x + width;
+		  int p2y = (i <= width) ? y : y + i - width;
+		  g.drawLine(p1x, p1y, p2x, p2y);
+		}
 
 //		for (int i = DST; i < width + height; i += DST) {
 //			int p1x = (i <= height) ? x : x + i -height;
@@ -643,24 +873,24 @@ public class FrameArea extends JComponent {
 //		}
 
 
-		// ||||||
-		for (int i = DST; i < width; i +=DST) {
-			int p1x = x + i;
-			int p1y = y;
-			int p2x = p1x;
-			int p2y = y + height;
-			g.drawLine(p1x, p1y, p2x, p2y);
-		}
-		// ----
-		// ----
-		// ----
-		for (int i = DST; i < height; i +=DST) {
-			int p1x = x;
-			int p1y = y + i;
-			int p2x = x + width;
-			int p2y = p1y;
-			g.drawLine(p1x, p1y, p2x, p2y);
-		}
+//		// ||||||
+//		for (int i = DST; i < width; i +=DST) {
+//			int p1x = x + i;
+//			int p1y = y;
+//			int p2x = p1x;
+//			int p2y = y + height;
+//			g.drawLine(p1x, p1y, p2x, p2y);
+//		}
+//		// ----
+//		// ----
+//		// ----
+//		for (int i = DST; i < height; i +=DST) {
+//			int p1x = x;
+//			int p1y = y + i;
+//			int p2x = x + width;
+//			int p2y = p1y;
+//			g.drawLine(p1x, p1y, p2x, p2y);
+//		}
 
 
 	  }
@@ -814,5 +1044,4 @@ public class FrameArea extends JComponent {
 		lab[1] = (int) (as + .5);
 		lab[2] = (int) (bs + .5);
 	}
-
 }

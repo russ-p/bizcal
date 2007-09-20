@@ -27,14 +27,17 @@ package bizcal.util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
 /**
  * @author Fredrik Bertilsson
+ * @author martin.heinemann(at)tudor.lu
  */
 public class DateUtil
 {
@@ -42,7 +45,6 @@ public class DateUtil
 		new DefaultCalendarFactory();
 
 	public static Date round2Day(Date date)
-		throws Exception
 	{
 		Calendar cal = newCalendar();
 		cal.setTime(date);
@@ -61,7 +63,6 @@ public class DateUtil
 	 * @return
 	 */
 	public static Date round2Hour(Date date, int hour)
-			throws Exception
 	{
 		/* ================================================== */
 		Calendar cal = newCalendar();
@@ -71,13 +72,46 @@ public class DateUtil
 			cal.set(Calendar.MINUTE, 0);
 			cal.set(Calendar.SECOND, 0);
 			cal.set(Calendar.MILLISECOND, 0);
-		} else
-			throw new Exception("Bad hour " + hour);
+		} 
 
 		return cal.getTime();
 		/* ================================================== */
 	}
-
+	
+	
+	/**
+	 * sets the appropriate minute. If the value is bigger than 60
+	 * it will adapt the hours and the day. <strong>Not the month!!!</strong>
+	 * 
+	 * @param date
+	 * @param minute
+	 * @return
+	 */
+	public static Date round2Minute(Date date, int minute)
+	{
+		Calendar cal = newCalendar();
+		cal.setTime(date);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		if (minute < 0)
+			minute = (-1) * minute;
+		/* ------------------------------------------------------- */
+		// get overlapping hours
+		int overlapping = minute / 60;
+		// compute new hour
+		int oldHour = cal.get(Calendar.HOUR_OF_DAY);
+		int addDays = (oldHour+overlapping) / 24;
+		// set the hours
+		cal.set(Calendar.HOUR_OF_DAY, (oldHour+overlapping) % 24);
+		// set the days
+		if (addDays > 0)
+			cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) + addDays);
+		// this is not finished yet. Month overflow is not handled!!
+		/* ------------------------------------------------------- */
+		// set minutes
+		cal.set(Calendar.MINUTE, (minute % 60));
+	    return cal.getTime();
+	}
 
 	public static Date round2Minute(Date date)
 		throws Exception
@@ -124,7 +158,20 @@ public class DateUtil
 		return cal.get(Calendar.HOUR_OF_DAY);
 		/* ================================================== */
 	}
-	
+
+	/**
+	 * Returns the minutes of the hour
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static int getMinuteOfHour(Date date) {
+		/* ================================================== */
+		Calendar cal = newCalendar();
+		cal.setTime(date);
+		return cal.get(Calendar.MINUTE);
+		/* ================================================== */
+	}
 
 	public static TimeOfDay getTimeOfDay(Date date)
 		throws Exception
@@ -187,7 +234,7 @@ public class DateUtil
 	 * @return
 	 * @throws Exception
 	 */
-	public static int getDayOfMonth(Date date) throws Exception
+	public static int getDayOfMonth(Date date)
     {
 		Calendar cal = newCalendar();
         cal.setTime(date);
@@ -206,7 +253,6 @@ public class DateUtil
 	 * @throws Exception
 	 */
 	public static Date getDiffDay(Date date, int diff)
-		throws Exception
 	{
 		Calendar cal = newCalendar();
         cal.setTime(date);
@@ -214,6 +260,37 @@ public class DateUtil
 		return cal.getTime();
 	}
 
+	
+	/**
+	 * Moves the date by the given amount of days.
+	 * It will consider any month overflows and switches
+	 * automatically to the next month.
+	 * 
+	 * @param date
+	 * @param offset
+	 * @return
+	 */
+	public static Date move(Date date, int offset) {
+		/* ================================================== */
+		Calendar cal = newCalendar();
+        cal.setTime(date);
+        cal.add(Calendar.DAY_OF_MONTH, offset);
+        
+        return cal.getTime();
+		/* ================================================== */
+	}
+	
+	
+	public static Date moveByMinute(Date date, int offset) {
+		/* ================================================== */
+		Calendar cal = newCalendar();
+        cal.setTime(date);
+        cal.add(Calendar.MINUTE, offset);
+        
+        return cal.getTime();
+		/* ================================================== */
+	}
+	
 	/**
 	 * Returns the diff of the two dates
 	 *
@@ -239,11 +316,47 @@ public class DateUtil
 		/* ================================================== */
 	}
 
+	/**
+	 * Returns a list of normalized Dates
+	 * that are between the two dates.
+	 * Normalized means, the time is set to 00:00:00
+	 * The start and end are the first and last dates in the list and
+	 * will not be normalized.
+	 * 
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	public static List<Date> getDayRange(Date start, Date end) {
+		/* ================================================== */
+		List<Date> dates = new ArrayList<Date>(0);
+		/* ------------------------------------------------------- */
+		if (start == null || end == null)
+			return dates;
+		/* ------------------------------------------------------- */
+		// add the first element
+		dates.add(start);
+		// loop as long as the next day is before the end
+		Date normalizedEnd = round2Day(end);
+		Date next = start;
+		/* ------------------------------------------------------- */
+		while (next.before(normalizedEnd)) {
+			dates.add(getDiffDay(next, 1));
+			next = round2Day(getDiffDay(next, 1));
+		}
+		/* ------------------------------------------------------- */
+		// add last element
+		dates.add(end);
+		/* ------------------------------------------------------- */
+		return dates;
+		/* ================================================== */
+	}
 	
 	/**
-	 * Returns the number of days that are between the two.
+	 * Returns the number of days that are between the two
+	 * day of week
 	 * [startDay,endDay]
-	 * week days.
+	 * [1..7]
 	 * 
 	 * @param startDay
 	 * @param endDay
@@ -261,6 +374,13 @@ public class DateUtil
 	}
 	
 	
+	
+	
+	/**
+	 * @param d1
+	 * @param d2
+	 * @return
+	 */
 	public static boolean isSameDay(Date d1, Date d2) {
 		GregorianCalendar cal1 = new GregorianCalendar();
 		cal1.setTime(d1);
@@ -273,10 +393,26 @@ public class DateUtil
 
 
 
-	public static int getDateDiff(Date date2, Date date1) throws Exception {
+	/**
+	 * Returns the number of dates that are between the two given dates
+	 * 
+	 * @param date2
+	 * @param date1
+	 * @return
+	 * @throws Exception
+	 */
+	public static int getDateDiff(Date date2, Date date1)  {
+		/* ================================================== */
 		return (int) ((date2.getTime() - date1.getTime()) / 24 / 3600 / 1000);
+		/* ================================================== */
 	}
 
+	/**
+	 * @param date
+	 * @param time
+	 * @return
+	 * @throws Exception
+	 */
 	public static Date setTimeOfDate(Date date, TimeOfDay time)
 			throws Exception {
 		Calendar cal = newCalendar();

@@ -74,9 +74,20 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
- *          Revision 1.22  2007/06/27 15:22:18  heine_
- *          nearly Stable
- *          added LGPL license headers
+ *          Revision 1.23  2007/09/20 07:23:16  heine_
+ *          new version commit
+ *
+ *          Revision 1.36  2007-09-11 16:14:41  heinemann
+ *          speed up
+ *
+ *          Revision 1.35  2007/08/22 11:58:23  heinemann
+ *          *** empty log message ***
+ *
+ *          Revision 1.34  2007/07/03 07:23:39  heinemann
+ *          *** empty log message ***
+ *
+ *          Revision 1.33  2007/06/27 14:59:55  heinemann
+ *          *** empty log message ***
  *
  *          Revision 1.32  2007/06/27 11:59:15  heinemann
  *          *** empty log message ***
@@ -281,9 +292,21 @@ public abstract class CalendarView {
 			String tip = event.getToolTip();
 			area.setToolTipText(tip);
 		}
-		area.setIcon(event.getIcon());
+		/* ------------------------------------------------------- */
+		// set icons
+		area.setIcon(			event.getIcon());
+		area.setUpperRightIcon( event.getUpperRightIcon());
+		/* ------------------------------------------------------- */
 		area.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
+		/* ------------------------------------------------------- */
+		// set the line distance
+//		if (event.get(Event.LINE_DISTANCE) != null)
+		try {
+			area.setLineDistance((Integer) event.get(Event.LINE_DISTANCE));
+		} catch (Exception e) {
+//			e.printStackTrace();
+		}
+		/* ------------------------------------------------------- */
 		area.setSelected(isSelected(event));
 		register(calId, event, area);
 		return area;
@@ -424,6 +447,8 @@ public abstract class CalendarView {
 
 		private boolean _shiftKey = false;
 
+		private boolean dragged;
+
 		public FrameAreaMouseListener(FrameArea frameArea, Object calId,
 				Event event) {
 			_frameArea = frameArea;
@@ -434,7 +459,7 @@ public abstract class CalendarView {
 		public void mousePressed(MouseEvent e) {
 			/* ------------------------------------------------------- */
 			CalendarView.isMousePressed = true;
-
+			this.dragged = false;
 			_shiftKey = (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0;
 
 			// store the clicked FrameArea
@@ -534,9 +559,16 @@ public abstract class CalendarView {
 						/* ------------------------------------------------------- */
 						// if the date has not changed, do nothing
 						Date eventDateNew = getDate(baseFrameArea.getBounds().x + 5,
-								baseFrameArea.getBounds().y);
-//						if (!e.getPoint().equals(_startDrag)) {
-						if (!eventDateNew.equals(_event.getStart())) {
+								baseFrameArea.getBounds().y+1);
+						// =============================================================
+						// cut the seconds from both dates, they can differ but
+						// are not significant for us because we create a calendar
+						// and not a scientific timetable
+						// =============================================================
+						if (dragged && 
+								!(DateUtil.round2Minute(eventDateNew).equals(
+										DateUtil.round2Minute(_event.getStart())))) {
+//						if (!eventDateNew.equals(_event.getStart())) {
 							/* ------------------------------------------------------- */
 							// move
 							listener.moved(_event, _calId, _event.getStart(),
@@ -567,6 +599,7 @@ public abstract class CalendarView {
 		}
 
 		public void mouseEntered(MouseEvent e) {
+			/* ================================================== */
 			FrameArea baseFrameArea = frameAreaHash.get(_event);
 			if (!baseFrameArea.equals(_frameArea)) {
 				baseFrameArea.getMouseListeners()[0].mouseEntered(e);
@@ -597,9 +630,11 @@ public abstract class CalendarView {
 			} catch (Exception exc) {
 				ErrorHandler.handleError(exc);
 			}
+			/* ================================================== */
 		}
 
 		public void mouseExited(MouseEvent e) {
+			/* ================================================== */
 			FrameArea baseFrameArea = frameAreaHash.get(_event);
 			if (!baseFrameArea.equals(_frameArea)) {
 				baseFrameArea.getMouseListeners()[0].mouseExited(e);
@@ -626,9 +661,11 @@ public abstract class CalendarView {
 			} catch (Exception exc) {
 				ErrorHandler.handleError(exc);
 			}
+			/* ================================================== */
 		}
 
 		public void mouseClicked(MouseEvent e) {
+			/* ================================================== */
 			FrameArea baseFrameArea = frameAreaHash.get(_event);
 			if (!baseFrameArea.equals(_frameArea)) {
 				baseFrameArea.getMouseListeners()[0].mouseClicked(e);
@@ -667,9 +704,11 @@ public abstract class CalendarView {
 			} catch (Exception exc) {
 				ErrorHandler.handleError(exc);
 			}
+			/* ================================================== */
 		}
 
 		private void maybeShowPopup(MouseEvent e) {
+			/* ================================================== */
 			try {
 				if (e.isPopupTrigger()) {
 					FrameArea area = getFrameArea(_calId, _event);
@@ -683,9 +722,12 @@ public abstract class CalendarView {
 			} catch (Exception exc) {
 				ErrorHandler.handleError(exc);
 			}
+			/* ================================================== */
 		}
 
 		public void mouseDragged(MouseEvent e) {
+			/* ================================================== */
+			this.dragged = true;
 			FrameArea baseFrameArea = frameAreaHash.get(_event);
 			//
 			// if (!baseFrameArea.equals(_frameArea)) {
@@ -1188,9 +1230,20 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
-	 * <br>Revision 1.22  2007/06/27 15:22:18  heine_
-	 * <br>nearly Stable
-	 * <br>added LGPL license headers
+	 * <br>Revision 1.23  2007/09/20 07:23:16  heine_
+	 * <br>new version commit
+	 * <br>
+	 * <br>Revision 1.36  2007-09-11 16:14:41  heinemann
+	 * <br>speed up
+	 * <br>
+	 * <br>Revision 1.35  2007/08/22 11:58:23  heinemann
+	 * <br>*** empty log message ***
+	 * <br>
+	 * <br>Revision 1.34  2007/07/03 07:23:39  heinemann
+	 * <br>*** empty log message ***
+	 * <br>
+	 * <br>Revision 1.33  2007/06/27 14:59:55  heinemann
+	 * <br>*** empty log message ***
 	 * <br>
 	 * <br>Revision 1.32  2007/06/27 11:59:15  heinemann
 	 * <br>*** empty log message ***
@@ -1266,9 +1319,20 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
-	 * <br>Revision 1.22  2007/06/27 15:22:18  heine_
-	 * <br>nearly Stable
-	 * <br>added LGPL license headers
+	 * <br>Revision 1.23  2007/09/20 07:23:16  heine_
+	 * <br>new version commit
+	 * <br>
+	 * <br>Revision 1.36  2007-09-11 16:14:41  heinemann
+	 * <br>speed up
+	 * <br>
+	 * <br>Revision 1.35  2007/08/22 11:58:23  heinemann
+	 * <br>*** empty log message ***
+	 * <br>
+	 * <br>Revision 1.34  2007/07/03 07:23:39  heinemann
+	 * <br>*** empty log message ***
+	 * <br>
+	 * <br>Revision 1.33  2007/06/27 14:59:55  heinemann
+	 * <br>*** empty log message ***
 	 * <br>
 	 * <br>Revision 1.32  2007/06/27 11:59:15  heinemann
 	 * <br>*** empty log message ***
@@ -1350,9 +1414,20 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
-	 * <br>Revision 1.22  2007/06/27 15:22:18  heine_
-	 * <br>nearly Stable
-	 * <br>added LGPL license headers
+	 * <br>Revision 1.23  2007/09/20 07:23:16  heine_
+	 * <br>new version commit
+	 * <br>
+	 * <br>Revision 1.36  2007-09-11 16:14:41  heinemann
+	 * <br>speed up
+	 * <br>
+	 * <br>Revision 1.35  2007/08/22 11:58:23  heinemann
+	 * <br>*** empty log message ***
+	 * <br>
+	 * <br>Revision 1.34  2007/07/03 07:23:39  heinemann
+	 * <br>*** empty log message ***
+	 * <br>
+	 * <br>Revision 1.33  2007/06/27 14:59:55  heinemann
+	 * <br>*** empty log message ***
 	 * <br>
 	 * <br>Revision 1.32  2007/06/27 11:59:15  heinemann
 	 * <br>*** empty log message ***

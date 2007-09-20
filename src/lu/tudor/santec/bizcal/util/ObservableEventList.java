@@ -26,8 +26,8 @@
  *
  * @version
  * <br>$Log: ObservableEventList.java,v $
- * <br>Revision 1.1  2007/06/27 15:39:35  heine_
- * <br>*** empty log message ***
+ * <br>Revision 1.2  2007/09/20 07:23:16  heine_
+ * <br>new version commit
  * <br>
  * <br>Revision 1.4  2007/06/20 12:08:24  heinemann
  * <br>*** empty log message ***
@@ -64,8 +64,8 @@ import bizcal.common.Event;
  *
  * @version
  * <br>$Log: ObservableEventList.java,v $
- * <br>Revision 1.1  2007/06/27 15:39:35  heine_
- * <br>*** empty log message ***
+ * <br>Revision 1.2  2007/09/20 07:23:16  heine_
+ * <br>new version commit
  * <br>
  * <br>Revision 1.4  2007/06/20 12:08:24  heinemann
  * <br>*** empty log message ***

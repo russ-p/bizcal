@@ -25,12 +25,18 @@
  *******************************************************************************/
 package bizcal.util;
 
+import java.io.Serializable;
+
 /**
  * @author Fredrik Bertilsson
+ * @param <T>
  */
-public class Interval
+public class Interval implements Serializable
 {
-    private Comparable start;
+	private static final long serialVersionUID = 1L;
+	
+	
+	private Comparable start;
     private Comparable end;
     private boolean includeStart = true;
     private boolean includeEnd = false;
@@ -93,7 +99,6 @@ public class Interval
     }
 
     public boolean contains(Comparable obj)
-    	throws Exception
     {
         if (start != null) {
            if (obj.compareTo(getStart()) < 0)
@@ -110,7 +115,7 @@ public class Interval
         return true;
     }
 
-    public boolean contains(Interval interval) throws Exception {
+    public boolean contains(Interval interval) {
 		if (start != null) {
 			int cmp = interval.getStart().compareTo(start);
 			if (cmp < 0)
@@ -135,7 +140,6 @@ public class Interval
 	}
 
     public boolean overlap(Interval interval)
-    	throws Exception
     {
         Interval tmpInterv = new Interval(getStart(), getEnd());
         tmpInterv.setIncludeStart(false);

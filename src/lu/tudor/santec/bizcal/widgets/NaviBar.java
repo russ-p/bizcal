@@ -45,12 +45,19 @@ import com.jgoodies.forms.layout.RowSpec;
 public class NaviBar extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	public static final int TOP = 1;
-	public static final int BOTTOM = 2;
+	
+	// inner constraints
+	public static final int TOP 	= 1;
+	public static final int BOTTOM 	= 2;
+	public static final int FILL 	= 3;
+	
 	private CellConstraints cc;
 	private FormLayout layout;
 	private int pos = 2;
 	
+	/**
+	 * 
+	 */
 	public NaviBar() {
 		this.setOpaque(false);
 		this.layout = new FormLayout("1dlu, 60dlu, 1dlu", "1dlu, pref:grow");
@@ -62,9 +69,13 @@ public class NaviBar extends JPanel {
 		
 	}
 	
+	/**
+	 * @param width
+	 */
 	public NaviBar(int width) {
 		this.setOpaque(false);
-		this.layout = new FormLayout("1dlu, " + width + "dlu, 1dlu", "1dlu, pref:grow");
+		this.layout = new FormLayout("1dlu, " + width + "dlu, 1dlu", "1dlu, pref");
+		
 		this.setLayout(layout);	
 		this.cc = new CellConstraints();
 		
@@ -73,18 +84,39 @@ public class NaviBar extends JPanel {
 		
 	}
 	
+	/**
+	 * @param buttonPanel
+	 * @param alignment
+	 */
 	public void addButtonPanel(JComponent buttonPanel, int alignment) {
+		/* ================================================== */
 		if (alignment == TOP) {
+			/* ------------------------------------------------------- */
 			this.layout.insertRow(pos, new RowSpec("pref"));
 			this.add(buttonPanel, cc.xy(2, pos));
 			pos++;
 			this.layout.insertRow(pos, new RowSpec("3dlu"));
 			pos++;
-		} else {
+			/* ------------------------------------------------------- */
+		} else 
+		if (FILL == alignment) {
+			/* ------------------------------------------------------- */
+//			this.layout.insertRow(pos, new RowSpec("fill:pref:grow"));
+//			this.add(new JLabel("f "+pos), cc.xy(2, pos));
+//			pos++;
+			this.layout.insertRow(pos, new RowSpec("fill:pref:grow"));
+			this.add(buttonPanel, cc.xy(2, pos));
+			pos++;
+			this.layout.insertRow(pos, new RowSpec("3dlu"));
+			pos++;
+			/* ------------------------------------------------------- */
+		}
+		else {
 			this.layout.appendRow(new RowSpec("pref"));
 			this.add(buttonPanel, cc.xy(2, layout.getRowCount()));
 			this.layout.appendRow(new RowSpec("3dlu"));
 		}
+		/* ================================================== */
 	}
 	
 	

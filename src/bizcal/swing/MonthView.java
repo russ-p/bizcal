@@ -241,9 +241,8 @@ public class MonthView extends CalendarView
 	 *
 	 * @version
 	 * <br>$Log: MonthView.java,v $
-	 * <br>Revision 1.16  2007/06/27 15:22:18  heine_
-	 * <br>nearly Stable
-	 * <br>added LGPL license headers
+	 * <br>Revision 1.17  2007/09/20 07:23:16  heine_
+	 * <br>new version commit
 	 * <br>
 	 * <br>Revision 1.9  2007/06/22 13:14:49  heinemann
 	 * <br>*** empty log message ***

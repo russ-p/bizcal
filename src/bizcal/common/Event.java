@@ -44,6 +44,17 @@ import bizcal.util.LocaleBroker;
 public class Event
 	implements Comparable
 {
+	
+	// =============================================
+	// constants to store parameters
+	// in the properties hashmap
+	// =============================================
+	
+	/**
+	 * Parameter key for the distance of the diagonal lines in background mode
+	 */
+	public static final String LINE_DISTANCE = "linedistance";
+	
 	private Object id;
 	private String summary;
 	private String description;
@@ -61,6 +72,8 @@ public class Event
 	private boolean selectable = true;
 	private ImageIcon icon = null;
 	private Object orgEvent;
+
+	private ImageIcon upperRightIcon;
 
 	public Object getId() {
 		return id;
@@ -189,6 +202,24 @@ public class Event
 	}
 	public void setIcon(ImageIcon icon) {
 		this.icon = icon;
+	}
+	
+	/**
+	 * Get the icon that is painted in the upper right corner
+	 * 
+	 * @return
+	 */
+	public ImageIcon getUpperRightIcon() {
+		return upperRightIcon;
+	}
+
+	/**
+	 * Set an icon for the upper right corner.
+	 * 
+	 * @param upperRightIcon
+	 */
+	public void setUpperRightIcon(ImageIcon upperRightIcon) {
+		this.upperRightIcon = upperRightIcon;
 	}
 
 	public Object getOrgEvent() {

@@ -43,9 +43,14 @@ import bizcal.util.TimeOfDay;
  *
  * @version
  * <br>$Log: DayViewConfig.java,v $
- * <br>Revision 1.7  2007/06/27 15:22:19  heine_
- * <br>nearly Stable
- * <br>added LGPL license headers
+ * <br>Revision 1.8  2007/09/20 07:23:16  heine_
+ * <br>new version commit
+ * <br>
+ * <br>Revision 1.13  2007/07/09 07:16:47  heinemann
+ * <br>*** empty log message ***
+ * <br>
+ * <br>Revision 1.12  2007/06/27 14:59:55  heinemann
+ * <br>*** empty log message ***
  * <br>
  * <br>Revision 1.11  2007/06/26 13:10:51  heinemann
  * <br>*** empty log message ***
@@ -64,7 +69,14 @@ public class DayViewConfig
 //	private TimeOfDay startView;
 	private TimeOfDay endView;
 
-
+	
+	
+	/**
+	 * The alpha for the grid lines
+	 */
+	private int gridAlpha = 50;
+	
+	
 	/**
 	 * Timeslots per hour
 	 */
@@ -348,7 +360,21 @@ public class DayViewConfig
 		/* ====================================================== */
 	}
 
+	/**
+	 * @return the gridAlpha
+	 */
+	public int getGridAlpha() {
+		return gridAlpha;
+	}
 
+	/**
+	 * @param gridAlpha the gridAlpha to set
+	 */
+	public void setGridAlpha(int gridAlpha) {
+		this.gridAlpha = gridAlpha;
+	}
+
+	
 
 
 }

@@ -69,7 +69,18 @@ public class ColoredCheckBox extends JCheckBox {
 		setIcon(cbi);
 		/* ================================================== */
 	}
-
+	
+	
+	/* (non-Javadoc)
+	 * @see javax.swing.AbstractButton#setSelected(boolean)
+	 */
+	@Override
+	public void setSelected(boolean b) {
+		/* ====================================================== */
+		super.setSelected(b);
+		this.model.setSelected(b);
+		/* ====================================================== */
+	}
 
 	/* (non-Javadoc)
 	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
@@ -88,6 +99,22 @@ public class ColoredCheckBox extends JCheckBox {
 	}
 
 
+	/**
+	 * 
+	 * 12.09.2007
+	 * 09:40:04
+	 *
+	 *
+	 * @version
+	 * <br>$Log: ColoredCheckBox.java,v $
+	 * <br>Revision 1.2  2007/09/20 07:23:16  heine_
+	 * <br>new version commit
+	 * <br>
+	 * <br>Revision 1.4  2007-09-18 09:52:32  heinemann
+	 * <br>*** empty log message ***
+	 * <br>
+	 *   
+	 */
 	public class ColorCheckBoxIcon implements Icon, UIResource, Serializable {
 
 		private Color color;
@@ -104,28 +131,31 @@ public class ColoredCheckBox extends JCheckBox {
 
 	    public void paintIcon(Component c, Graphics g, int x, int y) {
 
-	     JCheckBox cb = (JCheckBox)c;
-		ButtonModel model = cb.getModel();
-		int controlSize = getControlSize();
-
-	    boolean drawCheck = model.isSelected();
-
-		if (model.isEnabled()) {
-			g.setColor(color);
-			g.fillRoundRect(x, y+1, controlSize-1, controlSize-1 ,3,3);
-		} else {
-			g.setColor(MetalLookAndFeel.getControlShadow());
-			g.drawRect(x, y, controlSize - 1, controlSize - 1);
-		}
-
-			if(drawCheck) {
-				g.setColor(Color.DARK_GRAY);
-			    if (big)
-			    	drawBigCheck(c,g,x,y);
-			    else
-			    	drawCheck(c,g,x,y);
+		     JCheckBox cb = (JCheckBox)c;
+			ButtonModel model = cb.getModel();
+			int controlSize = getControlSize();
+	
+		    boolean drawCheck = model.isSelected();
+		    
+		    
+//		    System.out.println("drawCheck -> " + drawCheck);
+		    
+			if (model.isEnabled()) {
+				g.setColor(color);
+				g.fillRoundRect(x, y+1, controlSize-1, controlSize-1 ,3,3);
+			} else {
+				g.setColor(MetalLookAndFeel.getControlShadow());
+				g.drawRect(x, y, controlSize - 1, controlSize - 1);
 			}
-	    }
+	
+				if(drawCheck) {
+					g.setColor(Color.DARK_GRAY);
+				    if (big)
+				    	drawBigCheck(c,g,x,y);
+				    else
+				    	drawCheck(c,g,x,y);
+				}
+		}
 
 	    protected void drawCheck(Component c, Graphics g, int x, int y) {
 		int controlSize = getControlSize();

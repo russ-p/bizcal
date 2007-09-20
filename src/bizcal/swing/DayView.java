@@ -225,15 +225,14 @@ public class DayView extends CalendarView {
 			if (timeSlots > 10)
 				timeSlots = 10;
 			/* ------------------------------------------------------- */
-
 			// create a horizontal line for each time slot
+			Color color = getDesc().getLineColor();
+			Color hlineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(),getDesc().getGridAlpha());
 			for (int i = 1; i <= timeSlots; i++) {
 				/* ------------------------------------------------------- */
 				JLabel line = new JLabel();
-				Color color = getDesc().getLineColor();
-
-				line.setBackground(new Color(color.getRed(), color.getGreen(), color.getBlue(),50));
 				line.setOpaque(true);
+				line.setBackground(hlineColor);
 				calPanel.add(line, GRID_LEVEL);
 				timeLines.put(new Tuple(date, ""+(60/timeSlots)*i), line);
 				addHorizontalLine(line);
@@ -381,11 +380,22 @@ public class DayView extends CalendarView {
 
 			Calendar startdate = DateUtil.newCalendar();
 			startdate.setTime(interval2.getStartDate());
-
+			/* ------------------------------------------------------- */
+			// create vertical lines
+			Color vlColor = getDesc().getLineColor();
+			int vlAlpha = getDesc().getGridAlpha()+50;
+			if (vlAlpha > 255)
+				vlAlpha = 255;
+			/* ------------------------------------------------------- */
+			Color vlAlphaColor = new Color(vlColor.getRed(), vlColor.getGreen(), vlColor.getBlue(), vlAlpha);
+			/* ------------------------------------------------------- */
 			if (it > 0) {
+				/* ------------------------------------------------------- */
 				JLabel verticalLine = new JLabel();
 				verticalLine.setOpaque(true);
-				verticalLine.setBackground(getDesc().getLineColor());
+				verticalLine.setBackground(vlAlphaColor);
+//				verticalLine.setBackground(getDesc().getLineColor());
+
 				if (startdate.get(Calendar.DAY_OF_WEEK) == startdate
 						.getFirstDayOfWeek())
 					verticalLine.setBackground(getDescriptor().getLineColor2());
@@ -393,8 +403,9 @@ public class DayView extends CalendarView {
 					verticalLine.setBackground(getDescriptor().getLineColor3());
 				calPanel.add(verticalLine, GRID_LEVEL);
 				vLines.add(verticalLine);
+				/* ------------------------------------------------------- */
 			}
-
+			/* ------------------------------------------------------- */
 			List<FrameArea> frameAreas = new ArrayList<FrameArea>();
 			// l�gger till en framearea-lista f�r varje dag
 			frameAreaCols.add(frameAreas);
@@ -564,9 +575,17 @@ public class DayView extends CalendarView {
 	 *
 	 * @version <br>
 	 *          $Log: DayView.java,v $
-	 *          Revision 1.27  2007/06/27 15:22:18  heine_
-	 *          nearly Stable
-	 *          added LGPL license headers
+	 *          Revision 1.28  2007/09/20 07:23:16  heine_
+	 *          new version commit
+	 *
+	 *          Revision 1.23  2007-09-18 12:39:57  heinemann
+	 *          *** empty log message ***
+	 *
+	 *          Revision 1.22  2007/07/09 07:30:08  heinemann
+	 *          *** empty log message ***
+	 *
+	 *          Revision 1.21  2007/07/09 07:16:47  heinemann
+	 *          *** empty log message ***
 	 *
 	 *          Revision 1.20  2007/06/20 12:08:08  heinemann
 	 *          *** empty log message ***
@@ -775,7 +794,12 @@ public class DayView extends CalendarView {
 						for (FrameArea fa : fAreas) {
 							/* ------------------------------------------------------- */
 							int sw = findSmallestFrameArea(fa);
-							int baseFAWidth = getBaseFrameArea(fa.getEvent()).getBounds().width;
+							int baseFAWidth;
+							try {
+								baseFAWidth = getBaseFrameArea(fa.getEvent()).getBounds().width;
+							} catch (Exception e) {
+								continue;
+							}
 							if (sw > baseFAWidth) {
 								sw = baseFAWidth;
 							}
