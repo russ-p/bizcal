@@ -183,7 +183,7 @@ public class DayView extends CalendarView {
 	}
 
 	public void refresh0() throws Exception {
-		if (calPanel == null)
+		if (calPanel == null || this.getModel() == null)
 			return;
 
 		dayCount = (int) (getModel().getInterval().getDuration() / (24 * 3600 * 1000));
@@ -575,8 +575,13 @@ public class DayView extends CalendarView {
 	 *
 	 * @version <br>
 	 *          $Log: DayView.java,v $
-	 *          Revision 1.28  2007/09/20 07:23:16  heine_
-	 *          new version commit
+	 *          Revision 1.29  2008/01/21 14:13:55  heine_
+	 *          fixed nullpointer problem when refreshing without a model.
+	 *          The refresh method just returns in case of this
+	 *
+	 *          Revision 1.24  2008-01-21 14:06:11  heinemann
+	 *          fixed nullpointer problem when refreshing without a model.
+	 *          The refresh method just returns in case of this.
 	 *
 	 *          Revision 1.23  2007-09-18 12:39:57  heinemann
 	 *          *** empty log message ***
