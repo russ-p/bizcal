@@ -292,6 +292,26 @@ public class DateUtil
 	}
 	
 	/**
+	 * Sets the date to 23:59:59
+	 * 
+	 * @param date
+	 */
+	public static Date move2Midnight(Date date) {
+		/* ================================================== */
+		Calendar cal = newCalendar();
+        cal.setTime(date);
+        
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE,      59);
+        cal.set(Calendar.SECOND, 	  59);
+        cal.set(Calendar.MILLISECOND, 59);
+        
+        return cal.getTime();
+		/* ================================================== */
+	}
+	
+	
+	/**
 	 * Returns the diff of the two dates
 	 *
 	 * @param oldDate
@@ -377,6 +397,26 @@ public class DateUtil
 	
 	
 	/**
+	 * Checks if the dates are the same day of the year.
+	 * They can be in different years. Result will be true.
+	 * 
+	 * @param d1
+	 * @param d2
+	 * @return
+	 */
+	public static boolean isSameDayOfYear(Date d1, Date d2) {
+		GregorianCalendar cal1 = new GregorianCalendar();
+		cal1.setTime(d1);
+		GregorianCalendar cal2 = new GregorianCalendar();
+		cal2.setTime(d2);
+		if (cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR))
+			return true;
+		return false;
+	}
+
+	/**
+	 * Checks if the dates are on the exact same day.
+	 * 
 	 * @param d1
 	 * @param d2
 	 * @return
@@ -387,11 +427,10 @@ public class DateUtil
 		GregorianCalendar cal2 = new GregorianCalendar();
 		cal2.setTime(d2);
 		if (cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR))
-			return true;
+			if (cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR))
+				return true;
 		return false;
 	}
-
-
 
 	/**
 	 * Returns the number of dates that are between the two given dates
@@ -520,6 +559,25 @@ public class DateUtil
 		return cal.getTime();
 		/* ================================================== */
 	}
+	
+	
+	
+	/**
+	 * Extracts the age out of the day of birth
+	 * 
+	 * @param dayOfBirth
+	 * @return
+	 */
+	public static long extractAge(Date dayOfBirth) {
+		/* ================================================== */
+		Calendar c1 = new GregorianCalendar();
+		Calendar c2 = new GregorianCalendar();
+		c2.setTime(dayOfBirth);
+
+		return c1.get(Calendar.YEAR) - c2.get(Calendar.YEAR);
+		/* ================================================== */
+	}
+	
 	
 	
 	public static Calendar newCalendar()
