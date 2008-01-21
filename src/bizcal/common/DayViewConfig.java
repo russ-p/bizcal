@@ -43,8 +43,8 @@ import bizcal.util.TimeOfDay;
  *
  * @version
  * <br>$Log: DayViewConfig.java,v $
- * <br>Revision 1.8  2007/09/20 07:23:16  heine_
- * <br>new version commit
+ * <br>Revision 1.9  2008/01/21 14:12:52  heine_
+ * <br>*** empty log message ***
  * <br>
  * <br>Revision 1.13  2007/07/09 07:16:47  heinemann
  * <br>*** empty log message ***

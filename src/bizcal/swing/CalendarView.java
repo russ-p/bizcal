@@ -74,8 +74,11 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
- *          Revision 1.23  2007/09/20 07:23:16  heine_
- *          new version commit
+ *          Revision 1.24  2008/01/21 14:13:26  heine_
+ *          *** empty log message ***
+ *
+ *          Revision 1.37  2008-01-21 14:06:22  heinemann
+ *          code cleanup and java doc
  *
  *          Revision 1.36  2007-09-11 16:14:41  heinemann
  *          speed up
@@ -213,10 +216,19 @@ public abstract class CalendarView {
 
 	public abstract void refresh0() throws Exception;
 
+	/**
+	 * @param broker
+	 * @throws Exception
+	 */
 	public void setBroker(CalendarModel broker) throws Exception {
 		this.broker = broker;
 	}
 
+	/**
+	 * Same method as setBroker
+	 * 
+	 * @param model
+	 */
 	public void setModel(CalendarModel model) {
 		this.broker = model;
 	}
@@ -1230,8 +1242,11 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
-	 * <br>Revision 1.23  2007/09/20 07:23:16  heine_
-	 * <br>new version commit
+	 * <br>Revision 1.24  2008/01/21 14:13:26  heine_
+	 * <br>*** empty log message ***
+	 * <br>
+	 * <br>Revision 1.37  2008-01-21 14:06:22  heinemann
+	 * <br>code cleanup and java doc
 	 * <br>
 	 * <br>Revision 1.36  2007-09-11 16:14:41  heinemann
 	 * <br>speed up
@@ -1319,8 +1334,11 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
-	 * <br>Revision 1.23  2007/09/20 07:23:16  heine_
-	 * <br>new version commit
+	 * <br>Revision 1.24  2008/01/21 14:13:26  heine_
+	 * <br>*** empty log message ***
+	 * <br>
+	 * <br>Revision 1.37  2008-01-21 14:06:22  heinemann
+	 * <br>code cleanup and java doc
 	 * <br>
 	 * <br>Revision 1.36  2007-09-11 16:14:41  heinemann
 	 * <br>speed up
@@ -1414,8 +1432,11 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
-	 * <br>Revision 1.23  2007/09/20 07:23:16  heine_
-	 * <br>new version commit
+	 * <br>Revision 1.24  2008/01/21 14:13:26  heine_
+	 * <br>*** empty log message ***
+	 * <br>
+	 * <br>Revision 1.37  2008-01-21 14:06:22  heinemann
+	 * <br>code cleanup and java doc
 	 * <br>
 	 * <br>Revision 1.36  2007-09-11 16:14:41  heinemann
 	 * <br>speed up
