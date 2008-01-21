@@ -26,8 +26,8 @@
  *
  * @version
  * <br>$Log: EventModel.java,v $
- * <br>Revision 1.2  2007/09/20 07:23:16  heine_
- * <br>new version commit
+ * <br>Revision 1.3  2008/01/21 14:14:17  heine_
+ * <br>code cleanup and java doc
  * <br>
  * <br>Revision 1.12  2007/06/26 13:10:51  heinemann
  * <br>*** empty log message ***
@@ -94,8 +94,8 @@ import bizcal.util.Tuple;
  *
  * @version <br>
  *          $Log: EventModel.java,v $
- *          Revision 1.2  2007/09/20 07:23:16  heine_
- *          new version commit
+ *          Revision 1.3  2008/01/21 14:14:17  heine_
+ *          code cleanup and java doc
  *
  *          Revision 1.12  2007/06/26 13:10:51  heinemann
  *          *** empty log message ***

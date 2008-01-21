@@ -336,8 +336,8 @@ public class CalendarDemo extends JFrame{
 	 *
 	 * @version
 	 * <br>$Log: CalendarDemo.java,v $
-	 * <br>Revision 1.2  2007/09/20 07:23:16  heine_
-	 * <br>new version commit
+	 * <br>Revision 1.3  2008/01/21 14:14:17  heine_
+	 * <br>code cleanup and java doc
 	 * <br>
 	 * <br>Revision 1.17  2007/06/27 14:59:55  heinemann
 	 * <br>*** empty log message ***

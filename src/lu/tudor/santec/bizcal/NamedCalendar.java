@@ -28,6 +28,22 @@ import java.util.List;
 import lu.tudor.santec.bizcal.widgets.CheckBoxPanel;
 import bizcal.common.Event;
 
+/**
+ * @author martin.heinemann@tudor.lu
+ * 21.01.2008
+ * 09:08:47
+ *
+ *
+ * @version
+ * <br>$Log: NamedCalendar.java,v $
+ * <br>Revision 1.2  2008/01/21 14:14:17  heine_
+ * <br>code cleanup and java doc
+ * <br>
+ * <br>Revision 1.9  2008-01-21 14:05:26  heinemann
+ * <br>code cleanup and java doc
+ * <br>
+ *   
+ */
 public abstract class NamedCalendar  {
 
 
