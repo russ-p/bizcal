@@ -75,8 +75,8 @@ public class GradientArea
 	private Color itsBorderColor;
 	private boolean itsBorder;
 	private String itsBorderType;
-	private String text;
-	private JComponent component;
+//	private String text;
+//	private JComponent component;
 	private JLabel _label;
 	
 	/**

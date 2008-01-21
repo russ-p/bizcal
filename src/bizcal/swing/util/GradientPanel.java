@@ -25,28 +25,59 @@
  *******************************************************************************/
 package bizcal.swing.util;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-public class GradientPanel
-	extends JPanel
+public class GradientPanel extends JPanel
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel panel;
 	private GradientArea area;
 	
-	public GradientPanel(GradientArea area, JPanel panel)
-	{
-		setLayout(new Layout());
+	/**
+	 * @param area
+	 * @param panel
+	 */
+	public GradientPanel(GradientArea area, JPanel panel) {
+		/* ================================================== */
 		panel.setOpaque(false);
+		setLayout(new Layout());
+		
 		add(panel);
 		add(area);
 		this.panel = panel;
 		this.area = area;
+		/* ================================================== */
 	}
+	
+	/**
+	 * @param area
+	 * @param component
+	 */
+	public GradientPanel (GradientArea area, JComponent component) {
+		/* ================================================== */
+		this.panel = new JPanel(new BorderLayout());
+		setLayout(new Layout());
+		
+		panel.setOpaque(false);
+		panel.add(component);
+		
+		add(panel);
+		add(area);
+		this.area = area;
+		/* ================================================== */
+	}
+	
+	
 	
 	public Dimension getPreferredSize()
 	{
@@ -83,7 +114,8 @@ public class GradientPanel
 		}
 
 		public Dimension minimumLayoutSize(Container parent) {
-			return parent.getMinimumSize();
+//			return parent.getMinimumSize();
+			return panel.getMinimumSize();
 		}
 
 		public void layoutContainer(Container parent) {
