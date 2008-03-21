@@ -575,6 +575,11 @@ public class DayView extends CalendarView {
 	 *
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.30  2008/03/21 15:02:35  heine_
+	 *          fixed problem when selecting lasso area in a region that was in the bottom of the panel.
+	 *
+	 *          Removed all the evil getBounds() statements. Should run fast now and use lesser heap.
+	 *
 	 *          Revision 1.29  2008/01/21 14:13:55  heine_
 	 *          fixed nullpointer problem when refreshing without a model.
 	 *          The refresh method just returns in case of this
@@ -801,16 +806,16 @@ public class DayView extends CalendarView {
 							int sw = findSmallestFrameArea(fa);
 							int baseFAWidth;
 							try {
-								baseFAWidth = getBaseFrameArea(fa.getEvent()).getBounds().width;
+								baseFAWidth = getBaseFrameArea(fa.getEvent()).getWidth();
 							} catch (Exception e) {
 								continue;
 							}
 							if (sw > baseFAWidth) {
 								sw = baseFAWidth;
 							}
-							fa.setBounds(fa.getBounds().x, fa.getBounds().y,
+							fa.setBounds(fa.getX(), fa.getY(),
 									sw,
-									fa.getBounds().height);
+									fa.getHeight());
 
 							// ensure, that the background events are really painted in the background!
 							if (fa.getEvent().isBackground())
@@ -879,12 +884,12 @@ public class DayView extends CalendarView {
 	private int findSmallestFrameArea(FrameArea fa) {
 		/* ================================================== */
 		if (fa.getChildren() == null || fa.getChildren().size() < 1)
-			return fa.getBounds().width;
+			return fa.getWidth();
 		else {
-			int smallest = fa.getBounds().width;
+			int smallest = fa.getWidth();
 			for (FrameArea child : fa.getChildren()) {
-				if (child.getBounds().width < smallest)
-					smallest = child.getBounds().width;
+				if (child.getWidth() < smallest)
+					smallest = child.getWidth();
 			}
 			return smallest;
 		}
