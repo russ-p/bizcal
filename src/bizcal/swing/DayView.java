@@ -34,6 +34,9 @@ import java.awt.Font;
 import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -183,6 +186,8 @@ public class DayView extends CalendarView {
 	}
 
 	public void refresh0() throws Exception {
+		/* ================================================== */
+
 		if (calPanel == null || this.getModel() == null)
 			return;
 
@@ -206,132 +211,132 @@ public class DayView extends CalendarView {
 
 		addDraggingComponents(calPanel);
 
-		Font hourFont = getDesc().getFont().deriveFont((float) 12);
+		Font hourFont = getDayViewConfig().getFont().deriveFont((float) 12);
 		hourFont = hourFont.deriveFont(Font.BOLD);
-
+		/* ------------------------------------------------------- */
+		// create a color for the lines
+		/* ------------------------------------------------------- */
+		Color color = getDayViewConfig().getLineColor();
+		Color hlineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(),getDayViewConfig().getGridAlpha());
+		/* ------------------------------------------------------- */
 		// Steps through the time axis and adds hour labels, minute labels
 		// and timelines in different maps.
 		// key: date, value: label
+		/* ------------------------------------------------------- */
 		long pos = getFirstInterval().getStartDate().getTime();
 		while (pos < getFirstInterval().getEndDate().getTime()) {
-			Date date = new Date(pos);
-
-
+			/* ------------------------------------------------------- */
+			// create a date object for the current hour
+			/* ------------------------------------------------------- */
+			Date currentHour = new Date(pos);
+			/* ------------------------------------------------------- */
+			// load the number of timeslots per hour from the config
+			/* ------------------------------------------------------- */
 			int timeSlots = this.config.getNumberOfTimeSlots();
 			// do not print more than 6 minute time slots (every 10'')
-			if (PIXELS_PER_HOUR > 120)
-				timeSlots = 6;
-
-			if (timeSlots > 10)
-				timeSlots = 10;
+//			if (PIXELS_PER_HOUR > 120)
+//				timeSlots = 6;
+			/* ------------------------------------------------------- */
+			// keep a maximum of timeslots per hour.
+			/* ------------------------------------------------------- */
+//			if (timeSlots > 10)
+//				timeSlots = 10;
 			/* ------------------------------------------------------- */
 			// create a horizontal line for each time slot
-			Color color = getDesc().getLineColor();
-			Color hlineColor = new Color(color.getRed(), color.getGreen(), color.getBlue(),getDesc().getGridAlpha());
+			/* ------------------------------------------------------- */
 			for (int i = 1; i <= timeSlots; i++) {
+				/* ------------------------------------------------------- */
+				// create a new JLabel for each line
 				/* ------------------------------------------------------- */
 				JLabel line = new JLabel();
 				line.setOpaque(true);
 				line.setBackground(hlineColor);
+				/* ------------------------------------------------------- */
+				// add the label to the panel. Layout will be done later in the layout manager
+				/* ------------------------------------------------------- */
 				calPanel.add(line, GRID_LEVEL);
-				timeLines.put(new Tuple(date, ""+(60/timeSlots)*i), line);
+				/* ------------------------------------------------------- */
+				// put a tuple of the current day and the minute that the line is representing
+				/* ------------------------------------------------------- */
+				timeLines.put(new Tuple(currentHour, ""+(60/timeSlots)*i), line);
 				addHorizontalLine(line);
 				/* ------------------------------------------------------- */
 			}
-//			// Hour line
-//			JLabel line = new JLabel();
-//			line.setBackground(getDesc().getLineColor());
-//			line.setOpaque(true);
-//			calPanel.add(line, GRID_LEVEL);
-//			timeLines.put(new Tuple(date, "00"), line);
-//			addHorizontalLine(line);
-//			/* ------------------------------------------------------- */
-////			// Quarter hour line
-////			// ev l�gga denna loop efter att vi placerat ut aktiviteterna
-////			// d� kommer den hamna l�ngst bak men �nd� synas
-////			line = new JLabel();
-////			line.setBackground(getDesc().getLineColor());
-////			line.setOpaque(true);
-////			calPanel.add(line, GRID_LEVEL);
-////			timeLines.put(new Tuple(date, "15"), line);
-////			addHorizontalLine(line);
-//			/* ------------------------------------------------------- */
-//			// Half hour line
-//			// ev l�gga denna loop efter att vi placerat ut aktiviteterna
-//			// d� kommer den hamna l�ngst bak men �nd� synas
-//			line = new JLabel();
-//			line.setBackground(getDesc().getLineColor());
-//			line.setOpaque(true);
-//			calPanel.add(line, GRID_LEVEL);
-//			timeLines.put(new Tuple(date, "30"), line);
-//			addHorizontalLine(line);
-
-			//
-//			// 3*Quarter hour line
-//			// ev l�gga denna loop efter att vi placerat ut aktiviteterna
-//			// d� kommer den hamna l�ngst bak men �nd� synas
-//			line = new JLabel();
-//			line.setBackground(getDesc().getLineColor());
-//			line.setOpaque(true);
-//			calPanel.add(line, GRID_LEVEL);
-//			timeLines.put(new Tuple(date, "45"), line);
-//			addHorizontalLine(line);
-
-			pos += 3600 * 1000;
+			/* ------------------------------------------------------- */
+			// increase the position by one hour
+			/* ------------------------------------------------------- */
+			pos += DateUtil.MILLIS_HOUR;
+			/* ------------------------------------------------------- */
 		}
 		if (config.isShowDateFooter()) {
 			JLabel line = new JLabel();
-			line.setBackground(getDesc().getLineColor());
+			line.setBackground(getDayViewConfig().getLineColor());
 			line.setOpaque(true);
 			calPanel.add(line, GRID_LEVEL);
 			timeLines.put(new Tuple(new Date(pos), "00"), line);
 		}
-
+		/* ------------------------------------------------------- */
+		// create the columns for each day
+		/* ------------------------------------------------------- */
 		createColumns();
-
-		Iterator i = getSelectedCalendars().iterator();
-		while (i.hasNext()) {
-			bizcal.common.Calendar cal = (bizcal.common.Calendar) i.next();
+		/* ------------------------------------------------------- */
+		// set the background color for each calendar
+		/* ------------------------------------------------------- */
+		for (Object obj : getSelectedCalendars()) {
+			/* ------------------------------------------------------- */
+			bizcal.common.Calendar cal = (bizcal.common.Calendar) obj;
 			JPanel calBackground = new JPanel();
 			calBackground.setBackground(cal.getColor());
 			calBackgrounds.add(calBackground);
 			calPanel.add(calBackground);
+			/* ------------------------------------------------------- */
 		}
-
+		
 		columnHeader.setModel(getModel());
 		columnHeader.setPopupMenuCallback(popupMenuCallback);
 		columnHeader.refresh();
-
+		/* ------------------------------------------------------- */
+		// if this is the first refresh, we must initialize the scrollpane
+		/* ------------------------------------------------------- */
 		if (firstRefresh)
 			initScroll();
 		firstRefresh = false;
 
-
-
-
+		/* ------------------------------------------------------- */
+		// do the refresh
+		/* ------------------------------------------------------- */
 		calPanel.validate();
 		calPanel.repaint();
-//		scrollPane.setPreferredSize(new DiSmension(calPanel.getPreferredSize().width, rowHeader.getComponent().getPreferredSize().height));
 		/* ------------------------------------------------------- */
 		// put the timelines in the background
+		/* ------------------------------------------------------- */
 		for (JLabel l : timeLines.values()) {
 			calPanel.setComponentZOrder(l, calPanel.getComponents().length-2);
 		}
 		/* ------------------------------------------------------- */
-
 		scrollPane.validate();
 		scrollPane.repaint();
-
 
 		rowHeader.getComponent().updateUI();
 		// Hack to make to init scroll work
 		// JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
 		// scrollBar.setValue(scrollBar.getValue()-1);
 
+		/* ================================================== */
 	}
 
+	/**
+	 * Returns the number of columns that are to display.
+	 * As bizcal can display multiple calendars in parallel, it
+	 * multiplies the number of days with the number of displayed calendars.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	private int getColCount() throws Exception {
+		/* ================================================== */
 		return dayCount * getSelectedCalendars().size();
+		/* ================================================== */
 	}
 
 	/**
@@ -341,12 +346,14 @@ public class DayView extends CalendarView {
 	 * @throws Exception
 	 */
 	private DateInterval getFirstInterval() throws Exception {
+		/* ================================================== */
 		Date start = getInterval().getStartDate();
 //		Date end = DateUtil.getDiffDay(start, +1);
 
 		return new DateInterval(
 				DateUtil.round2Hour(start, this.config.getDayStartHour()),
 				DateUtil.round2Hour(start, this.config.getDayEndHour()));
+		/* ================================================== */
 	}
 
 	/**
@@ -382,8 +389,8 @@ public class DayView extends CalendarView {
 			startdate.setTime(interval2.getStartDate());
 			/* ------------------------------------------------------- */
 			// create vertical lines
-			Color vlColor = getDesc().getLineColor();
-			int vlAlpha = getDesc().getGridAlpha()+50;
+			Color vlColor = getDayViewConfig().getLineColor();
+			int vlAlpha = getDayViewConfig().getGridAlpha()+50;
 			if (vlAlpha > 255)
 				vlAlpha = 255;
 			/* ------------------------------------------------------- */
@@ -489,32 +496,92 @@ public class DayView extends CalendarView {
 	 * getDesc().getViewEndTime().getValue() -
 	 * getDesc().getViewStartTime().getValue(); }
 	 */
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see bizcal.swing.CalendarView#getDate(int, int)
+	 
+	/***
+	 * Try to get a date fitting to the given position
+	 * 
 	 */
 	protected Date getDate(int xPos, int yPos) throws Exception {
+		/* ================================================== */
 		int colNo = getColumn(xPos);
 		int dayNo = 0;
+		/* ------------------------------------------------------- */
+		// try to find the day in which the xPointer is located
+		/* ------------------------------------------------------- */
 		if (dayCount != 0)
 			dayNo = colNo % dayCount;
-
+		/* ------------------------------------------------------- */
+		// get the DateInterval for the day
+		/* ------------------------------------------------------- */
 		DateInterval interval = getInterval(dayNo);
+		/* ------------------------------------------------------- */
+		// now we have the day. Next step is to find the time
+		/* ------------------------------------------------------- */
 		yPos -= getCaptionRowHeight();
-		double ratio = ((double) yPos) / ((double) getTimeHeight());
-		long time = (long) (interval.getDuration() * ratio);
+		
+//		BigDecimal bg_Pos = new BigDecimal (yPos);
+//		BigDecimal bg_timeHeight = new BigDecimal (getTimeHeight());
+//		BigDecimal bg_ratio = bg_Pos.divide (bg_timeHeight,5,RoundingMode.DOWN);
+//		BigDecimal bg_time = new BigDecimal (interval.getDuration()).multiply(bg_ratio);
+//		long time = bg_time.longValue();
+		
+//		Date duration = DateUtil.round2Minute(new Date(interval.getDuration()));
+		
+//		double ratio = ((double) yPos) / ((double) getTimeHeight());
+		
+		long time = (long) Math.round((double)(interval.getDuration()/60000  * yPos) / (double)getTimeHeight());
+//		
+//		BigDecimal b = new BigDecimal(interval.getDuration());
+//		
+//		b.round(new MathContext(60000));
+		time *= 60000;
 		time += interval.getStartDate().getTime();
-
+//		System.out.println("yPos: " + yPos + " -> " + new Date(time));
 		return new Date(time);
+		
+		
+		
+		/* ================================================== */
 	}
-
+	
+	
+	private static long normalize(long time) {
+		/* ================================================== */
+//		return DateUtil.round2Minute(new Date(time)).getTime();
+		int mod = 1000;
+		BigDecimal b = new BigDecimal(time);
+//		BigDecimal rounded = b.round(new MathContext(60000, RoundingMode.HALF_UP));
+		BigDecimal rounded = b.setScale(60000, RoundingMode.HALF_DOWN);
+		
+		
+		System.out.println("Normalizing " + time + " to " + rounded.longValue());
+		
+//		return rounded.longValue();
+		return time;
+		
+//		return time/60000;
+		/* ================================================== */
+	}
+	
+	/**
+	 * Returns the DateInterval object for the given day
+	 * 
+	 * @param dayNo
+	 * @return
+	 * @throws Exception
+	 */
 	private DateInterval getInterval(int dayNo) throws Exception {
+		/* ================================================== */
+		// get the first interval
+		/* ------------------------------------------------------- */
 		DateInterval interval = getFirstInterval();
+		/* ------------------------------------------------------- */
+		// cycle through the days until we have reached the desired one
+		/* ------------------------------------------------------- */
 		for (int i = 0; i < dayNo; i++)
 			interval = incDay(interval);
 		return interval;
+		/* ================================================== */
 	}
 
 	private int getColumn(int xPos) throws Exception {
@@ -575,6 +642,9 @@ public class DayView extends CalendarView {
 	 *
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.31  2008/03/28 08:45:11  heine_
+	 *          *** empty log message ***
+	 *
 	 *          Revision 1.30  2008/03/21 15:02:35  heine_
 	 *          fixed problem when selecting lasso area in a region that was in the bottom of the panel.
 	 *
@@ -756,8 +826,10 @@ public class DayView extends CalendarView {
 						} else
 							overlapCols[j] = 0;
 						}
+					/* ------------------------------------------------------- */
 						// Overlap logic. Loop the events/frameareas a second
 						// time and set the xpos and widths
+					/* ------------------------------------------------------- */
 						if (overlapColCount > 0) {
 							/* ------------------------------------------------------- */
 							int currWidth = colWidth;
@@ -795,9 +867,10 @@ public class DayView extends CalendarView {
 							}
 						}
 					}
-
+				/* ------------------------------------------------------- */
 				// Loop the frameareas a third time
 				// and set areas that belong to an event to the same width
+				/* ------------------------------------------------------- */
 				for (List<FrameArea> fAreas : frameAreaCols) {
 					/* ------------------------------------------------------- */
 					if (fAreas != null)
@@ -816,8 +889,9 @@ public class DayView extends CalendarView {
 							fa.setBounds(fa.getX(), fa.getY(),
 									sw,
 									fa.getHeight());
-
+							/* ------------------------------------------------------- */
 							// ensure, that the background events are really painted in the background!
+							/* ------------------------------------------------------- */
 							if (fa.getEvent().isBackground())
 								calPanel.setComponentZOrder(fa, calPanel.getComponents().length-5);
 							/* ------------------------------------------------------- */
@@ -841,15 +915,22 @@ public class DayView extends CalendarView {
 // area.setBounds(r.x + index*slotWidth, r.y, slotWidth, r.height);
 // }
 // }
-					if (dayCount > 1)
-						day = incDay(day);
+				if (dayCount > 1)
+					day = incDay(day);
 
-
-				Iterator i = timeLines.keySet().iterator();
-				while (i.hasNext()) {
-					Tuple key = (Tuple) i.next();
+				/* ------------------------------------------------------- */
+				// iterate through all time lines
+				/* ------------------------------------------------------- */
+				for (Tuple key : timeLines.keySet()) {
+					/* ------------------------------------------------------- */
+					// get the day of the line
+					/* ------------------------------------------------------- */
 					Date date = (Date) key.elementAt(0);
+					/* ------------------------------------------------------- */
+					// extract the minutes from the string
+					/* ------------------------------------------------------- */
 					int minutes = Integer.parseInt((String) key.elementAt(1));
+					/* ------------------------------------------------------- */
 					JLabel line = (JLabel) timeLines.get(key);
 					Date date1 = new Date(date.getTime() + minutes * 60 * 1000);
 					int y1 = getYPos(date1, 0);
@@ -860,14 +941,16 @@ public class DayView extends CalendarView {
 						lineheight = 1;
 					}
 					line.setBounds(x1, y1, width, lineheight);
+					/* ------------------------------------------------------- */
 				}
 
 				for (int iCal = 0; iCal < calBackgrounds.size(); iCal++) {
+					/* ------------------------------------------------------- */
 					int x1 = getXPos(iCal * dayCount);
 					int x2 = getXPos((iCal + 1) * dayCount);
 					JPanel calBackground = (JPanel) calBackgrounds.get(iCal);
-					calBackground.setBounds(x1, getCaptionRowHeight(), x2 - x1,
-							getHeight());
+					calBackground.setBounds(x1, getCaptionRowHeight(), x2 - x1,	getHeight());
+					/* ------------------------------------------------------- */
 				}
 			} catch (Exception e) {
 				throw BizcalException.create(e);
@@ -876,7 +959,7 @@ public class DayView extends CalendarView {
 	}
 
 	/**
-	 * Finds the smalles width of a framearea and its children
+	 * Finds the smallest width of a framearea and its children
 	 *
 	 * @param fa
 	 * @return
@@ -900,18 +983,27 @@ public class DayView extends CalendarView {
 		return getCalendarId(getColumn(x));
 	}
 
-	private DayViewConfig getDesc() throws Exception {
+	/**
+	 * returns the day view config object.
+	 * If none is specified, it will create a default.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	private DayViewConfig getDayViewConfig() throws Exception {
+		/* ================================================== */
 		DayViewConfig result = (DayViewConfig) getDescriptor();
 		if (result == null) {
 			result = new DayViewConfig();
 			setDescriptor(result);
 		}
 		return result;
+		/* ================================================== */
 	}
 
-	public DayViewConfig getDayViewConfig() throws Exception {
-		return getDesc();
-	}
+//	public DayViewConfig getDayViewConfig() throws Exception {
+//		return getDesc();
+//	}
 
 	protected int getInitYPos() throws Exception {
 		double viewStart = getModel().getViewStart().getValue();

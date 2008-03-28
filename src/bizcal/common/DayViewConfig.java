@@ -43,6 +43,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version
  * <br>$Log: DayViewConfig.java,v $
+ * <br>Revision 1.10  2008/03/28 08:45:12  heine_
+ * <br>*** empty log message ***
+ * <br>
  * <br>Revision 1.9  2008/01/21 14:12:52  heine_
  * <br>*** empty log message ***
  * <br>
@@ -80,7 +83,7 @@ public class DayViewConfig
 	/**
 	 * Timeslots per hour
 	 */
-	private int numberOfTimeSlots = 4;
+	private int numberOfTimeSlots = 3;
 
 	/**
 	 * The default start time of the day view

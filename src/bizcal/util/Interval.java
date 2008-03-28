@@ -28,8 +28,14 @@ package bizcal.util;
 import java.io.Serializable;
 
 /**
+ * An Interval represents a peace of something. Can be a time ore some numbers.
+ * Restriction is, that the "something" implements Comparable.
+ * 
  * @author Fredrik Bertilsson
+ * @credits martin.heinemann(at)tudor.lu
+ * 
  * @param <T>
+ *   
  */
 public class Interval implements Serializable
 {
@@ -98,7 +104,12 @@ public class Interval implements Serializable
         this.includeStart = includeStart;
     }
 
-    public boolean contains(Comparable obj)
+    /**
+     * @param obj
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+	public boolean contains(Comparable obj)
     {
         if (start != null) {
            if (obj.compareTo(getStart()) < 0)
@@ -115,7 +126,12 @@ public class Interval implements Serializable
         return true;
     }
 
-    public boolean contains(Interval interval) {
+    /**
+     * @param interval
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+	public boolean contains(Interval interval) {
 		if (start != null) {
 			int cmp = interval.getStart().compareTo(start);
 			if (cmp < 0)
@@ -139,6 +155,10 @@ public class Interval implements Serializable
 		return true;
 	}
 
+    /**
+     * @param interval
+     * @return
+     */
     public boolean overlap(Interval interval)
     {
         Interval tmpInterv = new Interval(getStart(), getEnd());
@@ -157,7 +177,13 @@ public class Interval implements Serializable
         return false;
     }
 
-    public Interval intersection(Interval interval)
+    /**
+     * @param interval
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+	public Interval intersection(Interval interval)
     	throws Exception
     {
     	Comparable start = getStart();
@@ -171,7 +197,13 @@ public class Interval implements Serializable
     	return new Interval(start, end);
     }
 
-    public Interval union(Interval interval) throws Exception {
+    /**
+     * @param interval
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+	public Interval union(Interval interval) throws Exception {
 		Comparable start = getStart();
 		Comparable end = getEnd();
 		if (interval.getStart().compareTo(start) < 0)
@@ -181,6 +213,9 @@ public class Interval implements Serializable
 		return new Interval(start, end);
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals(Object other)
 	{
 	    try {
@@ -195,6 +230,9 @@ public class Interval implements Serializable
 	    }
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString()
 	{
 	    try {

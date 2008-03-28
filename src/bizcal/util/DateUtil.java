@@ -41,6 +41,11 @@ import java.util.TimeZone;
  */
 public class DateUtil
 {
+	public static final int MILLIS_SECOND = 1000;
+	public static final int MILLIS_MINUTE = 60 * MILLIS_SECOND;
+	public static final int MILLIS_HOUR   = MILLIS_MINUTE * 60;
+	public static final int MILLIS_DAY    = MILLIS_HOUR * 24;
+	
 	private static CalendarFactory calFactory =
 		new DefaultCalendarFactory();
 
@@ -114,7 +119,6 @@ public class DateUtil
 	}
 
 	public static Date round2Minute(Date date)
-		throws Exception
 	{
 		Calendar cal = newCalendar();
 		cal.setTime(date);

@@ -31,31 +31,50 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 /**
+ * A DateInterval is a child of Interval. It represents a peace of time.
+ * 
+ * 
  * @author Fredrik Bertilsson
+ * @credits martin.heinemann(at)tudor.lu
+ * 
+ * 
+ * 
  */
-public class DateInterval
-	extends Interval
+public class DateInterval extends Interval
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private long _duration;
 
-    public DateInterval(Interval interval)
-    	throws Exception
-    {
+    /**
+     * @param interval
+     * @throws Exception
+     */
+    public DateInterval(Interval interval) throws Exception {
+    /* ================================================== */
         setStart(interval.getStart());
         setEndDate((Date) interval.getEnd());
         setIncludeStart(interval.isIncludeStart());
         setIncludeEnd(interval.isIncludeEnd());
+        /* ================================================== */
     }
 
     public DateInterval()
     {
     }
 
-    public DateInterval(Date start, Date end)
-    	throws Exception
-    {
+    /**
+     * @param start
+     * @param end
+     * @throws Exception
+     */
+    public DateInterval(Date start, Date end) throws Exception {
+    	/* ================================================== */
     	setStartDate(start);
     	setEndDate(end);
+    	/* ================================================== */
     }
 
     public DateInterval(Date day)

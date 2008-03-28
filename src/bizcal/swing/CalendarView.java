@@ -74,6 +74,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.26  2008/03/28 08:45:12  heine_
+ *          *** empty log message ***
+ *
  *          Revision 1.25  2008/03/21 15:02:35  heine_
  *          fixed problem when selecting lasso area in a region that was in the bottom of the panel.
  *
@@ -103,6 +106,7 @@ import bizcal.util.TimeOfDay;
  *
  */
 public abstract class CalendarView {
+	
 	public CalendarModel broker;
 
 	protected CalendarListener listener;
@@ -222,14 +226,18 @@ public abstract class CalendarView {
 	}
 
 	/**
+	 * Increases the given DateInterval by one day.
+	 * 
 	 * @param day
 	 * @return
 	 * @throws Exception
 	 */
 	protected DateInterval incDay(DateInterval day) throws Exception {
+		/* ================================================== */
 		return new DateInterval(new Date(
 				day.getStartDate().getTime() + 24 * 3600 * 1000), new Date(day
 				.getEndDate().getTime() + 24 * 3600 * 1000));
+		/* ================================================== */
 	}
 
 	protected void fireDateSelected(Date date) throws Exception {
@@ -428,32 +436,37 @@ public abstract class CalendarView {
 
 		private boolean dragged;
 
-		public FrameAreaMouseListener(FrameArea frameArea, Object calId,
-				Event event) {
+		public FrameAreaMouseListener(FrameArea frameArea, Object calId, Event event) {
+			/* ================================================== */
 			_frameArea = frameArea;
 			_calId = calId;
 			_event = event;
+			/* ================================================== */
 		}
 
 		public void mousePressed(MouseEvent e) {
-			/* ------------------------------------------------------- */
+			/* ================================================== */
 			CalendarView.isMousePressed = true;
 			this.dragged = false;
 			_shiftKey = (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0;
-
+			/* ------------------------------------------------------- */
 			// store the clicked FrameArea
+			/* ------------------------------------------------------- */
 			if (originalClickedFrameArea == null)
 				originalClickedFrameArea = _frameArea;
 			/* ------------------------------------------------------- */
 			try {
+				/* ------------------------------------------------------- */
 				// select the event
+				/* ------------------------------------------------------- */
 				if (e.getClickCount() == 1 && _event.isSelectable()) {
 					/* ------------------------------------------------------- */
 //					FrameArea area = getFrameArea(_calId, _event);
 					FrameArea area = frameAreaHash.get(_event);
 					
 					boolean isSelected = area.isSelected();
-
+					/* ------------------------------------------------------- */
+					// 
 					if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) == 0
 							&& !isSelected)
 						deselect();
@@ -512,6 +525,7 @@ public abstract class CalendarView {
 			}
 			/* ------------------------------------------------------- */
 			// clear the deleted
+			/* ------------------------------------------------------- */
 			for (FrameArea fa : deletedFrameAreas) {
 				fa.setVisible(false);
 				calPanel.remove(fa);
@@ -554,7 +568,9 @@ public abstract class CalendarView {
 									_calId, eventDateNew);
 							/* ------------------------------------------------------- */
 						}
+						/* ------------------------------------------------------- */
 						// clicked event for isPopTrigger
+						/* ------------------------------------------------------- */
 						if (e.getClickCount() == 1 && _event.isSelectable()) {
 							/* ------------------------------------------------------- */
 							FrameArea area = getFrameArea(_calId, _event);
@@ -716,25 +732,21 @@ public abstract class CalendarView {
 			// }
 			// if we are here, we are working on the baseFrameArea
 			try {
+				/* ------------------------------------------------------- */
 				// DEBUG
 				// setMousePos(e);
 				// **************************************************************************
 				//
 				// compute values for detecting the crossing of a vertical line
 				//
+				/* ------------------------------------------------------- */
 				int currX = _frameArea.getX();
 				int currY = _frameArea.getY();
 				int currWidth = _frameArea.getWidth();
-				// int currHeight = _frameArea.getHeight();
-
-				int nextSmaller = findNextSmallerVerticalLine(currX
-						+ LINE_OFFSET);
-				int nextGreater = findNextGreaterVerticalLine(currX
-						+ LINE_OFFSET);
-
-				// int nextGreaterHorizontalLine =
-				// findNextGreaterHorizontalLinePos(currY + e.getPoint().y);
-
+				/* ------------------------------------------------------- */
+				int nextSmaller = findNextSmallerVerticalLine(currX	+ LINE_OFFSET);
+				int nextGreater = findNextGreaterVerticalLine(currX	+ LINE_OFFSET);
+				/* ------------------------------------------------------- */
 				int colWidth = getColumnWidth();
 				int gap2left = currX - nextSmaller;
 				int gap2right = nextGreater - currX - currWidth;
@@ -745,26 +757,26 @@ public abstract class CalendarView {
 				// resizing
 				/* ------------------------------------------------------- */
 				if (CalendarView.isResizeable) {
-
 					/* ------------------------------------------------------- */
 					// try to make a new frame for a new day
 					// or remove one
 					// ###################################################################################
 					// Adjustments for the last area
+					/* ------------------------------------------------------- */
 					FrameArea lastArea = (FrameArea) e.getSource();
-					currX = lastArea.getX();
-					currY = lastArea.getY();
+					currX     = lastArea.getX();
+					currY     = lastArea.getY();
 					currWidth = lastArea.getWidth();
 
-					gap2left = currX
-							- findNextSmallerVerticalLine(currX + LINE_OFFSET);
-					gap2right = findNextGreaterVerticalLine(currX + LINE_OFFSET)
-							- currX - currWidth;
+					gap2left  = currX - findNextSmallerVerticalLine(currX + LINE_OFFSET);
+					gap2right =         findNextGreaterVerticalLine(currX + LINE_OFFSET) - currX - currWidth;
 
 					// int pY =
 					// findNextGreaterHorizontalLinePos(e.getPoint().y);
+					/* ------------------------------------------------------- */
 					// ensure, that the event area is at leat as small as the
 					// time slot height!
+					/* ------------------------------------------------------- */
 					if ((_frameArea.getHeight() + e.getPoint().y) < CalendarView.this.desc
 							.getMinimumTimeSlotHeight()
 							|| (_frameArea.getHeight() + e.getPoint().y) < getTimeSlotHeight())
@@ -1200,7 +1212,8 @@ public abstract class CalendarView {
 	}
 
 	/**
-	 *
+	 * This is the key listener that is attached to each FrameArea.
+	 * It handles the copy/paste things
 	 *
 	 * @author martin.heinemann@tudor.lu
 	 * 20.06.2007
@@ -1209,6 +1222,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.26  2008/03/28 08:45:12  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.25  2008/03/21 15:02:35  heine_
 	 * <br>fixed problem when selecting lasso area in a region that was in the bottom of the panel.
 	 * <br>
@@ -1219,33 +1235,6 @@ public abstract class CalendarView {
 	 * <br>
 	 * <br>Revision 1.37  2008-01-21 14:06:22  heinemann
 	 * <br>code cleanup and java doc
-	 * <br>
-	 * <br>Revision 1.36  2007-09-11 16:14:41  heinemann
-	 * <br>speed up
-	 * <br>
-	 * <br>Revision 1.35  2007/08/22 11:58:23  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.34  2007/07/03 07:23:39  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.33  2007/06/27 14:59:55  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.32  2007/06/27 11:59:15  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.31  2007/06/27 09:07:08  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.30  2007/06/26 13:10:51  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.29  2007/06/22 13:14:49  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.27  2007/06/20 12:08:08  heinemann
-	 * <br>*** empty log message ***
 	 * <br>
 	 *
 	 */
@@ -1299,6 +1288,8 @@ public abstract class CalendarView {
 	}
 
 	/**
+	 * This keylistener is for the underlying panel on which all FrameAreas are painted.
+	 * 
 	 * @author martin.heinemann@tudor.lu
 	 * 20.06.2007
 	 * 10:16:34
@@ -1306,6 +1297,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.26  2008/03/28 08:45:12  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.25  2008/03/21 15:02:35  heine_
 	 * <br>fixed problem when selecting lasso area in a region that was in the bottom of the panel.
 	 * <br>
@@ -1317,38 +1311,10 @@ public abstract class CalendarView {
 	 * <br>Revision 1.37  2008-01-21 14:06:22  heinemann
 	 * <br>code cleanup and java doc
 	 * <br>
-	 * <br>Revision 1.36  2007-09-11 16:14:41  heinemann
-	 * <br>speed up
-	 * <br>
-	 * <br>Revision 1.35  2007/08/22 11:58:23  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.34  2007/07/03 07:23:39  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.33  2007/06/27 14:59:55  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.32  2007/06/27 11:59:15  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.31  2007/06/27 09:07:08  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.30  2007/06/26 13:10:51  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.29  2007/06/22 13:14:49  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.27  2007/06/20 12:08:08  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
 	 *
 	 */
 	protected class ThisKeyListener extends KeyAdapter {
 		private int SHIFT = 16;
-
 		private int CTRL = 17;
 
 		/* (non-Javadoc)
@@ -1399,6 +1365,12 @@ public abstract class CalendarView {
 		}
 	}
 
+	/**
+	 * @param xPos
+	 * @param yPos
+	 * @return
+	 * @throws Exception
+	 */
 	protected abstract Date getDate(int xPos, int yPos) throws Exception;
 
 	/**
@@ -1409,6 +1381,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.26  2008/03/28 08:45:12  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.25  2008/03/21 15:02:35  heine_
 	 * <br>fixed problem when selecting lasso area in a region that was in the bottom of the panel.
 	 * <br>
@@ -1419,34 +1394,6 @@ public abstract class CalendarView {
 	 * <br>
 	 * <br>Revision 1.37  2008-01-21 14:06:22  heinemann
 	 * <br>code cleanup and java doc
-	 * <br>
-	 * <br>Revision 1.36  2007-09-11 16:14:41  heinemann
-	 * <br>speed up
-	 * <br>
-	 * <br>Revision 1.35  2007/08/22 11:58:23  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.34  2007/07/03 07:23:39  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.33  2007/06/27 14:59:55  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.32  2007/06/27 11:59:15  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.31  2007/06/27 09:07:08  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.30  2007/06/26 13:10:51  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.29  2007/06/22 13:14:49  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
-	 * <br>Revision 1.27  2007/06/20 12:08:08  heinemann
-	 * <br>*** empty log message ***
-	 * <br>
 	 *
 	 */
 	protected class ThisMouseListener extends MouseAdapter implements
@@ -1481,23 +1428,31 @@ public abstract class CalendarView {
 					int ly = findNextSmallerHorizontalLinePos(e.getY());
 					int lwidth = findNextGreaterVerticalLine(e.getX()) - lx;
 					int lheight = getTimeSlotHeight();
-
+//					System.out.println("Height: " + lheight);
 					_lassoArea.setBounds(lx, ly, lwidth, lheight);
-					
+//					System.out.println("lasso " + _lassoArea.getBounds());
 					setSelectionDate(lx+(lwidth/2), ly);
 
 					_lassoArea.setVisible(true);
-					return;
+					/* ------------------------------------------------------- */
+				} else {
+					/* ------------------------------------------------------- */
+					// on double click, create a new event
+					/* ------------------------------------------------------- */
+					// the date is in the range of the lasso area
+					/* ------------------------------------------------------- */
+					int newY = findNextSmallerHorizontalLinePos(e.getPoint().y);
+					
+//					Date date = getDate(	  e.getPoint().x, e.getPoint().y);
+					Date date = getDate(	  e.getPoint().x, newY);
+					Object id = getCalendarId(e.getPoint().x, e.getPoint().y);
+					if (listener == null)
+						return;
+					if (!getModel().isInsertable(id, date))
+						return;
+					listener.newEvent(id, date);
 					/* ------------------------------------------------------- */
 				}
-				/* ------------------------------------------------------- */
-				Date date = getDate(e.getPoint().x, e.getPoint().y);
-				Object id = getCalendarId(e.getPoint().x, e.getPoint().y);
-				if (listener == null)
-					return;
-				if (!getModel().isInsertable(id, date))
-					return;
-				listener.newEvent(id, date);
 				/* ------------------------------------------------------- */
 			} catch (Exception exc) {
 				ErrorHandler.handleError(exc);
@@ -1536,46 +1491,53 @@ public abstract class CalendarView {
 		public void mouseReleased(MouseEvent e) {
 			/* ================================================== */
 			try {
+				/* ------------------------------------------------------- */
 				maybeShowPopup(e);
 				_dragging = false;
+				/* ------------------------------------------------------- */
+				// if nothing had been dragged, do nothing
+				/* ------------------------------------------------------- */
 				if (_dragArea == null)
 					return;
 				/* ------------------------------------------------------- */
-				Object id = null;
+				// get the calendar id
+				/* ------------------------------------------------------- */
+				Object calendarId = null;
 				try {
-					id = getCalendarId(e.getPoint().x, e.getPoint().y);
+					calendarId = getCalendarId(e.getPoint().x, e.getPoint().y);
 				} catch (Exception e1) {
 					return;
 				}
 				/* ------------------------------------------------------- */
 				// find the date interval for a new event
 				// start date is the left upper corner of the main drag area
-				Date date1 = getDate(_dragArea.getX() + 5, _dragArea
-						.getY());
+				/* ------------------------------------------------------- */
+				Date date1 = getDate(_dragArea.getX() + 5, _dragArea.getY());
 				/* ------------------------------------------------------- */
 				// if there are additionalFrameAreas, the end date is the last
 				// position of the latest frame area
+				/* ------------------------------------------------------- */
 				Date date2 = null;
 				if (additionalFrames != null && additionalFrames.size() > 0) {
 					/* ------------------------------------------------------- */
 					// find the last frame
+					/* ------------------------------------------------------- */
 					List<Integer> keys = new ArrayList<Integer>(
 							additionalFrames.keySet());
 					Collections.sort(keys);
-
+					/* ------------------------------------------------------- */
 					// get the last frame
-					FrameArea lastArea = additionalFrames.get(keys.get(keys
-							.size() - 1));
-					date2 = getDate(lastArea.getX() + 2, lastArea
-							.getY()
-							+ lastArea.getHeight());
+					/* ------------------------------------------------------- */
+					FrameArea lastArea = additionalFrames.get(keys.get(keys.size() - 1));
+					date2 = getDate(lastArea.getX() + 2, lastArea.getY()
+													+ lastArea.getHeight());
 					/* ------------------------------------------------------- */
 				} else {
 					/* ------------------------------------------------------- */
 					// we use the bounds of the _dragArea
-					date2 = getDate(_dragArea.getX() + 10, _dragArea
-							.getY()
-							+ _dragArea.getHeight());
+					/* ------------------------------------------------------- */
+					date2 = getDate(_dragArea.getX() + 10, _dragArea.getY()
+															+ _dragArea.getHeight());
 					/* ------------------------------------------------------- */
 				}
 				if (_lasso) {
@@ -1589,11 +1551,12 @@ public abstract class CalendarView {
 					int rightLowerCornerY 	= _dragArea.getY() + _dragArea.getHeight();
 					Date lowerRightDate 	= getDate( rightLowerCornerX, rightLowerCornerY);
 					/* ------------------------------------------------------- */
-					lasso(id, date1, lowerRightDate);
+					lasso(calendarId, date1, lowerRightDate);
 					/* ------------------------------------------------------- */
 				}
 				/* ------------------------------------------------------- */
 				// notify the listener for a new event
+				/* ------------------------------------------------------- */
 				if (!_lasso)// && (date1.before(date2)))
 					if (listener != null)
 						listener.newEvent(_dragCalId, new DateInterval(date1,
@@ -1602,20 +1565,26 @@ public abstract class CalendarView {
 				_dragArea.setVisible(false);
 				/* ------------------------------------------------------- */
 				// hide all additional lassos
+				/* ------------------------------------------------------- */
 				for (FrameArea a : additionalFrames.values())
 					a.setVisible(false);
 				/* ------------------------------------------------------- */
 				// reset the mouse pointer
+				/* ------------------------------------------------------- */
 				_dragArea.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 				/* ------------------------------------------------------- */
 				// getCalenderArea().remove(_dragArea);
+				/* ------------------------------------------------------- */
 				_lasso = false;
 				_dragArea = null;
 				_dragCalId = null;
+				/* ------------------------------------------------------- */
 			} catch (Exception exc) {
 				throw BizcalException.create(exc);
 			}
-
+			/* ------------------------------------------------------- */
+			// enable new dragging
+			/* ------------------------------------------------------- */
 			draggingEnabled = true;
 			/* ================================================== */
 		}
@@ -1976,15 +1945,17 @@ public abstract class CalendarView {
 		if (mouseY < getTimeSlotHeight())
 			return calPanel.getY();
 		/* ------------------------------------------------------- */
-//		int linePos = calPanel.getWidth();
 		int linePos = calPanel.getHeight();
+//		System.out.println("======================================================================");
 		for (JLabel l : hLines) {
 			/* ------------------------------------------------------- */
+//			System.out.println("LineY: " + l.getY());
 			if (l.getY() < linePos
 					&& l.getY() >= mouseY - getTimeSlotHeight())
 				linePos = l.getY();
 			/* ------------------------------------------------------- */
 		}
+//		System.out.println("======================================================================");
 		return linePos;
 		/* ================================================== */
 	}
@@ -2211,7 +2182,14 @@ public abstract class CalendarView {
 		/* ================================================== */
 	}
 
+	/**
+	 * Deselect frame areas. 
+	 * FIXME not working
+	 * 
+	 * @throws Exception
+	 */
 	public void deselect() throws Exception {
+		/* ================================================== */
 		_selectedEvents.clear();
 		Iterator iCal = broker.getSelectedCalendars().iterator();
 		while (iCal.hasNext()) {
@@ -2237,10 +2215,13 @@ public abstract class CalendarView {
 			}
 		}
 		if (listener != null) {
+			/* ------------------------------------------------------- */
 			listener.eventsSelected(_selectedEvents);
 			listener.selectionReset();
+			/* ------------------------------------------------------- */
 		}
 		calPanel.requestFocus();
+		/* ================================================== */
 	}
 
 	public void copy() throws Exception {

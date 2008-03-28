@@ -157,11 +157,29 @@ public class DayViewPanel extends AbstractCalendarView {
 		try {
 //			dayView.refresh();
 			updateSwitcherButton();
+			refreshGrid();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		/* ================================================== */
 	}
+	
+	
+	/**
+	 * 
+	 */
+	private void refreshGrid() {
+		/* ================================================== */
+		try {
+			this.dayView.resetHorizontalLines();
+			this.dayView.refresh();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		/* ================================================== */
+	}
+	
 	
 	/**
 	 *
@@ -195,6 +213,9 @@ public class DayViewPanel extends AbstractCalendarView {
 	}
 
 
+	/**
+	 * Update the button in the upper left corner to switch the day view
+	 */
 	private void updateSwitcherButton() {
 		/* ================================================== */
 		if (STATE_FULL == this.state) {
@@ -228,6 +249,7 @@ public class DayViewPanel extends AbstractCalendarView {
 				}
 		try {
 			dayView.refresh();
+			refreshGrid();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -256,7 +278,6 @@ public class DayViewPanel extends AbstractCalendarView {
 		try {
 			dayView.refresh();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -295,6 +316,7 @@ public class DayViewPanel extends AbstractCalendarView {
 
 	@Override
 	public List getEvents() {
+		/* ================================================== */
 		try {
 			Interval interval = this.dayModel.getInterval();
 			/* ------------------------------------------------------- */
@@ -316,18 +338,13 @@ public class DayViewPanel extends AbstractCalendarView {
 		} catch (Exception e) {
 			return null;
 		}
+		/* ================================================== */
 	}
 
 	public void setZoomFactor(int zoom) {
 		/* ================================================== */
 		DayView.PIXELS_PER_HOUR = zoom;
-		try {
-			this.dayView.resetHorizontalLines();
-			this.dayView.refresh();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		refresh();
 		/* ================================================== */
 	}
 

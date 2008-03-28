@@ -68,10 +68,10 @@ public class CalendarDemo extends JFrame{
 		
 		this.eventDataList = new ObservableEventList();
 		
-		EventModel dayModel = new EventModel(eventDataList, EventModel.TYPE_DAY);
-		EventModel weekModel = new EventModel(eventDataList, EventModel.TYPE_WEEK);
+		EventModel dayModel   = new EventModel(eventDataList, EventModel.TYPE_DAY);
+		EventModel weekModel  = new EventModel(eventDataList, EventModel.TYPE_WEEK);
 		EventModel monthModel = new EventModel(eventDataList, EventModel.TYPE_MONTH);
-		EventModel listModel = new EventModel(eventDataList, EventModel.TYPE_MONTH);
+		EventModel listModel  = new EventModel(eventDataList, EventModel.TYPE_MONTH);
 
 
 		
@@ -336,6 +336,9 @@ public class CalendarDemo extends JFrame{
 	 *
 	 * @version
 	 * <br>$Log: CalendarDemo.java,v $
+	 * <br>Revision 1.4  2008/03/28 08:45:12  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.3  2008/01/21 14:14:17  heine_
 	 * <br>code cleanup and java doc
 	 * <br>
