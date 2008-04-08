@@ -41,6 +41,19 @@ import bizcal.swing.CalendarListener;
 import bizcal.swing.util.FrameArea;
 import bizcal.util.DateInterval;
 
+/**
+ * @author martin.heinemann@tudor.lu
+ * 08.04.2008
+ * 11:38:08
+ *
+ *
+ * @version
+ * <br>$Log: CalendarDemo.java,v $
+ * <br>Revision 1.5  2008/04/08 13:17:53  heine_
+ * <br>*** empty log message ***
+ * <br>
+ *   
+ */
 public class CalendarDemo extends JFrame{
 
 	private static final long serialVersionUID = 1L;
@@ -62,34 +75,49 @@ public class CalendarDemo extends JFrame{
 	private CalendarPanel calendarPanel;
 
 	public CalendarDemo() {
+		/* ================================================== */
 		super("Calendar Demo");
 
 		this.calendarPanel = new CalendarPanel();
-		
+		/* ------------------------------------------------------- */
+		// this is the "data base" for all events. All created events 
+		// will be stored in this list
+		/* ------------------------------------------------------- */
 		this.eventDataList = new ObservableEventList();
-		
+		/* ------------------------------------------------------- */
+		// create a model for each view day, week, month, list
+		// they all gain the same data list to operate on
+		/* ------------------------------------------------------- */
 		EventModel dayModel   = new EventModel(eventDataList, EventModel.TYPE_DAY);
 		EventModel weekModel  = new EventModel(eventDataList, EventModel.TYPE_WEEK);
 		EventModel monthModel = new EventModel(eventDataList, EventModel.TYPE_MONTH);
 		EventModel listModel  = new EventModel(eventDataList, EventModel.TYPE_MONTH);
-
-
 		
 		/* ------------------------------------------------------- */
-		this.dayViewPanel = new DayViewPanel(dayModel);
-		this.weekViewPanel = new DayViewPanel(weekModel);
+		// create the panels for each kind of view
+		/* ------------------------------------------------------- */
+		this.dayViewPanel 	= new DayViewPanel(  dayModel);
+		this.weekViewPanel 	= new DayViewPanel(  weekModel);
 		this.monthViewPanel = new MonthViewPanel(monthModel);
-		this.listViewPanel = new ListViewPanel(listModel);
+		this.listViewPanel 	= new ListViewPanel( listModel);
 		/* ------------------------------------------------------- */
-		
+		// create a new calendar listener.
+		// It will be informed of many interactions on the calendar like, event selected
+		// copy & paste, date changed etc. Have a look at the interface
+		/* ------------------------------------------------------- */
 		DemoCalendarListener calListener = new DemoCalendarListener();
 		
-		
-		dayViewPanel.addCalendarListener(calListener);
-		weekViewPanel.addCalendarListener(calListener);
+		/* ------------------------------------------------------- */
+		// add the same listener to all views
+		// you can create different listeners for each view, if you like to.
+		/* ------------------------------------------------------- */
+		dayViewPanel.addCalendarListener(  calListener);
+		weekViewPanel.addCalendarListener( calListener);
 		monthViewPanel.addCalendarListener(calListener);
-		listViewPanel.addCalendarListener(calListener);
+		listViewPanel.addCalendarListener( calListener);
 
+		/* ------------------------------------------------------- */
+		// now we add all views to the base panel
 		/* ------------------------------------------------------- */
 		calendarPanel.addCalendarView(dayViewPanel);
 		calendarPanel.addCalendarView(weekViewPanel);
@@ -97,44 +125,47 @@ public class CalendarDemo extends JFrame{
 		calendarPanel.addCalendarView(listViewPanel);
 		/* ------------------------------------------------------- */
 		
-
-		
-		
-		
-		
+		/* ------------------------------------------------------- */
+		// now we create some sample calendars.
+		// they will appear in the right bar.
+		/* ------------------------------------------------------- */
 		calendarPanel.addNamedCalendar(new TestNamedCalendar("Peter", "dem Peter seiner", Color.RED));
 		calendarPanel.addNamedCalendar(new TestNamedCalendar("Max", "dem Max seiner", Color.BLUE));
 		calendarPanel.addNamedCalendar(new TestNamedCalendar("Office", "allen ihrer", Color.GRAY));
-
-
+		/* ------------------------------------------------------- */
+		// next step is to create a listener that is responsible for selecting and deselcting of
+		// the calendars created above.
+		//
+		// we distinguish between active and selected calendars.
+		// An active calendar is allowed to display its events on the views
+		// A selected calendar is the calendar which will recieve the actions on the view, 
+		// like creating a new event, moving, deleting etc.
+		/* ------------------------------------------------------- */
 		calendarPanel.addNamedCalendarListener(new NamedCalendarListener() {
 
 			public void activeCalendarsChanged(Collection<NamedCalendar> calendars) {
 				/* ====================================================== */
-//				 if no calendar is active, remove all events
-				/* ================================================== */
+				// if no calendar is active, remove all events
+				/* ------------------------------------------------------- */
 				if (calendars == null || calendars.size() < 1) {
 					eventDataList.clear();
 					return;
 				}
 				/* ------------------------------------------------------- */
-				/* ================================================== */
 				// fetch the appointments of the active calendars
-				/* ================================================== */
+				/* ------------------------------------------------------- */
 				updateEventsForActiveCalendars();
 				/* ====================================================== */
 			}
 
 			public void selectedCalendarChanged(NamedCalendar selectedCalendar) {
 				/* ====================================================== */
-				
+				// we do nothing here.
+				// If you have any ideas of something that should be triggerd when a calendar was selected...
 				/* ====================================================== */
 			}
 
 		});
-
-
-
 
 		this.add(calendarPanel);
 
@@ -336,6 +367,9 @@ public class CalendarDemo extends JFrame{
 	 *
 	 * @version
 	 * <br>$Log: CalendarDemo.java,v $
+	 * <br>Revision 1.5  2008/04/08 13:17:53  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.4  2008/03/28 08:45:12  heine_
 	 * <br>*** empty log message ***
 	 * <br>

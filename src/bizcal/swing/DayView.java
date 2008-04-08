@@ -34,9 +34,6 @@ import java.awt.Font;
 import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -121,6 +118,7 @@ public class DayView extends CalendarView {
 	 * @throws Exception
 	 */
 	public DayView(DayViewConfig desc, Component upperLeftCornerComponent) throws Exception {
+		/* ================================================== */
 		super(desc);
 		this.config = desc;
 		calPanel = new JLayeredPane();
@@ -182,7 +180,7 @@ public class DayView extends CalendarView {
 //				/* ====================================================== */
 //			}
 //		});
-
+		/* ================================================== */
 	}
 
 	public void refresh0() throws Exception {
@@ -545,23 +543,23 @@ public class DayView extends CalendarView {
 	}
 	
 	
-	private static long normalize(long time) {
-		/* ================================================== */
-//		return DateUtil.round2Minute(new Date(time)).getTime();
-		int mod = 1000;
-		BigDecimal b = new BigDecimal(time);
-//		BigDecimal rounded = b.round(new MathContext(60000, RoundingMode.HALF_UP));
-		BigDecimal rounded = b.setScale(60000, RoundingMode.HALF_DOWN);
-		
-		
-		System.out.println("Normalizing " + time + " to " + rounded.longValue());
-		
-//		return rounded.longValue();
-		return time;
-		
-//		return time/60000;
-		/* ================================================== */
-	}
+//	private static long normalize(long time) {
+//		/* ================================================== */
+////		return DateUtil.round2Minute(new Date(time)).getTime();
+////		int mod = 1000;
+//		BigDecimal b = new BigDecimal(time);
+////		BigDecimal rounded = b.round(new MathContext(60000, RoundingMode.HALF_UP));
+//		BigDecimal rounded = b.setScale(60000, RoundingMode.HALF_DOWN);
+//		
+//		
+//		System.out.println("Normalizing " + time + " to " + rounded.longValue());
+//		
+////		return rounded.longValue();
+//		return time;
+//		
+////		return time/60000;
+//		/* ================================================== */
+//	}
 	
 	/**
 	 * Returns the DateInterval object for the given day
@@ -642,6 +640,9 @@ public class DayView extends CalendarView {
 	 *
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.32  2008/04/08 13:17:53  heine_
+	 *          *** empty log message ***
+	 *
 	 *          Revision 1.31  2008/03/28 08:45:11  heine_
 	 *          *** empty log message ***
 	 *

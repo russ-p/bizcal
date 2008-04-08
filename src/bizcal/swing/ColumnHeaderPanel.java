@@ -80,15 +80,15 @@ public class ColumnHeaderPanel
 	private CalendarViewConfig config;
 	private boolean isMonthView = false;
 
-	// formater for month view
-	DateFormat monthDateFormat = new SimpleDateFormat("EEEE",
-			LocaleBroker.getLocale());
-	// formater for week view
-	DateFormat weekDateFormat = new SimpleDateFormat("EE - dd.MM.",
-			LocaleBroker.getLocale());
-	// formater for day view
-	DateFormat dayFormat = new SimpleDateFormat("EEEE dd.MM.yyyy",
-			LocaleBroker.getLocale());
+//	// formater for month view
+//	DateFormat monthDateFormat = new SimpleDateFormat("EEEE",
+//			LocaleBroker.getLocale());
+//	// formater for week view
+//	DateFormat weekDateFormat = new SimpleDateFormat("EE - dd.MM.",
+//			LocaleBroker.getLocale());
+//	// formater for day view
+//	DateFormat dayFormat = new SimpleDateFormat("EEEE dd.MM.yyyy",
+//			LocaleBroker.getLocale());
 
 
 	public ColumnHeaderPanel(CalendarViewConfig config)
@@ -182,11 +182,11 @@ public class ColumnHeaderPanel
 					//
 					String dateStr = "";
 					if (dayCount == 1)
-						dateStr = TextUtil.formatCase(dayFormat.format(date));
+						dateStr = TextUtil.formatCase(config.getDayFormat().format(date));
 					else if (isMonthView)
-						dateStr = monthDateFormat.format(date);
+						dateStr = config.getMonthDateFormat().format(date);
 					else
-						dateStr = weekDateFormat.format(date);
+						dateStr = config.getWeekDateFormat().format(date);
 					/* ------------------------------------------------------- */
 					JLabel header = new JLabel(dateStr, JLabel.CENTER);
 					header.setAlignmentY(2);
@@ -378,19 +378,26 @@ public class ColumnHeaderPanel
 		}
 
 		for (int i=0; i < dateHeaders.size(); i++) {
+			/* ------------------------------------------------------- */
 			JLabel label = (JLabel) dateHeaders.get(i);
 			Date date = (Date) dateList.get(i);
 			String str = "";
+			/* ------------------------------------------------------- */
 			if (isMonthView)
-				str = monthDateFormat.format(date);
+				str = config.getMonthDateFormat().format(date);
 			else
-				str = weekDateFormat.format(date);
+				str = config.getWeekDateFormat().format(date);
+			/* ------------------------------------------------------- */
 			if (str.length() > charCount)
 				str = str.substring(0, charCount);
+			/* ------------------------------------------------------- */
 			str = TextUtil.formatCase(str);
+			/* ------------------------------------------------------- */
 			if (today.equals(DateUtil.round2Day(date)))
 				str = "<html><b>" + str + "</b> </html>";
+			/* ------------------------------------------------------- */
 			label.setText(str);
+			/* ------------------------------------------------------- */
 		}
 	}
 

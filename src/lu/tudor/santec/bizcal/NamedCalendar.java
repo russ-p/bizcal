@@ -36,6 +36,9 @@ import bizcal.common.Event;
  *
  * @version
  * <br>$Log: NamedCalendar.java,v $
+ * <br>Revision 1.3  2008/04/08 13:17:53  heine_
+ * <br>*** empty log message ***
+ * <br>
  * <br>Revision 1.2  2008/01/21 14:14:17  heine_
  * <br>code cleanup and java doc
  * <br>
@@ -190,8 +193,6 @@ public abstract class NamedCalendar  {
 	public abstract void deleteEvent(String clientId, Event event);
 
 	public abstract List<Event> getEvents(Date from, Date to) ;
-
-//	public abstract List<Event> getEventsAround(Date date);
 
 	/**
 	 * Saves an event

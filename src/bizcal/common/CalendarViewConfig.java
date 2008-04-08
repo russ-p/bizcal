@@ -27,7 +27,10 @@ package bizcal.common;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
+import bizcal.util.LocaleBroker;
 import bizcal.util.TimeOfDay;
 
 public class CalendarViewConfig
@@ -44,6 +47,19 @@ public class CalendarViewConfig
 	private Color lineColor3 = new Color(100, 100, 100);
 	private TimeOfDay startView;
 	private TimeOfDay endView;
+	
+	
+	//	 formater for month view
+	private DateFormat monthDateFormat = new SimpleDateFormat("EEEE",
+			LocaleBroker.getLocale());
+	// formater for week view
+	private DateFormat weekDateFormat = new SimpleDateFormat("EE - dd.MM.",
+			LocaleBroker.getLocale());
+	// formater for day view
+	private DateFormat dayFormat = new SimpleDateFormat("EEEE dd.MM.yyyy",
+			LocaleBroker.getLocale());
+	
+	
 
 	public CalendarViewConfig()
 	{
@@ -138,4 +154,51 @@ public class CalendarViewConfig
 		return 20;
 		/* ====================================================== */
 	}
+
+	/**
+	 * @return the dayFormat
+	 */
+	public DateFormat getDayFormat() {
+		return dayFormat;
+	}
+
+	/**
+	 * @param dayFormat the dayFormat to set
+	 */
+	public void setDayFormat(DateFormat dayFormat) {
+		this.dayFormat = dayFormat;
+	}
+
+	/**
+	 * @return the monthDateFormat
+	 */
+	public DateFormat getMonthDateFormat() {
+		return monthDateFormat;
+	}
+
+	/**
+	 * @param monthDateFormat the monthDateFormat to set
+	 */
+	public void setMonthDateFormat(DateFormat monthDateFormat) {
+		this.monthDateFormat = monthDateFormat;
+	}
+
+	/**
+	 * @return the weekDateFormat
+	 */
+	public DateFormat getWeekDateFormat() {
+		return weekDateFormat;
+	}
+
+	/**
+	 * @param weekDateFormat the weekDateFormat to set
+	 */
+	public void setWeekDateFormat(DateFormat weekDateFormat) {
+		this.weekDateFormat = weekDateFormat;
+	}
+	
+	
+	
+	
+	
 }

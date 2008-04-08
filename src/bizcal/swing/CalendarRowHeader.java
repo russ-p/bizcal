@@ -47,8 +47,8 @@ import bizcal.util.BizcalException;
 public class CalendarRowHeader
 {
 	private JLayeredPane panel;
-	private List calLabels = new ArrayList();
-	private List calLines = new ArrayList();
+	private List<JLabel> calLabels = new ArrayList<JLabel>();
+	private List<JLabel> calLines = new ArrayList<JLabel>();
 	private GradientArea gradientArea;
 	private int width = 100;
 	private int footerHeight = 0;

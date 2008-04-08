@@ -28,11 +28,8 @@ package bizcal.swing;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.LayoutManager;
 import java.awt.Point;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -40,7 +37,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -64,8 +60,6 @@ import bizcal.swing.util.LassoArea;
 import bizcal.util.BizcalException;
 import bizcal.util.DateInterval;
 import bizcal.util.DateUtil;
-import bizcal.util.LocaleBroker;
-import bizcal.util.TextUtil;
 import bizcal.util.TimeOfDay;
 
 /**
@@ -74,6 +68,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.27  2008/04/08 13:17:53  heine_
+ *          *** empty log message ***
+ *
  *          Revision 1.26  2008/03/28 08:45:12  heine_
  *          *** empty log message ***
  *
@@ -1222,6 +1219,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.27  2008/04/08 13:17:53  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.26  2008/03/28 08:45:12  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1297,6 +1297,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.27  2008/04/08 13:17:53  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.26  2008/03/28 08:45:12  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1381,6 +1384,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.27  2008/04/08 13:17:53  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.26  2008/03/28 08:45:12  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -2392,68 +2398,85 @@ public abstract class CalendarView {
 		}
 	}
 
-	protected class DateLabelGroup extends ComponentAdapter {
-		private List<JLabel> labels = new ArrayList<JLabel>();
-
-		private List<Date> dates = new ArrayList<Date>();
-
-		private List<DateFormat> patterns = new ArrayList<DateFormat>();
-
-		public void addLabel(JLabel label, Date date) {
-			labels.add(label);
-			dates.add(date);
-		}
-
-		public void addPattern(String pattern) {
-			patterns.add(new SimpleDateFormat(pattern));
-		}
-
-		public void addFormat(DateFormat format) {
-			patterns.add(format);
-		}
-
-		public void componentResized(ComponentEvent event) {
-			try {
-				if (patterns.size() == 0) {
-					Locale l = LocaleBroker.getLocale();
-					patterns
-							.add(DateFormat.getDateInstance(DateFormat.LONG, l));
-					patterns.add(DateFormat.getDateInstance(DateFormat.MEDIUM,
-							l));
-					patterns.add(DateFormat
-							.getDateInstance(DateFormat.SHORT, l));
-				}
-				int maxPatternIndex = 0;
-				for (int i = 0; i < labels.size(); i++) {
-					JLabel label = (JLabel) labels.get(i);
-					Date date = (Date) dates.get(i);
-					for (int j = 0; j < patterns.size(); j++) {
-						DateFormat format = (DateFormat) patterns.get(j);
-						FontMetrics metrics = label.getFontMetrics(label
-								.getFont());
-						int width = metrics.stringWidth(format.format(date));
-						if (width < event.getComponent().getWidth()) {
-							if (j > maxPatternIndex)
-								maxPatternIndex = j;
-							break;
-						}
-						if (j == patterns.size() - 1)
-							maxPatternIndex = patterns.size() - 1;
-					}
-				}
-				DateFormat format = (DateFormat) patterns.get(maxPatternIndex);
-				// DateFormat format = (DateFormat) patterns.get(0);
-				for (int i = 0; i < labels.size(); i++) {
-					JLabel label = (JLabel) labels.get(i);
-					Date date = (Date) dates.get(i);
-					label.setText(TextUtil.formatCase(format.format(date)));
-				}
-			} catch (Exception e) {
-				ErrorHandler.handleError(e);
-			}
-		}
-
-	}
+//	/**
+//	 * @author martin.heinemann@tudor.lu
+//	 * 08.04.2008
+//	 * 12:56:59
+//	 *
+//	 *
+//	 * @version
+//	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.27  2008/04/08 13:17:53  heine_
+//	 * <br>*** empty log message ***
+//	 * <br>
+//	 *   
+//	 */
+//	protected class DateLabelGroup extends ComponentAdapter {
+//		
+//		private List<JLabel> labels = new ArrayList<JLabel>();
+//
+//		private List<Date> dates = new ArrayList<Date>();
+//
+//		private List<DateFormat> patterns = new ArrayList<DateFormat>();
+//
+//		public void addLabel(JLabel label, Date date) {
+//			labels.add(label);
+//			dates.add(date);
+//		}
+//
+//		public void addPattern(String pattern) {
+//			patterns.add(new SimpleDateFormat(pattern));
+//		}
+//
+//		public void addFormat(DateFormat format) {
+//			patterns.add(format);
+//		}
+//
+//		public void componentResized(ComponentEvent event) {
+//			/* ================================================== */
+//			try {
+//				if (patterns.size() == 0) {
+//					/* ------------------------------------------------------- */
+//					Locale l = LocaleBroker.getLocale();
+//					patterns
+//							.add(DateFormat.getDateInstance(DateFormat.LONG, l));
+//					patterns.add(DateFormat.getDateInstance(DateFormat.MEDIUM,
+//							l));
+//					patterns.add(DateFormat
+//							.getDateInstance(DateFormat.SHORT, l));
+//					/* ------------------------------------------------------- */
+//				}
+//				int maxPatternIndex = 0;
+//				for (int i = 0; i < labels.size(); i++) {
+//					JLabel label = (JLabel) labels.get(i);
+//					Date date = (Date) dates.get(i);
+//					for (int j = 0; j < patterns.size(); j++) {
+//						DateFormat format = (DateFormat) patterns.get(j);
+//						FontMetrics metrics = label.getFontMetrics(label
+//								.getFont());
+//						int width = metrics.stringWidth(format.format(date));
+//						if (width < event.getComponent().getWidth()) {
+//							if (j > maxPatternIndex)
+//								maxPatternIndex = j;
+//							break;
+//						}
+//						if (j == patterns.size() - 1)
+//							maxPatternIndex = patterns.size() - 1;
+//					}
+//				}
+//				DateFormat format = (DateFormat) patterns.get(maxPatternIndex);
+//				// DateFormat format = (DateFormat) patterns.get(0);
+//				for (int i = 0; i < labels.size(); i++) {
+//					JLabel label = (JLabel) labels.get(i);
+//					Date date = (Date) dates.get(i);
+//					label.setText(TextUtil.formatCase(format.format(date)));
+//				}
+//			} catch (Exception e) {
+//				ErrorHandler.handleError(e);
+//			}
+//		}
+//		/* ================================================== */
+//	}
 
 	protected List getSelectedCalendars() throws Exception {
 		return broker.getSelectedCalendars();
