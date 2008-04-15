@@ -426,6 +426,10 @@ public class DateUtil
 	 * @return
 	 */
 	public static boolean isSameDay(Date d1, Date d2) {
+		/* ================================================== */
+		if (d1 == null || d2 == null)
+			return false;
+		/* ------------------------------------------------------- */
 		GregorianCalendar cal1 = new GregorianCalendar();
 		cal1.setTime(d1);
 		GregorianCalendar cal2 = new GregorianCalendar();
@@ -434,6 +438,7 @@ public class DateUtil
 			if (cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR))
 				return true;
 		return false;
+		/* ================================================== */
 	}
 
 	/**
