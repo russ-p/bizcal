@@ -46,6 +46,13 @@ public class DateUtil
 	public static final int MILLIS_HOUR   = MILLIS_MINUTE * 60;
 	public static final int MILLIS_DAY    = MILLIS_HOUR * 24;
 	
+	public static final int MINUTES_HOUR  = 60;
+	public static final int MINUTES_DAY   = MINUTES_HOUR * 24;
+	public static final int MINUTES_WEEK  = MINUTES_DAY * 7;
+	
+	public static final int DAYS_WEEK     = 7;
+	
+	
 	private static CalendarFactory calFactory =
 		new DefaultCalendarFactory();
 
@@ -92,8 +99,8 @@ public class DateUtil
 	 * @param minute
 	 * @return
 	 */
-	public static Date round2Minute(Date date, int minute)
-	{
+	public static Date round2Minute(Date date, int minute) {
+		/* ================================================== */
 		Calendar cal = newCalendar();
 		cal.setTime(date);
 		cal.set(Calendar.SECOND, 0);
@@ -116,6 +123,7 @@ public class DateUtil
 		// set minutes
 		cal.set(Calendar.MINUTE, (minute % 60));
 	    return cal.getTime();
+	    /* ================================================== */
 	}
 
 	public static Date round2Minute(Date date)
@@ -285,6 +293,13 @@ public class DateUtil
 	}
 	
 	
+	/**
+	 * Moves the given date by the given minutes.
+	 * 
+	 * @param date
+	 * @param offset
+	 * @return
+	 */
 	public static Date moveByMinute(Date date, int offset) {
 		/* ================================================== */
 		Calendar cal = newCalendar();
@@ -309,6 +324,25 @@ public class DateUtil
         cal.set(Calendar.MINUTE,      59);
         cal.set(Calendar.SECOND, 	  59);
         cal.set(Calendar.MILLISECOND, 59);
+        
+        return cal.getTime();
+		/* ================================================== */
+	}
+	
+	/**
+	 * Sets the date to 00:00:00
+	 * 
+	 * @param date
+	 */
+	public static Date move2Morning(Date date) {
+		/* ================================================== */
+		Calendar cal = newCalendar();
+        cal.setTime(date);
+        
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE,      0);
+        cal.set(Calendar.SECOND, 	  0);
+        cal.set(Calendar.MILLISECOND, 0);
         
         return cal.getTime();
 		/* ================================================== */
@@ -398,6 +432,79 @@ public class DateUtil
 	}
 	
 	
+	/**
+	 * Returns the amount of minutes that are between the two dates
+	 * 
+	 * @param startDate
+	 * @param end
+	 * @return minutes
+	 */
+	public static long getDiffMinutes(Date startDate, Date endDate) {
+		/* ====================================================== */
+//		if (isSameDay(startDate, endDate)) {
+//			/* ------------------------------------------------------- */
+//			return getMinutesOfRestDay(endDate) - getMinutesOfRestDay(startDate);
+//			/* ------------------------------------------------------- */
+//		}
+		/* ------------------------------------------------------- */
+		return (endDate.getTime() / MILLIS_MINUTE) - (startDate.getTime() / MILLIS_MINUTE);
+		/* ====================================================== */
+	}
+	
+	
+	
+	/**
+	 * Counts the minutes from this date up to midnight
+	 * 
+	 * @param date
+	 * @return 
+	 */
+	public static int getMinutesOfRestDay(Date date) {
+		/* ================================================== */
+		if (date == null)
+			return 0;
+		/* ------------------------------------------------------- */
+		// count minutes to midnight
+		/* ------------------------------------------------------- */
+		int sum = 0;
+		/* ------------------------------------------------------- */
+		Calendar cal = new GregorianCalendar();
+		cal.setTime(date);
+		/* ------------------------------------------------------- */
+		int minute = cal.get(Calendar.MINUTE);
+		int hour   = cal.get(Calendar.HOUR_OF_DAY);
+		/* ------------------------------------------------------- */
+		// add the minutes up to the next hour
+		/* ------------------------------------------------------- */
+		sum = 60 - minute;
+		/* ------------------------------------------------------- */
+		// for each hour, until midnight, add 60 minutes
+		/* ------------------------------------------------------- */
+		int fac = 23 - hour;
+		sum = sum + fac * 60;
+		
+		return sum;
+		/* ================================================== */
+	}
+	
+	/**
+	 * Counts the minutes from midnight to this date 
+	 * 
+	 * @param date
+	 * @return 
+	 */
+	public static int getMinutesOfDay(Date date) {
+		/* ================================================== */
+		if (date == null)
+			return 0;
+		/* ------------------------------------------------------- */
+		long diffMinutes = getDiffMinutes(move2Morning(date), date);
+		/* ------------------------------------------------------- */
+		return (int) diffMinutes;
+		/* ================================================== */
+	}
+	
+	
 	
 	
 	/**
@@ -438,6 +545,27 @@ public class DateUtil
 			if (cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR))
 				return true;
 		return false;
+		/* ================================================== */
+	}
+	
+	/**
+	 * Returns true if the dates are in the same year
+	 * 
+	 * @param d1
+	 * @param d2
+	 * @return true if both are in the same year
+	 */
+	public static boolean isSameYear(Date d1, Date d2) {
+		/* ================================================== */
+		if (d1 == null || d2 == null)
+			return false;
+		/* ------------------------------------------------------- */
+		GregorianCalendar cal1 = new GregorianCalendar();
+		cal1.setTime(d1);
+		GregorianCalendar cal2 = new GregorianCalendar();
+		cal2.setTime(d2);
+		/* ------------------------------------------------------- */
+		return (cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR));
 		/* ================================================== */
 	}
 
@@ -609,6 +737,8 @@ public class DateUtil
 			return cal;
 		}
 	}
+
+
 
 
 }
