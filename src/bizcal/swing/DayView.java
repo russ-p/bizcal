@@ -76,6 +76,10 @@ public class DayView extends CalendarView {
 	private List<Date> _dateList = new ArrayList<Date>();
 
 	private Map<Tuple, JLabel> timeLines = new HashMap<Tuple, JLabel>();
+	
+	private HashMap<Date, Integer> linePositionMap = new HashMap<Date, Integer>();
+	
+	private Map<Integer, Date> minuteMapping = Collections.synchronizedMap(new HashMap<Integer, Date>());
 
 	private Map hourLabels = new HashMap();
 
@@ -201,6 +205,8 @@ public class DayView extends CalendarView {
 		frameAreaCols.clear();
 		eventColList.clear();
 		timeLines.clear();
+		linePositionMap.clear();
+		minuteMapping.clear();
 		hourLabels.clear();
 		minuteLabels.clear();
 		calBackgrounds.clear();
@@ -380,8 +386,8 @@ public class DayView extends CalendarView {
 
 			if (it % dayCount == 0)
 				interval2 = new DateInterval(interval);
-
-			_dateList.add(interval2.getStartDate());
+			if (interval2 != null)
+				_dateList.add(interval2.getStartDate());
 
 			Calendar startdate = DateUtil.newCalendar();
 			startdate.setTime(interval2.getStartDate());
@@ -474,6 +480,7 @@ public class DayView extends CalendarView {
 	}
 
 	private int getYPos(long time, int dayNo) throws Exception {
+		/* ================================================== */
 		DateInterval interval = getInterval(dayNo);
 		time -= interval.getStartDate().getTime();
 
@@ -487,6 +494,7 @@ public class DayView extends CalendarView {
 		int ypos = (int) (dblTime / timeSpan * viewPortHeight);
 		ypos += getCaptionRowHeight();
 		return ypos;
+		/* ================================================== */
 	}
 
 	/*
@@ -499,8 +507,9 @@ public class DayView extends CalendarView {
 	 * Try to get a date fitting to the given position
 	 * 
 	 */
-	protected Date getDate(int xPos, int yPos) throws Exception {
+	protected synchronized Date getDate(int xPos, int yPos) throws Exception {
 		/* ================================================== */
+		
 		int colNo = getColumn(xPos);
 		int dayNo = 0;
 		/* ------------------------------------------------------- */
@@ -534,8 +543,25 @@ public class DayView extends CalendarView {
 //		b.round(new MathContext(60000));
 		time *= 60000;
 		time += interval.getStartDate().getTime();
-//		System.out.println("yPos: " + yPos + " -> " + new Date(time));
-		return new Date(time);
+		/* ------------------------------------------------------- */
+		Date foundDate = null;
+		while (foundDate == null) {
+			/* ------------------------------------------------------- */
+			foundDate = minuteMapping.get(yPos);
+			yPos++;
+			if (yPos < 0 )
+				break;
+			/* ------------------------------------------------------- */
+		}
+		/* ------------------------------------------------------- */
+//		return new Date(time);
+		if (foundDate != null) {
+			TimeOfDay td = DateUtil.getTimeOfDay(foundDate);
+			Date d = td.getDate(interval.getStartDate());
+			return d;
+		}
+		return null;
+//		return foundDate;
 		
 		
 		
@@ -640,6 +666,9 @@ public class DayView extends CalendarView {
 	 *
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.33  2008/04/24 14:17:37  heine_
+	 *          Improved timeslot search when clicking and moving
+	 *
 	 *          Revision 1.32  2008/04/08 13:17:53  heine_
 	 *          *** empty log message ***
 	 *
@@ -934,7 +963,11 @@ public class DayView extends CalendarView {
 					/* ------------------------------------------------------- */
 					JLabel line = (JLabel) timeLines.get(key);
 					Date date1 = new Date(date.getTime() + minutes * 60 * 1000);
+					
 					int y1 = getYPos(date1, 0);
+					
+					linePositionMap.put(date1, y1);
+					
 					int x1 = 0;
 					int lineheight = 1;
 					if (minutes > 0) {
@@ -944,12 +977,73 @@ public class DayView extends CalendarView {
 					line.setBounds(x1, y1, width, lineheight);
 					/* ------------------------------------------------------- */
 				}
-
+				/* ------------------------------------------------------- */
+				// build up the hash for minute to pixel mapping
+				/* ------------------------------------------------------- */
+				// get the dates of the lines and sort them
+				/* ------------------------------------------------------- */
+				List<Date> lines = new ArrayList<Date>(linePositionMap.keySet());
+				/* ------------------------------------------------------- */
+				// add the first, there is no line!
+				/* ------------------------------------------------------- */
+//				minuteMapping.put(0, getFirstInterval().getStartDate());
+				linePositionMap.put(getFirstInterval().getStartDate(), 0);
+				Collections.sort(lines);
+				/* ------------------------------------------------------- */
+				int linesPerHour = config.getNumberOfTimeSlots();
+				for (int i = 0; i < lines.size(); i++) {
+					/* ------------------------------------------------------- */
+					// get the date for the position
+					/* ------------------------------------------------------- */
+					Date currDate = lines.get(i);
+					/* ------------------------------------------------------- */
+					// get the position for that date
+					/* ------------------------------------------------------- */
+					int currPos = linePositionMap.get(currDate);
+					/* ------------------------------------------------------- */
+					// get the position of the next date
+					/* ------------------------------------------------------- */
+					int nextPos = 0;
+					if (i+1 < lines.size()) {
+						Date nextDate = lines.get(i+1);
+						nextPos   = linePositionMap.get(nextDate);
+					} else
+						nextPos = getTimeHeight();
+					/* ------------------------------------------------------- */
+					// div the height of one timeslot
+					/* ------------------------------------------------------- */
+					int slotHeight = nextPos - currPos;
+					int numberOfMinutesPerSlot = 60 / linesPerHour;
+					/* ------------------------------------------------------- */
+					// compute the number of pixels for one minute
+					/* ------------------------------------------------------- */
+					int pixelsPerMinute = slotHeight / numberOfMinutesPerSlot;
+					/* ------------------------------------------------------- */
+					// add the minute->pixel mapping
+					/* ------------------------------------------------------- */
+					minuteMapping.put(currPos, currDate);
+					int startMinute = DateUtil.getMinuteOfHour(currDate);
+					
+					for (int k = 1; k < numberOfMinutesPerSlot; k++) {
+						
+						minuteMapping.put(currPos + k*pixelsPerMinute, DateUtil.round2Minute(currDate, startMinute + k));
+					}
+					/* ------------------------------------------------------- */
+				}
+				/* ------------------------------------------------------- */
+				// DEBUG print minuteMapping
+				/* ------------------------------------------------------- */
+//				List<Integer> minList = new ArrayList<Integer>(minuteMapping.keySet());
+//				Collections.sort(minList);
+//				for (Integer in : minList)
+//					System.out.println("Key: " + in + " => " + minuteMapping.get(in));
+				
+				/* ------------------------------------------------------- */
 				for (int iCal = 0; iCal < calBackgrounds.size(); iCal++) {
 					/* ------------------------------------------------------- */
 					int x1 = getXPos(iCal * dayCount);
 					int x2 = getXPos((iCal + 1) * dayCount);
-					JPanel calBackground = (JPanel) calBackgrounds.get(iCal);
+					JPanel calBackground = calBackgrounds.get(iCal);
 					calBackground.setBounds(x1, getCaptionRowHeight(), x2 - x1,	getHeight());
 					/* ------------------------------------------------------- */
 				}
@@ -957,6 +1051,7 @@ public class DayView extends CalendarView {
 				throw BizcalException.create(e);
 			}
 		}
+		/* ================================================== */
 	}
 
 	/**
@@ -969,14 +1064,14 @@ public class DayView extends CalendarView {
 		/* ================================================== */
 		if (fa.getChildren() == null || fa.getChildren().size() < 1)
 			return fa.getWidth();
-		else {
-			int smallest = fa.getWidth();
-			for (FrameArea child : fa.getChildren()) {
-				if (child.getWidth() < smallest)
-					smallest = child.getWidth();
-			}
-			return smallest;
+		
+		int smallest = fa.getWidth();
+		for (FrameArea child : fa.getChildren()) {
+			if (child.getWidth() < smallest)
+				smallest = child.getWidth();
 		}
+		return smallest;
+		
 		/* ================================================== */
 	}
 

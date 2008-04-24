@@ -68,6 +68,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.28  2008/04/24 14:17:37  heine_
+ *          Improved timeslot search when clicking and moving
+ *
  *          Revision 1.27  2008/04/08 13:17:53  heine_
  *          *** empty log message ***
  *
@@ -359,8 +362,8 @@ public abstract class CalendarView {
 			/* ------------------------------------------------------- */
 			if (this.vLines.size() > 0)
 				return vLines.get(0).getX();
-			else
-				return calPanel.getWidth();
+			
+			return calPanel.getWidth();
 			/* ------------------------------------------------------- */
 		}
 		return -1;
@@ -549,7 +552,7 @@ public abstract class CalendarView {
 						/* ------------------------------------------------------- */
 						// if the date has not changed, do nothing
 						Date eventDateNew = getDate(baseFrameArea.getX() + 5,
-								baseFrameArea.getY()+1);
+								baseFrameArea.getY());
 						// =============================================================
 						// cut the seconds from both dates, they can differ but
 						// are not significant for us because we create a calendar
@@ -983,7 +986,7 @@ public abstract class CalendarView {
 													lfa.getY(),
 													currWidth,
 													findNextGreaterHorizontalLinePos(currY
-															+ e.getPoint().y));
+															+ e.getPoint().y) - 1);
 									/* ------------------------------------------------------- */
 								}
 								/* ------------------------------------------------------- */
@@ -1097,7 +1100,7 @@ public abstract class CalendarView {
 								mov = getTimeSlotHeight();
 							/* ------------------------------------------------------- */
 							if (_startDrag.y > e.getPoint().y) {
-								mov = mov * (-1);
+								mov = mov * (-1) - 1;
 							}
 							/* ------------------------------------------------------- */
 							if (baseFrameArea.getY() + mov >= calPanel
@@ -1219,6 +1222,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.28  2008/04/24 14:17:37  heine_
+	 * <br>Improved timeslot search when clicking and moving
+	 * <br>
 	 * <br>Revision 1.27  2008/04/08 13:17:53  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1297,6 +1303,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.28  2008/04/24 14:17:37  heine_
+	 * <br>Improved timeslot search when clicking and moving
+	 * <br>
 	 * <br>Revision 1.27  2008/04/08 13:17:53  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1384,6 +1393,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.28  2008/04/24 14:17:37  heine_
+	 * <br>Improved timeslot search when clicking and moving
+	 * <br>
 	 * <br>Revision 1.27  2008/04/08 13:17:53  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1434,9 +1446,7 @@ public abstract class CalendarView {
 					int ly = findNextSmallerHorizontalLinePos(e.getY());
 					int lwidth = findNextGreaterVerticalLine(e.getX()) - lx;
 					int lheight = getTimeSlotHeight();
-//					System.out.println("Height: " + lheight);
 					_lassoArea.setBounds(lx, ly, lwidth, lheight);
-//					System.out.println("lasso " + _lassoArea.getBounds());
 					setSelectionDate(lx+(lwidth/2), ly);
 
 					_lassoArea.setVisible(true);
@@ -2406,6 +2416,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.28  2008/04/24 14:17:37  heine_
+//	 * <br>Improved timeslot search when clicking and moving
+//	 * <br>
 //	 * <br>Revision 1.27  2008/04/08 13:17:53  heine_
 //	 * <br>*** empty log message ***
 //	 * <br>
