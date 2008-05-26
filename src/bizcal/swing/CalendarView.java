@@ -49,6 +49,7 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 import bizcal.common.CalendarModel;
 import bizcal.common.CalendarViewConfig;
@@ -68,6 +69,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.29  2008/05/26 08:15:31  heine_
+ *          removed MainThread locking by swing worker thread
+ *
  *          Revision 1.28  2008/04/24 14:17:37  heine_
  *          Improved timeslot search when clicking and moving
  *
@@ -180,9 +184,23 @@ public abstract class CalendarView {
 	}
 
 	public final void refresh() throws Exception {
-		_frameAreaMap.clear();
-		_eventMap.clear();
-		refresh0();
+		/* ================================================== */
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				/* ================================================== */
+				_frameAreaMap.clear();
+				_eventMap.clear();
+				try {
+					/* --------------------------------------------- */
+					refresh0();
+					/* --------------------------------------------- */
+				} catch (Exception e) {
+				
+				}
+				/* ================================================== */
+			}
+		});
+		/* ================================================== */
 	}
 
 	public abstract void refresh0() throws Exception;
@@ -1222,6 +1240,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.29  2008/05/26 08:15:31  heine_
+	 * <br>removed MainThread locking by swing worker thread
+	 * <br>
 	 * <br>Revision 1.28  2008/04/24 14:17:37  heine_
 	 * <br>Improved timeslot search when clicking and moving
 	 * <br>
@@ -1303,6 +1324,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.29  2008/05/26 08:15:31  heine_
+	 * <br>removed MainThread locking by swing worker thread
+	 * <br>
 	 * <br>Revision 1.28  2008/04/24 14:17:37  heine_
 	 * <br>Improved timeslot search when clicking and moving
 	 * <br>
@@ -1393,6 +1417,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.29  2008/05/26 08:15:31  heine_
+	 * <br>removed MainThread locking by swing worker thread
+	 * <br>
 	 * <br>Revision 1.28  2008/04/24 14:17:37  heine_
 	 * <br>Improved timeslot search when clicking and moving
 	 * <br>
@@ -2416,6 +2443,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.29  2008/05/26 08:15:31  heine_
+//	 * <br>removed MainThread locking by swing worker thread
+//	 * <br>
 //	 * <br>Revision 1.28  2008/04/24 14:17:37  heine_
 //	 * <br>Improved timeslot search when clicking and moving
 //	 * <br>

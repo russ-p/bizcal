@@ -41,6 +41,7 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
 /**
  * Creates an area which fade between two given colors.
@@ -245,9 +246,13 @@ public class GradientArea
 	private class ThisComponentListner
 		extends ComponentAdapter
 	{
-		public void componentResized(ComponentEvent e)
-		{
-			_label.setBounds(10,0, e.getComponent().getWidth(), e.getComponent().getHeight());
+		public void componentResized(final ComponentEvent e)
+		{	
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					_label.setBounds(10,0, e.getComponent().getWidth(), e.getComponent().getHeight());
+				}
+			});
 		}
 	}
 	

@@ -48,6 +48,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 
 import bizcal.common.Calendar;
 import bizcal.common.CalendarModel;
@@ -359,15 +360,21 @@ public class CalendarList
 		
 		public void componentResized(ComponentEvent e)
 		{
-			try {				
-				width = _panel.getWidth();
-				header.setBounds(0,0,width,GRADIENT_TOP_HEIGHT);
-				groupName.setBounds(5,0,width-5,20);
-				//refresh();			
-			} catch (Exception exc) {
-				exc.printStackTrace();
-				ErrorHandler.handleError(exc);
-			}
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					/* ================================================== */
+					try {				
+						width = _panel.getWidth();
+						header.setBounds(0,0,width,GRADIENT_TOP_HEIGHT);
+						groupName.setBounds(5,0,width-5,20);
+						//refresh();			
+					} catch (Exception exc) {
+						exc.printStackTrace();
+						ErrorHandler.handleError(exc);
+					}
+					/* ================================================== */
+				}
+			});
 		}		
 	}
     

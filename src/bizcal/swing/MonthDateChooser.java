@@ -50,6 +50,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
 import bizcal.common.CalendarModel;
 import bizcal.swing.util.ErrorHandler;
@@ -515,16 +516,22 @@ public class MonthDateChooser
 	
 	public void componentResized(ComponentEvent e)
 	{
-		try {
-			
-			width = _panel.getWidth();
-			height = _panel.getHeight();
-			refresh();
-		
-		} catch (Exception exc) {
-			exc.printStackTrace();
-			ErrorHandler.handleError(exc);
-		}
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				/* ================================================== */
+				try {
+					
+					width = _panel.getWidth();
+					height = _panel.getHeight();
+					refresh();
+					
+				} catch (Exception exc) {
+					exc.printStackTrace();
+					ErrorHandler.handleError(exc);
+				}
+				/* ================================================== */
+			}
+		});
 	}		
 }
 	
