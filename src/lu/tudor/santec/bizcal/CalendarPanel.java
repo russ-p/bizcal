@@ -688,14 +688,17 @@ public class CalendarPanel extends JPanel implements MouseListener {
 		// if the to selected calendar is not active, do so
 		//
 		// ... hmm, some kind of weird....
+		/* ------------------------------------------------------- */
 		if (!cal.isActive()) {
 			cal.setActive(true);
 		}
 		/* ------------------------------------------------------- */
 		// try to set selected
+		/* ------------------------------------------------------- */
 		if (!cal.isSelected()) {
 			/* ------------------------------------------------------- */
 			// select the new one
+			/* ------------------------------------------------------- */
 			cal.setSelected(true);
 			cal.getCheckBox().setSelected(true);
 			if (this.lastShowingCalendarBeforeShowAll != null)

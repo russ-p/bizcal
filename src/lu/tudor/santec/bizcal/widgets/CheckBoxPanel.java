@@ -86,12 +86,12 @@ public class CheckBoxPanel extends JPanel implements MouseListener {
 		this.cb.repaint();
 	}
 
-	public void addActionListener(ActionListener listener) {
+	public synchronized void addActionListener(ActionListener listener) {
 		this.cb.addActionListener(listener);
 		this.listeners .add(listener);
 	}
 
-	public void removeActionListener(ActionListener listener) {
+	public synchronized void removeActionListener(ActionListener listener) {
 		this.cb.removeActionListener(listener);
 		this.listeners .remove(listener);
 	}
@@ -123,6 +123,7 @@ public class CheckBoxPanel extends JPanel implements MouseListener {
 	 * @param isSelected the isSelected to set
 	 */
 	public void setSelected(boolean isSelected) {
+		/* ================================================== */
 		this.isSelected = isSelected;
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -130,6 +131,7 @@ public class CheckBoxPanel extends JPanel implements MouseListener {
 			}
 		});
 		asynchInformActionListeners();
+		/* ================================================== */
 	}
 
 	public void setColor(Color c) {
@@ -156,7 +158,7 @@ public class CheckBoxPanel extends JPanel implements MouseListener {
 	/**
 	 * Inform action listeners asynchronous to speedup the gui
 	 */
-	private void asynchInformActionListeners() {
+	private synchronized void asynchInformActionListeners() {
 		/* ================================================== */
 		Thread t = new Thread() {
 			public void run() {

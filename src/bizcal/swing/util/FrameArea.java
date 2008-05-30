@@ -223,8 +223,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 		/* ================================================== */
 		if (this.children == null)
 			return new ArrayList<FrameArea>();
-		else
-			return this.children;
+		return this.children;
 		/* ================================================== */
 	}
 
@@ -289,6 +288,10 @@ public class FrameArea extends JComponent implements ComponentListener {
 	// The toolkit will invoke this method when it's time to paint
 	public void paint(Graphics g) {
 		/* ================================================== */
+//		if (!this.isVisible())
+//			return;
+//		if (this.event.isBackground())
+//			System.out.println("Paint:: " + this.hashCode() + " -- " + this.event.getStart());
 		try {
 			setBackground(event.getColor());
 		} catch (Exception e) {
@@ -303,17 +306,14 @@ public class FrameArea extends JComponent implements ComponentListener {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		/* ------------------------------------------------------- */
-		int width = (int) getWidth();
-		int height = (int) getHeight();
+		int width  = getWidth();
+		int height = getHeight();
 		BufferedImage buffImg = null;
-		try {
+		
 			/* ------------------------------------------------------- */
 			buffImg = new BufferedImage(width, height,
 						  				BufferedImage.TYPE_INT_ARGB);
-			/* ------------------------------------------------------- */
-		} catch (Exception e) {
-			System.out.println("W: " + width + " H: " + height);
-		}
+		
 		/* ------------------------------------------------------- */
 		Graphics2D gbi = buffImg.createGraphics();
 		gbi.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -711,6 +711,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.8  2008/05/30 11:36:47  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.7  2007/09/20 07:23:16  heine_
 	 * <br>new version commit
 	 * <br>
@@ -950,8 +953,8 @@ public class FrameArea extends JComponent implements ComponentListener {
 		// choose the biggest deltaE
 		if (deltaBgBlack > deltaBgWhite)
 			return Color.BLACK;
-		else
-			return Color.WHITE;
+		
+		return Color.WHITE;
 		/* ================================================== */
 	}
 

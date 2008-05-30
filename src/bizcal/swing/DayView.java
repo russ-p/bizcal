@@ -192,7 +192,9 @@ public class DayView extends CalendarView {
 
 		if (calPanel == null || this.getModel() == null)
 			return;
-
+		/* ------------------------------------------------------- */
+		// remove nealry everything from the panel
+		/* ------------------------------------------------------- */
 		dayCount = (int) (getModel().getInterval().getDuration() / (24 * 3600 * 1000));
 		calPanel.removeAll();
 		calPanel.setBackground(Color.WHITE);
@@ -370,10 +372,11 @@ public class DayView extends CalendarView {
 
 
 		frameAreaHash.clear();
-		List events = null;
+		List<Event> events = null;
 		DateInterval interval2 = null;
 		/* ------------------------------------------------------- */
 		// iterate over all columns
+		/* ------------------------------------------------------- */
 		for (int it = 0; it < cols; it++) {
 			/* ------------------------------------------------------- */
 			int iCal = it / dayCount;
@@ -426,13 +429,13 @@ public class DayView extends CalendarView {
 			Interval currDayInterval = getInterval(it % dayCount);
 			List<Event> colEvents = new ArrayList<Event>();
 			eventColList.add(colEvents);
+			/* ------------------------------------------------------- */
 			int iEvent = 0;
 			if (events == null)
 				events = new ArrayList();
-			Iterator j = events.iterator();
-
-			while (j.hasNext()) {
-				Event event = (Event) j.next();
+			
+			for (Event event : events) {
+				/* ------------------------------------------------------- */
 				DateInterval eventInterv = new DateInterval(event.getStart(),
 						event.getEnd());
 				if (!currDayInterval.overlap(eventInterv))
@@ -445,9 +448,12 @@ public class DayView extends CalendarView {
 
 				frameAreas.add(area);
 				colEvents.add(event);
+			
 				calPanel.add(area, new Integer(event.getLevel()));
 				iEvent++;
-
+				
+				
+				
 				/* ------------------------------------------------------- */
 				if (!frameAreaHash.containsKey(event))
 					frameAreaHash.put(event, area);
@@ -666,6 +672,9 @@ public class DayView extends CalendarView {
 	 *
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.34  2008/05/30 11:36:48  heine_
+	 *          *** empty log message ***
+	 *
 	 *          Revision 1.33  2008/04/24 14:17:37  heine_
 	 *          Improved timeslot search when clicking and moving
 	 *
@@ -800,13 +809,13 @@ public class DayView extends CalendarView {
 					// events per day
 					// the same with the frameAreaCols
 					// =======================================================
-					List events = (List) eventColList.get(i);
+					List events = eventColList.get(i);
 					List<FrameArea> areas = frameAreaCols.get(i);
 					/* ------------------------------------------------------- */
 					int overlapCols[] = new int[events.size()];
 					for (int j = 0; j < events.size(); j++) {
 						/* ------------------------------------------------------- */
-						FrameArea area = (FrameArea) areas.get(j);
+						FrameArea area = areas.get(j);
 						Event event = (Event) events.get(j);
 						// adapt the FrameArea according the appropriate event
 						// data
@@ -922,8 +931,14 @@ public class DayView extends CalendarView {
 							/* ------------------------------------------------------- */
 							// ensure, that the background events are really painted in the background!
 							/* ------------------------------------------------------- */
-							if (fa.getEvent().isBackground())
-								calPanel.setComponentZOrder(fa, calPanel.getComponents().length-5);
+							try {
+								/* --------------------------------------------- */
+								if (fa.getEvent().isBackground())
+									calPanel.setComponentZOrder(fa, calPanel.getComponents().length-5);
+								/* --------------------------------------------- */
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 							/* ------------------------------------------------------- */
 						}
 					/* ------------------------------------------------------- */

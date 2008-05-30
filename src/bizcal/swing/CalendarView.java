@@ -69,6 +69,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.30  2008/05/30 11:36:47  heine_
+ *          *** empty log message ***
+ *
  *          Revision 1.29  2008/05/26 08:15:31  heine_
  *          removed MainThread locking by swing worker thread
  *
@@ -1240,6 +1243,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.30  2008/05/30 11:36:47  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.29  2008/05/26 08:15:31  heine_
 	 * <br>removed MainThread locking by swing worker thread
 	 * <br>
@@ -1324,6 +1330,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.30  2008/05/30 11:36:47  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.29  2008/05/26 08:15:31  heine_
 	 * <br>removed MainThread locking by swing worker thread
 	 * <br>
@@ -1417,6 +1426,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.30  2008/05/30 11:36:47  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.29  2008/05/26 08:15:31  heine_
 	 * <br>removed MainThread locking by swing worker thread
 	 * <br>
@@ -2187,7 +2199,7 @@ public abstract class CalendarView {
 	}
 
 	protected FrameArea getFrameArea(Object calId, Event event) {
-		return (FrameArea) _frameAreaMap.get("" + calId + event.getId()
+		return _frameAreaMap.get("" + calId + event.getId()
 				+ event.getStart().getTime());
 	}
 
@@ -2443,6 +2455,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.30  2008/05/30 11:36:47  heine_
+//	 * <br>*** empty log message ***
+//	 * <br>
 //	 * <br>Revision 1.29  2008/05/26 08:15:31  heine_
 //	 * <br>removed MainThread locking by swing worker thread
 //	 * <br>

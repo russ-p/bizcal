@@ -49,6 +49,9 @@ import bizcal.util.DateInterval;
  *
  * @version
  * <br>$Log: CalendarDemo.java,v $
+ * <br>Revision 1.6  2008/05/30 11:36:47  heine_
+ * <br>*** empty log message ***
+ * <br>
  * <br>Revision 1.5  2008/04/08 13:17:53  heine_
  * <br>*** empty log message ***
  * <br>
@@ -173,6 +176,15 @@ public class CalendarDemo extends JFrame{
 //		this.pack();
 		this.setSize(1000, 700);
 		this.setVisible(true);
+		for (int i = 0; i < 50; i++) {
+			this.setSize(850+i*5, 800+i*2);
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 	}
 
@@ -367,6 +379,9 @@ public class CalendarDemo extends JFrame{
 	 *
 	 * @version
 	 * <br>$Log: CalendarDemo.java,v $
+	 * <br>Revision 1.6  2008/05/30 11:36:47  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.5  2008/04/08 13:17:53  heine_
 	 * <br>*** empty log message ***
 	 * <br>
