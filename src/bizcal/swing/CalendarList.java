@@ -360,9 +360,9 @@ public class CalendarList
 		
 		public void componentResized(ComponentEvent e)
 		{
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					/* ================================================== */
+//			SwingUtilities.invokeLater(new Runnable() {
+//				public void run() {
+//					/* ================================================== */
 					try {				
 						width = _panel.getWidth();
 						header.setBounds(0,0,width,GRADIENT_TOP_HEIGHT);
@@ -373,8 +373,8 @@ public class CalendarList
 						ErrorHandler.handleError(exc);
 					}
 					/* ================================================== */
-				}
-			});
+//				}
+//			});
 		}		
 	}
     

@@ -248,11 +248,11 @@ public class GradientArea
 	{
 		public void componentResized(final ComponentEvent e)
 		{	
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
+//			SwingUtilities.invokeLater(new Runnable() {
+//				public void run() {
 					_label.setBounds(10,0, e.getComponent().getWidth(), e.getComponent().getHeight());
-				}
-			});
+//				}
+//			});
 		}
 	}
 	

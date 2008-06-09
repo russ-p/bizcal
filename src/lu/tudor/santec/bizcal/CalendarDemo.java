@@ -31,6 +31,8 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
+import tracing.SwingTracing;
+
 import lu.tudor.santec.bizcal.listeners.NamedCalendarListener;
 import lu.tudor.santec.bizcal.util.ObservableEventList;
 import lu.tudor.santec.bizcal.views.DayViewPanel;
@@ -49,6 +51,9 @@ import bizcal.util.DateInterval;
  *
  * @version
  * <br>$Log: CalendarDemo.java,v $
+ * <br>Revision 1.7  2008/06/09 14:10:09  heine_
+ * <br>*** empty log message ***
+ * <br>
  * <br>Revision 1.6  2008/05/30 11:36:47  heine_
  * <br>*** empty log message ***
  * <br>
@@ -176,15 +181,15 @@ public class CalendarDemo extends JFrame{
 //		this.pack();
 		this.setSize(1000, 700);
 		this.setVisible(true);
-		for (int i = 0; i < 50; i++) {
-			this.setSize(850+i*5, 800+i*2);
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+//		for (int i = 0; i < 50; i++) {
+//			this.setSize(850+i*5, 800+i*2);
+//			try {
+//				Thread.sleep(200);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 
 	}
 
@@ -215,6 +220,10 @@ public class CalendarDemo extends JFrame{
 	 * @param args
 	 */
 	public static void main(String[] args) {
+//		SwingTracing.enableEventDispatcherTimeTracing(1000, false);
+//		SwingTracing.enableEventDispatcherThreadViolationTracing(false);
+//		SwingTracing.enableRepaintTracing("bizcal");
+		
 		new CalendarDemo();
 	}
 	
@@ -379,6 +388,9 @@ public class CalendarDemo extends JFrame{
 	 *
 	 * @version
 	 * <br>$Log: CalendarDemo.java,v $
+	 * <br>Revision 1.7  2008/06/09 14:10:09  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.6  2008/05/30 11:36:47  heine_
 	 * <br>*** empty log message ***
 	 * <br>

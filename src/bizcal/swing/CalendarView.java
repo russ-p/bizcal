@@ -26,6 +26,7 @@
 package bizcal.swing;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.LayoutManager;
@@ -69,6 +70,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.31  2008/06/09 14:10:09  heine_
+ *          *** empty log message ***
+ *
  *          Revision 1.30  2008/05/30 11:36:47  heine_
  *          *** empty log message ***
  *
@@ -167,7 +171,7 @@ public abstract class CalendarView {
 
 	private List<JLabel> hLines = new ArrayList<JLabel>();
 
-	HashMap<Event, FrameArea> frameAreaHash = new HashMap<Event, FrameArea>();
+	Map<Event, FrameArea> frameAreaHash = Collections.synchronizedMap(new HashMap<Event, FrameArea>());
 
 	private JComponent calPanel;
 
@@ -188,9 +192,9 @@ public abstract class CalendarView {
 
 	public final void refresh() throws Exception {
 		/* ================================================== */
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				/* ================================================== */
+//		SwingUtilities.invokeLater(new Runnable() {
+//			public void run() {
+//				/* ================================================== */
 				_frameAreaMap.clear();
 				_eventMap.clear();
 				try {
@@ -198,11 +202,11 @@ public abstract class CalendarView {
 					refresh0();
 					/* --------------------------------------------- */
 				} catch (Exception e) {
-				
+					e.printStackTrace();
 				}
 				/* ================================================== */
-			}
-		});
+//			}
+//		});
 		/* ================================================== */
 	}
 
@@ -451,11 +455,17 @@ public abstract class CalendarView {
 
 		private HashMap<Integer, FrameArea> additionalFrames = new HashMap<Integer, FrameArea>();
 
-		private List<FrameArea> deletedFrameAreas = new ArrayList<FrameArea>();
+		private List<FrameArea> deletedFrameAreas = Collections.synchronizedList(new ArrayList<FrameArea>());
 
 		private boolean _shiftKey = false;
 
 		private boolean dragged;
+
+		private long lastEventTime = 0;
+
+		private FrameArea baseArea;
+
+		private Integer lastCreatedKey;
 
 		public FrameAreaMouseListener(FrameArea frameArea, Object calId, Event event) {
 			/* ================================================== */
@@ -483,7 +493,7 @@ public abstract class CalendarView {
 				if (e.getClickCount() == 1 && _event.isSelectable()) {
 					/* ------------------------------------------------------- */
 //					FrameArea area = getFrameArea(_calId, _event);
-					FrameArea area = frameAreaHash.get(_event);
+					FrameArea area = getBaseArea();
 					
 					boolean isSelected = area.isSelected();
 					/* ------------------------------------------------------- */
@@ -516,7 +526,7 @@ public abstract class CalendarView {
 			/* ------------------------------------------------------- */
 			_startDrag = e.getPoint();
 			/* ------------------------------------------------------- */
-			FrameArea baseFrameArea = frameAreaHash.get(_event);
+			FrameArea baseFrameArea = getBaseArea();
 			// if (!_frameArea.equals(baseFrameArea)) {
 			// baseFrameArea.getMouseListeners()[0].mousePressed(e);
 			// return;
@@ -531,7 +541,24 @@ public abstract class CalendarView {
 			/* ------------------------------------------------------- */
 			maybeShowPopup(e);
 		}
-
+		
+		/**
+		 * Removes the frame area from the additionalFrames hashmap
+		 * 
+		 * @param fa
+		 */
+		private void removeAdditionalArea(FrameArea fa) {
+			/* ================================================== */
+			List<Integer> keys = new ArrayList<Integer>();
+			for (Integer key : additionalFrames.keySet())
+				if (additionalFrames.get(key).equals(fa))
+					keys.add(key);
+			for (Integer k : keys)  {
+				additionalFrames.remove(k);
+			}
+			/* ================================================== */
+		}
+		
 		/*
 		 * (non-Javadoc)
 		 *
@@ -539,7 +566,7 @@ public abstract class CalendarView {
 		 */
 		public void mouseReleased(MouseEvent e) {
 			/* ================================================== */
-			FrameArea baseFrameArea = frameAreaHash.get(_event);
+			FrameArea baseFrameArea = getBaseArea();
 			if (!baseFrameArea.equals(_frameArea)) {
 				baseFrameArea.getMouseListeners()[0].mouseReleased(e);
 				return;
@@ -550,10 +577,13 @@ public abstract class CalendarView {
 			for (FrameArea fa : deletedFrameAreas) {
 				fa.setVisible(false);
 				calPanel.remove(fa);
+				removeAdditionalArea(fa);
 			}
+			deletedFrameAreas.clear();
 			getComponent().revalidate();
 			/* ------------------------------------------------------- */
 			try {
+				/* ------------------------------------------------------- */
 				if (listener != null) {
 					if (isResizeable) {
 						/* ------------------------------------------------------- */
@@ -602,6 +632,7 @@ public abstract class CalendarView {
 					}
 				}
 				maybeShowPopup(e);
+				/* ------------------------------------------------------- */
 			} catch (Exception exc) {
 				ErrorHandler.handleError(exc);
 			}
@@ -611,12 +642,17 @@ public abstract class CalendarView {
 			originalClickedFrameArea = null;
 
 			CalendarView.isMousePressed = false;
+			try {
+				refresh();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 			/* ================================================== */
 		}
 
 		public void mouseEntered(MouseEvent e) {
 			/* ================================================== */
-			FrameArea baseFrameArea = frameAreaHash.get(_event);
+			FrameArea baseFrameArea = getBaseArea();
 			if (!baseFrameArea.equals(_frameArea)) {
 				baseFrameArea.getMouseListeners()[0].mouseEntered(e);
 				return;
@@ -651,7 +687,7 @@ public abstract class CalendarView {
 
 		public void mouseExited(MouseEvent e) {
 			/* ================================================== */
-			FrameArea baseFrameArea = frameAreaHash.get(_event);
+			FrameArea baseFrameArea = getBaseArea();
 			if (!baseFrameArea.equals(_frameArea)) {
 				baseFrameArea.getMouseListeners()[0].mouseExited(e);
 				return;
@@ -682,7 +718,7 @@ public abstract class CalendarView {
 
 		public void mouseClicked(MouseEvent e) {
 			/* ================================================== */
-			FrameArea baseFrameArea = frameAreaHash.get(_event);
+			FrameArea baseFrameArea = getBaseArea();
 			if (!baseFrameArea.equals(_frameArea)) {
 				baseFrameArea.getMouseListeners()[0].mouseClicked(e);
 				return;
@@ -740,296 +776,73 @@ public abstract class CalendarView {
 			}
 			/* ================================================== */
 		}
-
+		
+		/**
+		 * @return the base frame area, the area that is painted first for an event
+		 */
+		private FrameArea getBaseArea() {
+			/* ================================================== */
+			if (this.baseArea == null)
+				this.baseArea = frameAreaHash.get(_event);
+			return baseArea;
+			/* ================================================== */
+		}
+		
+		
+		private void enableCommit(FrameArea bArea, boolean b) {
+			/* ================================================== */
+			bArea.enableAutoCommit(b);
+			if (bArea.getChildren() != null)
+				for (FrameArea f : bArea.getChildren())
+					f.enableAutoCommit(b);
+			/* ================================================== */
+		}
+		
 		public void mouseDragged(MouseEvent e) {
 			/* ================================================== */
+			// filter events by time
+			// to not let every drag position fire a new computation
+			/* ------------------------------------------------------- */
+			if (this.lastEventTime == 0)
+				this.lastEventTime = System.currentTimeMillis();
+			else {
+				long current = System.currentTimeMillis();
+				if ((current - this.lastEventTime) < 15) {
+					return;
+				}
+				this.lastEventTime = current;
+			}
+			
+			/* ------------------------------------------------------- */
+			// get the baseframe and set dragged = true
+			// to enable multiday events to be moved by dragging
+			// all frameareas of this event
+			/* ------------------------------------------------------- */
+			FrameArea baseFrameArea = getBaseArea();
+			
+			try {
+				((FrameAreaMouseListener) baseFrameArea.getMouseListeners()[0]).dragged = true;
+			} catch (Exception ex) {}
+			
 			this.dragged = true;
-			FrameArea baseFrameArea = frameAreaHash.get(_event);
 			//
 			// if (!baseFrameArea.equals(_frameArea)) {
 			// e.setSource(baseFrameArea);
 			// baseFrameArea.getMouseMotionListeners()[0].mouseDragged(e);
 			// return;
 			// }
-			// if we are here, we are working on the baseFrameArea
 			try {
 				/* ------------------------------------------------------- */
 				// DEBUG
 				// setMousePos(e);
-				// **************************************************************************
-				//
-				// compute values for detecting the crossing of a vertical line
-				//
-				/* ------------------------------------------------------- */
-				int currX = _frameArea.getX();
-				int currY = _frameArea.getY();
-				int currWidth = _frameArea.getWidth();
-				/* ------------------------------------------------------- */
-				int nextSmaller = findNextSmallerVerticalLine(currX	+ LINE_OFFSET);
-				int nextGreater = findNextGreaterVerticalLine(currX	+ LINE_OFFSET);
-				/* ------------------------------------------------------- */
-				int colWidth = getColumnWidth();
-				int gap2left = currX - nextSmaller;
-				int gap2right = nextGreater - currX - currWidth;
-				// **************************************************************************
-
-				baseFrameArea.setIsMoving(true);
 				/* ------------------------------------------------------- */
 				// resizing
 				/* ------------------------------------------------------- */
 				if (CalendarView.isResizeable) {
+//					TimeTracker.start("resize");
+					resizeDrag(baseFrameArea, e);
 					/* ------------------------------------------------------- */
-					// try to make a new frame for a new day
-					// or remove one
-					// ###################################################################################
-					// Adjustments for the last area
-					/* ------------------------------------------------------- */
-					FrameArea lastArea = (FrameArea) e.getSource();
-					currX     = lastArea.getX();
-					currY     = lastArea.getY();
-					currWidth = lastArea.getWidth();
-
-					gap2left  = currX - findNextSmallerVerticalLine(currX + LINE_OFFSET);
-					gap2right =         findNextGreaterVerticalLine(currX + LINE_OFFSET) - currX - currWidth;
-
-					// int pY =
-					// findNextGreaterHorizontalLinePos(e.getPoint().y);
-					/* ------------------------------------------------------- */
-					// ensure, that the event area is at leat as small as the
-					// time slot height!
-					/* ------------------------------------------------------- */
-					if ((_frameArea.getHeight() + e.getPoint().y) < CalendarView.this.desc
-							.getMinimumTimeSlotHeight()
-							|| (_frameArea.getHeight() + e.getPoint().y) < getTimeSlotHeight())
-						return;
-
-					// ###################################################################################
-
-					/* ------------------------------------------------------- */
-					// if the mouse pointer is not in the original column
-					if ((gap2left + e.getPoint().x) < 0
-							|| (e.getPoint().x > currWidth + gap2right)) {
-						/* ------------------------------------------------------- */
-						// remove the last frame area, if the mouseX is smaller
-						// than the boundX
-						if (gap2left + e.getPoint().x < 0) {
-							/* ------------------------------------------------------- */
-							// remove all areas that are greater than the
-							// mousepointer
-							if (baseFrameArea.getChildren() != null) {
-								List<FrameArea> deleteAreas = new ArrayList<FrameArea>();
-								for (FrameArea fa : baseFrameArea.getChildren()) {
-									// System.out.println("currX: " + currX + "
-									// eX: " + e.getPoint().x
-									// + " faX: " + fa.getX()
-									// + " next: " +
-									// findNextSmallerVerticalLine(currX+e.getPoint().x));
-									/* ------------------------------------------------------- */
-									if (fa.getX() > findNextSmallerVerticalLine(currX
-											+ e.getPoint().x)) {
-										// remove
-										// we can not remove them from the
-										// panel,
-										// because we need the mouselistener
-										// until the mouse released event
-										fa.setVisible(false);
-										deleteAreas.add(fa);
-										deletedFrameAreas.add(fa);
-									}
-									/* ------------------------------------------------------- */
-								}
-								// delete from the parent
-								baseFrameArea.getChildren().removeAll(
-										deleteAreas);
-								// if (lastArea != null)
-								// lastArea.getMouseMotionListeners()[0]
-								// .mouseDragged(e);
-							}
-							/* ------------------------------------------------------- */
-						} else {
-							/* ------------------------------------------------------- */
-							// <----
-							// remove the new areas
-							FrameArea currLast = findLastFrameArea(baseFrameArea);
-							if (currLast != null
-									&& currX + gap2right + e.getPoint().x < currLast
-											.getX()) {
-								/* ------------------------------------------------------- */
-								// we can not remove them from the panel,
-								// because we need the mouselistener
-								// until mouse released event
-								currLast.setVisible(false);
-
-								deletedFrameAreas.add(currLast);
-								/* ------------------------------------------------------- */
-							}
-
-							// ##########################################################
-							//
-							// create new frame areas, if needed!
-							/* ------------------------------------------------------- */
-							else {
-								// if the mouse pointer has crossed the next
-								// vertical line
-								int xPoint = 0;
-								if (baseFrameArea
-										.equals(CalendarView.originalClickedFrameArea))
-									xPoint = e.getPoint().x;
-								else
-									xPoint = e.getPoint().x
-											+ CalendarView.originalClickedFrameArea
-													.getX();
-								/* ------------------------------------------------------- */
-								if (xPoint > currWidth + gap2right) {
-									/* ------------------------------------------------------- */
-									List<Integer> newLines = null;
-									newLines = findUndrawnLines(currX
-											+ this.mouseXold, currX
-											+ e.getPoint().x, colWidth,
-											baseFrameArea.getX());
-									/* ------------------------------------------------------- */
-									if (newLines != null && newLines.size() > 0) {
-										/* ------------------------------------------------------- */
-										// create new frame areas for each line
-										for (Integer i : newLines) {
-											/* ------------------------------------------------------- */
-											// if frame is present, continue
-											if (additionalFrames.containsKey(i)) {
-												additionalFrames.get(i)
-														.setVisible(true);
-												continue;
-											}
-											/* ------------------------------------------------------- */
-											// create a new FrameArea
-											FrameArea fa = new FrameArea();
-											fa
-													.setBounds(
-															i,
-															0,
-															currWidth,
-															findNextGreaterHorizontalLinePos(currY
-																	+ e
-																			.getPoint().y));
-											fa.setEvent(_event);
-											/* ------------------------------------------------------- */
-											calPanel.add(fa, new Integer(3));
-											fa.setVisible(true);
-											additionalFrames.put(i, fa);
-											/* ------------------------------------------------------- */
-											if (lastCreatedFrameArea != null) {
-												/* ------------------------------------------------------- */
-												lastCreatedFrameArea
-														.setBounds(
-																lastCreatedFrameArea
-																		.getX(),
-																0,
-																currWidth,
-																calPanel
-																		.getMaximumSize().height);
-											}
-											this.lastCreatedFrameArea = fa;
-											baseFrameArea.addChild(fa);
-											/* ------------------------------------------------------- */
-										}
-									}
-								} // if
-							} // else
-						}// else
-					}
-					// ==============================================================================
-					// compute height
-					// if shift is pressed, we take the current mouse y position
-					// as new height.
-					// otherwise we will use normal step wise height
-					// ==============================================================================
-					int newHeight = 0;
-					if (_shiftKey)
-						newHeight = e.getPoint().y;
-					else
-						newHeight = findNextGreaterHorizontalLinePos(e
-								.getPoint().y);
-					/* ------------------------------------------------------- */
-					// set bounds of the base frame area
-					if (baseFrameArea.getChildren() == null
-							|| baseFrameArea.getChildren().size() == 0) {
-						/* ------------------------------------------------------- */
-						// adjust bounds only if there are changes -->
-						// performance
-						if (baseFrameArea.getHeight() != newHeight) {
-							// System.out.println("new height");
-							/* ------------------------------------------------------- */
-							if (baseFrameArea
-									.equals(CalendarView.originalClickedFrameArea)) {
-								baseFrameArea.setBounds(baseFrameArea
-										.getX(), baseFrameArea
-										.getY(), currWidth, newHeight);
-							} else {
-								baseFrameArea.setBounds(baseFrameArea
-										.getX(), baseFrameArea
-										.getY(), currWidth,
-										findNextGreaterHorizontalLinePos(e
-												.getPoint().y
-												- baseFrameArea.getY()));
-							}
-							/* ------------------------------------------------------- */
-						}
-						/* ------------------------------------------------------- */
-					} else {
-						/* ------------------------------------------------------- */
-						// set baseframe height to max
-						if (baseFrameArea.getHeight() != calPanel
-								.getMaximumSize().height)
-							baseFrameArea.setBounds(
-									baseFrameArea.getX(), baseFrameArea
-											.getY(), currWidth, calPanel
-											.getMaximumSize().height);
-						/* ------------------------------------------------------- */
-
-						int diffPoint = (_startDrag.y - e.getPoint().y);
-						if (Math.abs(diffPoint) > getTimeSlotHeight()) {
-							/* ------------------------------------------------------- */
-							int mov = getTimeSlotHeight();
-							if (_startDrag.y > e.getPoint().y) {
-								mov = mov * (-1);
-							}
-							/* ------------------------------------------------------- */
-							// make sure that the new boundaries are inside the
-							// calendar panel
-							if (baseFrameArea.getY() + mov >= calPanel
-									.getY()) {
-								/* ------------------------------------------------------- */
-								FrameArea lfa = findLastFrameArea(baseFrameArea);
-								if (lfa != null) {
-									/* ------------------------------------------------------- */
-									lfa
-											.setBounds(
-													lfa.getX(),
-													lfa.getY(),
-													currWidth,
-													findNextGreaterHorizontalLinePos(currY
-															+ e.getPoint().y) - 1);
-									/* ------------------------------------------------------- */
-								}
-								/* ------------------------------------------------------- */
-							}
-						}
-					}
-					FrameArea tempLast = null;
-					try {
-						tempLast = findLastFrameArea(baseFrameArea);
-						if (tempLast == null)
-							tempLast = baseFrameArea;
-					} catch (Exception e1) {
-						tempLast = baseFrameArea;
-						// e1.printStackTrace();
-					}
-					tempLast.setMovingTimeString(getDate(baseFrameArea
-							.getX(), baseFrameArea.getY()),
-							getDate(tempLast.getX(), tempLast
-									.getY()
-									+ tempLast.getHeight()));
-
-					/* ------------------------------------------------------- */
+//					TimeTracker.finish("resize");
 				}
 				// ######################################################################################
 				// ######################################################################################
@@ -1039,152 +852,14 @@ public abstract class CalendarView {
 				// ==============================================================
 				else {
 					/* ------------------------------------------------------- */
-					// horizontal moving
-					Integer newXPos = null;
-					// <-----
-					if (e.getPoint().x < 0) {
-						/* ------------------------------------------------------- */
-						// mousepointer has left the event to the left
-						// compute the crossing of a vertical line
-						if ((gap2left + e.getPoint().x) < 0) {
-							// move to day before
-							newXPos = findNextSmallerVerticalLine(baseFrameArea
-									.getX() - 5);
-							// smaller
-						}
-						/* ------------------------------------------------------- */
-					} else {
-						// ---->
-						if (e.getPoint().x > currWidth)
-							if (e.getPoint().x > currWidth + gap2right) {
-								// /*
-								// -------------------------------------------------------
-								// */
-								newXPos = findNextGreaterVerticalLine(baseFrameArea
-										.getX());
-								// greater
-							}
-						/* ------------------------------------------------------- */
-					}
-
-					if (newXPos != null
-							&& newXPos <= calPanel.getX()
-									+ calPanel.getWidth()) {
-						/* ------------------------------------------------------- */
-						// System.out.println("Moving <----> "+newXPos);
-						int y = baseFrameArea.getY();
-						int width = baseFrameArea.getWidth();
-						int height = baseFrameArea.getHeight();
-
-						baseFrameArea.setBounds(newXPos, y, width, height);
-						// move additional frames
-						//
-						if (baseFrameArea.getChildren() != null
-								&& baseFrameArea.getChildren().size() > 0) {
-							/* ------------------------------------------------------- */
-							int count = 1;
-							for (FrameArea ac : baseFrameArea.getChildren()) {
-								/* ------------------------------------------------------- */
-								int acNewX = baseFrameArea.getX();
-								for (int i = 0; i < count; i++) {
-									acNewX = findNextGreaterVerticalLine(acNewX);
-								}
-								/* ------------------------------------------------------- */
-								count++;
-								// int acNewX =
-								// findNextSmallerVerticalLine(ac.getX()-5);
-								ac.setBounds(acNewX, ac.getY(),
-								// ac.getWidth(),
-										width, ac.getHeight());
-								/* ------------------------------------------------------- */
-								// }
-							}
-						}
-					} else {
-						/* ------------------------------------------------------- */
-						// vertical move
-						// try {
-						// System.out.println("k: " + _startDrag.y + " - " +
-						// e.getPoint().y);
-						// } catch (Exception ex) {
-						// ex.printStackTrace();
-						// }
-						int diffPoint = (_startDrag.y - e.getPoint().y);
-						if (Math.abs(diffPoint) > getTimeSlotHeight()
-								|| _shiftKey) {
-							/* ------------------------------------------------------- */
-							int mov;
-							// move without the line steps
-							if (_shiftKey)
-								mov = Math.abs(diffPoint);
-							else
-								mov = getTimeSlotHeight();
-							/* ------------------------------------------------------- */
-							if (_startDrag.y > e.getPoint().y) {
-								mov = mov * (-1) - 1;
-							}
-							/* ------------------------------------------------------- */
-							if (baseFrameArea.getY() + mov >= calPanel
-									.getY()) {
-								baseFrameArea.setBounds(baseFrameArea
-										.getX(), baseFrameArea
-										.getY()
-										+ mov, baseFrameArea.getWidth(),
-										baseFrameArea.getHeight());
-
-								/* ------------------------------------------------------- */
-								// find last frame
-								FrameArea lastArea = findLastFrameArea(baseFrameArea);
-								// if the event lasts longer than a day
-								if (baseFrameArea.getChildren() != null
-										&& baseFrameArea.getChildren().size() > 0) {
-									/* ------------------------------------------------------- */
-									// set the height of the base frame area to
-									// the panels bottom
-									baseFrameArea.setBounds(baseFrameArea
-											.getX(), baseFrameArea
-											.getY(), baseFrameArea
-											.getWidth(), calPanel
-											.getHeight()
-											- baseFrameArea.getY());
-									/* ------------------------------------------------------- */
-								}
-								if (lastArea != null)
-									lastArea.setBounds(lastArea.getX(),
-											lastArea.getY(), lastArea
-													.getWidth(),
-											lastArea.getHeight() + mov);
-								/* ------------------------------------------------------- */
-								// recall the mousedragged event to the current
-								// frame area if
-								// this is not the first one, in order to update
-								// the _startDrag
-								// member
-								// is this an evil hack?
-								if (!_frameArea.equals(baseFrameArea))
-									this.mousePressed(e);
-								/* ------------------------------------------------------- */
-							}
-						}
-					}
-					try {
-						_frameArea.setMovingTimeString(getDate(_frameArea
-								.getX(), _frameArea.getY()),
-								getDate(_frameArea.getX(), _frameArea
-										.getY()
-										+ _frameArea.getHeight()));
-
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
+					moveDrag(baseFrameArea, e);
 				}
 			} catch (Exception e2) {
-				// TODO: handle exception
 				e2.printStackTrace();
 			}
 
-			this.mouseXold = e.getPoint().x;
-
+//			this.mouseXold = e.getPoint().x;
+//			TimeTracker.finish(tracker);
 			/* ------------------------------------------------------- */
 		}
 
@@ -1206,7 +881,7 @@ public abstract class CalendarView {
 			// if mouse is at the bottom, switch to resize mode
 
 			if (!areaToChange.getCursor().equals(this.resizeCursor)) {
-				if (e.getPoint().y > areaToChange.getHeight() - 10) {
+				if (e.getPoint().y > areaToChange.getHeight() - 15) {
 					/* ------------------------------------------------------- */
 					// this is the latest frame area
 					if (e.getSource().equals(areaToChange)) {
@@ -1219,7 +894,7 @@ public abstract class CalendarView {
 				}
 			} else {
 				if (!areaToChange.getCursor().equals(this.handCursor)) {
-					if (e.getPoint().y < areaToChange.getHeight() - 10) {
+					if (e.getPoint().y < areaToChange.getHeight() - 15) {
 						areaToChange.setCursor(this.handCursor);
 						CalendarView.isResizeable = false;
 						e.consume();
@@ -1230,6 +905,605 @@ public abstract class CalendarView {
 
 			/* ================================================== */
 		}
+		
+		
+		/**
+		 * 
+		 */
+		private void moveDrag(FrameArea baseFrameArea, MouseEvent e) {
+			/* ================================================== */
+//			 **************************************************************************
+			//
+			// compute values for detecting the crossing of a vertical line
+			//
+			/* ------------------------------------------------------- */
+			int currX = _frameArea.getX();
+//			int currY = _frameArea.getY();
+			int currWidth = _frameArea.getWidth();
+			/* ------------------------------------------------------- */
+			int nextSmaller = findNextSmallerVerticalLine(currX	+ LINE_OFFSET);
+			int nextGreater = findNextGreaterVerticalLine(currX	+ LINE_OFFSET);
+			/* ------------------------------------------------------- */
+			int colWidth = getColumnWidth();
+			int gap2left = currX - nextSmaller;
+			int gap2right = nextGreater - currX - currWidth;
+			// **************************************************************************
+
+			baseFrameArea.setIsMoving(true);
+//			 horizontal moving
+			Integer newXPos = null;
+			// <-----
+			if (e.getPoint().x < 0) {
+				/* ------------------------------------------------------- */
+				// mousepointer has left the event to the left
+				// compute the crossing of a vertical line
+				if ((gap2left + e.getPoint().x) < 0) {
+					// move to day before
+					newXPos = findNextSmallerVerticalLine(baseFrameArea
+							.getX() - 5);
+					// smaller
+				}
+				/* ------------------------------------------------------- */
+			} else {
+				// ---->
+				if (e.getPoint().x > currWidth)
+					if (e.getPoint().x > currWidth + gap2right) {
+						// /*
+						// -------------------------------------------------------
+						// */
+						newXPos = findNextGreaterVerticalLine(baseFrameArea
+								.getX());
+						// greater
+					}
+				/* ------------------------------------------------------- */
+			}
+
+			if (newXPos != null
+					&& newXPos <= calPanel.getX()
+							+ calPanel.getWidth()) {
+				/* ------------------------------------------------------- */
+				// System.out.println("Moving <----> "+newXPos);
+				int y = baseFrameArea.getY();
+				int width = baseFrameArea.getWidth();
+				int height = baseFrameArea.getHeight();
+
+				baseFrameArea.setBounds(newXPos, y, width, height);
+				// move additional frames
+				//
+				if (baseFrameArea.getChildren() != null
+						&& baseFrameArea.getChildren().size() > 0) {
+					/* ------------------------------------------------------- */
+					int countX = 1;
+					for (FrameArea ac : baseFrameArea.getChildren()) {
+						/* ------------------------------------------------------- */
+						int acNewX = baseFrameArea.getX();
+						for (int i = 0; i < countX; i++) {
+							acNewX = findNextGreaterVerticalLine(acNewX);
+						}
+						/* ------------------------------------------------------- */
+						countX++;
+						// int acNewX =
+						// findNextSmallerVerticalLine(ac.getX()-5);
+						ac.setBounds(acNewX, ac.getY(),
+						// ac.getWidth(),
+								width, ac.getHeight());
+						/* ------------------------------------------------------- */
+						// }
+					}
+				}
+			} else {
+				/* ------------------------------------------------------- */
+				// vertical move
+				// try {
+				// System.out.println("k: " + _startDrag.y + " - " +
+				// e.getPoint().y);
+				// } catch (Exception ex) {
+				// ex.printStackTrace();
+				// }
+				int diffPoint = (_startDrag.y - e.getPoint().y);
+				if (Math.abs(diffPoint) > getTimeSlotHeight()
+						|| _shiftKey) {
+					/* ------------------------------------------------------- */
+					int mov;
+					// move without the line steps
+					if (_shiftKey)
+						mov = Math.abs(diffPoint);
+					else
+						mov = getTimeSlotHeight();
+					/* ------------------------------------------------------- */
+					if (_startDrag.y > e.getPoint().y) {
+						mov = mov * (-1) - 1;
+					}
+					/* ------------------------------------------------------- */
+					if (baseFrameArea.getY() + mov >= calPanel
+							.getY()) {
+						baseFrameArea.setBounds(baseFrameArea
+								.getX(), baseFrameArea
+								.getY()
+								+ mov, baseFrameArea.getWidth(),
+								baseFrameArea.getHeight());
+
+						/* ------------------------------------------------------- */
+						// find last frame
+						FrameArea lastArea = findLastFrameArea(baseFrameArea);
+						// if the event lasts longer than a day
+						if (baseFrameArea.getChildren() != null
+								&& baseFrameArea.getChildren().size() > 0) {
+							/* ------------------------------------------------------- */
+							// set the height of the base frame area to
+							// the panels bottom
+							baseFrameArea.setBounds(baseFrameArea
+									.getX(), baseFrameArea
+									.getY(), baseFrameArea
+									.getWidth(), calPanel
+									.getHeight()
+									- baseFrameArea.getY());
+							/* ------------------------------------------------------- */
+						}
+						if (lastArea != null)
+							lastArea.setBounds(lastArea.getX(),
+									lastArea.getY(), lastArea
+											.getWidth(),
+									lastArea.getHeight() + mov);
+						/* ------------------------------------------------------- */
+						// recall the mousedragged event to the current
+						// frame area if
+						// this is not the first one, in order to update
+						// the _startDrag
+						// member
+						// is this an evil hack?
+						if (!_frameArea.equals(baseFrameArea))
+							this.mousePressed(e);
+						/* ------------------------------------------------------- */
+					}
+				}
+			}
+			try {
+				_frameArea.setMovingTimeString(getDate(_frameArea
+						.getX(), _frameArea.getY()),
+						getDate(_frameArea.getX(), _frameArea
+								.getY()
+								+ _frameArea.getHeight()));
+
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			/* ================================================== */
+		}
+		
+		/**
+		 * 
+		 */
+		private void resizeDrag(FrameArea baseFrameArea, MouseEvent e) {
+			/* ================================================== */
+			//	 **************************************************************************
+			//
+			// compute values for detecting the crossing of a vertical line
+			//
+			/* ------------------------------------------------------- */
+			int currX = _frameArea.getX();
+			int currY = _frameArea.getY();
+			int currWidth = _frameArea.getWidth();
+			/* ------------------------------------------------------- */
+			int nextSmaller = findNextSmallerVerticalLine(currX	+ LINE_OFFSET);
+			int nextGreater = findNextGreaterVerticalLine(currX	+ LINE_OFFSET);
+			/* ------------------------------------------------------- */
+			int colWidth = getColumnWidth();
+			int gap2leftColumn = currX - nextSmaller;
+			int gap2rightColumn = nextGreater - currX - currWidth;
+			// **************************************************************************
+			enableCommit(baseFrameArea, false);
+			baseFrameArea.setIsMoving(true);
+			/* ------------------------------------------------------- */
+			// try to make a new frame for a new day
+			// or remove one
+			// ###################################################################################
+			// Adjustments for the current area
+			// we assume, that it can only be the last child of the base area that is in current state
+			// to be resized.
+			/* ------------------------------------------------------- */
+			// if the baseFramearea owns some children, we take the last one as current
+			/* ------------------------------------------------------- */
+			FrameArea currentArea = _frameArea;
+			Point currentPoint 	  = e.getPoint();
+			
+			if (baseFrameArea.getChildren() != null && baseFrameArea.getChildren().size() > 0) {
+				/* ------------------------------------------------------- */
+				currentArea = baseFrameArea.getChildren().get(baseFrameArea.getChildren().size()-1);
+				/* ------------------------------------------------------- */
+				// convert the point from the mouseevent to the coordinate system of the
+				// current area
+				/* ------------------------------------------------------- */
+				currentPoint = convertPoint(e.getPoint(), _frameArea, currentArea);
+				/* ------------------------------------------------------- */
+			} else if (!_frameArea.isVisible()) {
+				currentArea = baseFrameArea;
+				currentPoint = convertPoint(e.getPoint(), _frameArea, currentArea);
+			}
+			/* ------------------------------------------------------- */
+			currX     = currentArea.getX();
+			currY     = currentArea.getY();
+			
+			currWidth = currentArea.getWidth();
+			gap2leftColumn  = currX - findNextSmallerVerticalLine(currX + LINE_OFFSET);
+			gap2rightColumn =         findNextGreaterVerticalLine(currX + LINE_OFFSET) - currX - currWidth;
+			// int pY =
+			// findNextGreaterHorizontalLinePos(e.getPoint().y);
+			/* ------------------------------------------------------- */
+			// ensure, that the event area is at least as small as the
+			// time slot height!
+			/* ------------------------------------------------------- */
+			if ((currentArea.getHeight() + currentPoint.y) < CalendarView.this.desc
+					.getMinimumTimeSlotHeight()
+					|| (currentArea.getHeight() + currentPoint.y) < getTimeSlotHeight()) {
+				/* ------------------------------------------------------- */
+				enableCommit(baseFrameArea, true);
+					return;
+				/* ------------------------------------------------------- */
+			}
+			// ###################################################################################
+			
+			/* ------------------------------------------------------- */
+			// if the mouse pointer is not in the column of the clicked 
+			// frame area, we must check if we must delete or create new/old FrameAreas
+			//
+			// e.getX() is relative to the boundaries of the clicked component. So,
+			// if the mousepointer is moved to the left out of the bounds,
+			// the e.getX() will return a negative value.
+			// Therefore, when the gap to the left column plus the (eventually) negative 
+			// value of e.getX() if smaller than 0, we are in a column left to the clicked
+			// framearea. The same way for the other direction.
+			//
+			// gap2leftColumn/gap2rightColumn must be computed because we can not ashure, that the 
+			// framearea is exactly that width as the column. e.G. if there are overlapping events.
+			/* ------------------------------------------------------- */
+			if ((gap2leftColumn + currentPoint.x) < 0	|| (currentPoint.x > currWidth + gap2rightColumn)) {
+				/* ------------------------------------------------------- */
+				// remove the last frame area, if the mouseX is smaller
+				// than the boundX
+				// ======================================================================
+				// ======================================================================
+				// <---- Resize DIRECTION
+				//
+				// ======================================================================
+				// ======================================================================
+				if (gap2leftColumn + currentPoint.x < 0) {
+					/* ------------------------------------------------------- */
+//					System.out.println("Direction <-----");
+					// remove all areas that are greater than the
+					// mousepointer
+					if (baseFrameArea.getChildren() != null) {
+						/* ------------------------------------------------------- */
+						List<FrameArea> deleteAreas = new ArrayList<FrameArea>();
+						for (FrameArea fa : baseFrameArea.getChildren()) {
+							/* ------------------------------------------------------- */
+							if (fa.getX() > findNextSmallerVerticalLine(currX
+									+ currentPoint.x)) {
+								// remove
+								// we can not remove them from the
+								// panel,
+								// because we need the mouselistener
+								// until the mouse released event
+								fa.setVisible(false);
+								deleteAreas.add(fa);
+								deletedFrameAreas.add(fa);
+//								removeAdditionalArea(fa);
+							}
+							/* ------------------------------------------------------- */
+						}
+						// delete from the parent
+						baseFrameArea.getChildren().removeAll(
+								deleteAreas);
+						// if (lastArea != null)
+						// lastArea.getMouseMotionListeners()[0]
+						// .mouseDragged(e);
+					}
+					/* ------------------------------------------------------- */
+				} else {
+					/* ------------------------------------------------------- */
+					// ----> Resize DIRECTION
+					//
+					// remove the new areas
+					/* ------------------------------------------------------- */
+//					System.out.println("Direction ===>");
+//					FrameArea currLast = findLastFrameArea(baseFrameArea);
+//					currLast.setBounds(
+//							currLast.getX(),
+//							0,
+//							currWidth,
+//							calPanel.getMaximumSize().height);
+//					if (currLast != null && currX + gap2rightColumn + currentPoint.x < currLast
+//									.getX()) {
+//						System.out.println("Wohoo unreachable code reached. Damn your so good.");
+//						/* ------------------------------------------------------- */
+//						// we can not remove them from the panel,
+//						// because we need the mouselistener
+//						// until mouse released event
+//						/* ------------------------------------------------------- */
+//						currLast.setVisible(false);
+//						deletedFrameAreas.add(currLast);
+//						System.out.println("     Deleted Area");
+//						/* ------------------------------------------------------- */
+//					}
+
+					// ##########################################################
+					//
+					// create new frame areas, if needed!
+					/* ------------------------------------------------------- */
+//					else 
+					{
+						/* ------------------------------------------------------- */
+						// if the mouse pointer has crossed the next
+						// vertical line
+						/* ------------------------------------------------------- */
+						int crossPoint = 0;
+						crossPoint = currentPoint.x;
+//						
+//						if (baseFrameArea.equals(CalendarView.originalClickedFrameArea)) {
+//							crossPoint = currentPoint.x;
+//							System.out.println("=============== Using currenPoint");
+//						}
+//						else {
+//							crossPoint = currentPoint.x
+//									+ CalendarView.originalClickedFrameArea
+//											.getX();
+//							System.out.println("=============== Using originalPoint");
+//						}
+						/* ------------------------------------------------------- */
+						if (crossPoint > currWidth + gap2rightColumn) {
+							/* ------------------------------------------------------- */
+							List<Integer> newLines = null;
+							newLines = findUndrawnLines(currX + this.mouseXold, currX + currentPoint.x, 
+															baseFrameArea.getX());
+							/* ------------------------------------------------------- */
+							if (newLines != null && newLines.size() > 0) {
+								/* ------------------------------------------------------- */
+								// create new frame areas for each line
+								/* ------------------------------------------------------- */
+								currentArea.setBounds(
+										currentArea.getX(),
+										0,
+										currWidth,
+										calPanel.getMaximumSize().height);
+								for (Integer i : newLines) {
+									/* ------------------------------------------------------- */
+									// if frame is present, continue
+									if (additionalFrames.containsKey(i)) {
+										/* ------------------------------------------------------- */
+										FrameArea afa = additionalFrames.get(i);
+										/* ------------------------------------------------------- */
+										if (afa.isVisible()) {
+//											afa.setBounds(afa.getX(),
+//													0,
+//													currWidth,20);
+											lastCreatedFrameArea = afa;
+											continue;
+										}
+										if (!baseFrameArea.getChildren().contains(afa)) {
+											/* ------------------------------------------------------- */
+											baseFrameArea.addChild(afa);
+											if (deletedFrameAreas.contains(afa))
+												deletedFrameAreas.remove(afa);
+											/* ------------------------------------------------------- */
+										}
+//										System.out.println("Setting available frame visible " + i);
+										afa.setVisible(true);
+										afa.setBounds(
+												afa.getX(),
+												0,
+												currWidth,
+												calPanel.getMaximumSize().height);
+//										System.out.println("MAX -> old " + findNextGreaterVerticalLine(calPanel.getMaximumSize().height));
+										lastCreatedFrameArea = afa;
+										continue;
+										/* ------------------------------------------------------- */
+									}
+ 									/* ------------------------------------------------------- */
+									// create a new FrameArea
+									FrameArea fa = new FrameArea();
+									fa.setBounds(
+													i,
+													0,
+													currWidth,
+													findNextGreaterHorizontalLinePos(currY
+															+ currentPoint.y));
+//									fa.setEvent(_event);
+									/* ------------------------------------------------------- */
+									calPanel.add(fa, new Integer(3));
+									calPanel.validate();
+									calPanel.updateUI();
+									fa.setVisible(true);
+									additionalFrames.put(i, fa);
+									baseFrameArea.addChild(fa);
+									
+									
+									
+									/* ------------------------------------------------------- */
+									if (lastCreatedFrameArea != null) {
+										/* ------------------------------------------------------- */
+										lastCreatedFrameArea
+												.setBounds(
+														lastCreatedFrameArea.getX(),
+														0,
+														currWidth,
+														calPanel.getMaximumSize().height);
+//										System.out.println("MAX -> new");
+									}
+									this.lastCreatedFrameArea = fa;
+									this.lastCreatedKey = i;
+									currentPoint = convertPoint(currentPoint, currentArea, fa);
+									currentArea = fa;
+									/* ------------------------------------------------------- */
+								}
+							}
+							
+							/* ------------------------------------------------------- */
+						} // if
+					} // else
+				}// else
+				/* ------------------------------------------------------- */
+//				if (_frameArea != currentArea) {
+//					_frameArea.setBounds(_frameArea.getX(), _frameArea.getX(), _frameArea.getWidth(),
+//							800);
+//					System.out.println("adjusting _frameArea "+_frameArea.getX() + " -- " +_frameArea.getHeight() );
+//				}
+				/* ------------------------------------------------------- */
+//				if (baseFrameArea.getChildren() != null && baseFrameArea.getChildren().size() > 1) {
+//					FrameArea last = findLastFrameArea(baseFrameArea);
+//					for (FrameArea fa : baseFrameArea.getChildren()) {
+//						if (!fa.equals(last))
+//							if (fa.getHeight() <= calPanel.getMaximumSize().height)
+//								fa.setBounds(fa.getX(), fa.getY(), fa.getWidth(), calPanel.getMaximumSize().height);
+//					}
+//				}
+				
+				/* ------------------------------------------------------- */
+			} else {
+				/* ------------------------------------------------------- */
+				// the mouse pointer is in the same column as the original
+				// dragged frame area and we must "only" adjust the bounds of this
+				// frame are
+				/* ------------------------------------------------------- */
+//				 ==============================================================================
+				// compute height
+				// if shift is pressed, we take the current mouse y position
+				// as new height.
+				// otherwise we will use normal step wise height
+				// ==============================================================================
+				
+				int newHeight = 0;
+				if (_shiftKey)
+					newHeight = currentPoint.y;
+				else
+					newHeight = findNextGreaterHorizontalLinePos(currentPoint.y);
+				
+				currentArea.setBounds(currX, currY, currWidth, newHeight);
+//				System.out.println("resizing " + newHeight);
+			}
+			// ==============================================================================
+			// compute height
+			// if shift is pressed, we take the current mouse y position
+			// as new height.
+			// otherwise we will use normal step wise height
+			// ==============================================================================
+			
+//			int newHeight = 0;
+//			if (_shiftKey)
+//				newHeight = currentPoint.y;
+//			else
+//				newHeight = findNextGreaterHorizontalLinePos(currentPoint.y);
+			
+//			/* ------------------------------------------------------- */
+//			// set bounds of the base frame area
+//			if (baseFrameArea.getChildren() == null
+//					|| baseFrameArea.getChildren().size() < 1) {
+//				/* ------------------------------------------------------- */
+//				// adjust bounds only if there are changes -->
+//				// performance
+//				if (baseFrameArea.getHeight() != newHeight) {
+//					/* ------------------------------------------------------- */
+//					if (baseFrameArea.equals(CalendarView.originalClickedFrameArea)) {
+//						baseFrameArea.setBounds(baseFrameArea.getX(),
+//												baseFrameArea.getY(), 
+//												currWidth, 
+//												newHeight);
+//					} else {
+//						baseFrameArea.setBounds(baseFrameArea.getX(),
+//												baseFrameArea.getY(),
+//												currWidth,
+//												findNextGreaterHorizontalLinePos(
+//													currentPoint.y));
+//					}
+//					/* ------------------------------------------------------- */
+//				}
+//				/* ------------------------------------------------------- */
+//			} else {
+//				/* ------------------------------------------------------- */
+//				// set baseframe height to max
+//				/* ------------------------------------------------------- */
+//				if (baseFrameArea.getHeight() != calPanel
+//						.getMaximumSize().height)
+//					baseFrameArea.setBounds(
+//							baseFrameArea.getX(), baseFrameArea
+//									.getY(), currWidth, calPanel
+//									.getMaximumSize().height);
+//				/* ------------------------------------------------------- */
+//
+//				int diffPoint = (_startDrag.y - currentPoint.y);
+//				FrameArea lfa = findLastFrameArea(baseFrameArea);
+//				if (Math.abs(diffPoint) > getTimeSlotHeight()) {
+//					/* ------------------------------------------------------- */
+//					int mov = getTimeSlotHeight();
+//					if (_startDrag.y > currentPoint.y) {
+//						mov = mov * (-1);
+//					}
+//					/* ------------------------------------------------------- */
+//					// make sure that the new boundaries are inside the
+//					// calendar panel
+//					if (baseFrameArea.getY() + mov >= calPanel.getY()) {
+////						FrameArea lfa = findLastFrameArea(baseFrameArea);
+//						/* ------------------------------------------------------- */
+//						if (lfa != null) {
+//							/* ------------------------------------------------------- */
+//							lfa.setBounds(
+//											lfa.getX(),
+//											lfa.getY(),
+//											currWidth,
+//											findNextGreaterHorizontalLinePos(currY
+//													+ currentPoint.y) - 1);
+//							/* ------------------------------------------------------- */
+//						}
+//						/* ------------------------------------------------------- */
+//					}
+//				}
+//				/* ------------------------------------------------------- */
+//				// set all but the last children to max size
+//				/* ------------------------------------------------------- */
+////				FrameArea lastArea = findLastFrameArea(baseFrameArea);
+//				for (FrameArea fa : baseFrameArea.getChildren()) {
+//					if (!fa.equals(lfa)) {
+//						/* ------------------------------------------------------- */
+//						fa.setBounds(fa.getX(), 0, fa.getWidth(), calPanel.getMaximumSize().height);
+//						/* ------------------------------------------------------- */
+//					}
+//				}
+//				/* ------------------------------------------------------- */
+//			}
+			
+			
+//			this.mouseXold = currentPoint.x;
+//			/* ------------------------------------------------------- */
+//			// hide the deleted frame areas
+//			/* ------------------------------------------------------- */
+//			for (FrameArea hfa : deletedFrameAreas)
+//				hfa.setVisible(false);
+//			
+//			FrameArea tempLast = null;
+//			try {
+//				tempLast = findLastFrameArea(baseFrameArea);
+//				if (tempLast == null)
+//					tempLast = baseFrameArea;
+//			} catch (Exception e1) {
+//				tempLast = baseFrameArea;
+//				// e1.printStackTrace();
+//			}
+//			
+//			enableCommit(baseFrameArea, true);
+//			baseFrameArea.commitBounds();
+//			if (baseFrameArea.getChildren() != null)
+//				for (FrameArea f : baseFrameArea.getChildren())
+//					f.commitBounds();
+//			
+////			tempLast.setMovingTimeString(getDate(baseFrameArea
+////					.getX(), baseFrameArea.getY()),
+////					getDate(tempLast.getX(), tempLast
+////							.getY()
+////							+ tempLast.getHeight()));
+			/* ================================================== */
+		}
+		
+		
+		
 	}
 
 	/**
@@ -1243,6 +1517,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.31  2008/06/09 14:10:09  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.30  2008/05/30 11:36:47  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1330,6 +1607,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.31  2008/06/09 14:10:09  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.30  2008/05/30 11:36:47  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1426,6 +1706,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.31  2008/06/09 14:10:09  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.30  2008/05/30 11:36:47  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1688,10 +1971,7 @@ public abstract class CalendarView {
 				int pX = e.getPoint().x;
 				int pY = findNextGreaterHorizontalLinePos(e.getPoint().y);
 				Integer offset = null;
-				// ensure, that the event area is at leat as small as the
-				// time slot height!
-				if (e.getPoint().y <= _dragArea.getY())
-					return;
+				
 				/* ------------------------------------------------------- */
 				/* ------------------------------------------------------- */
 				if (draggingEnabled) {
@@ -1751,7 +2031,7 @@ public abstract class CalendarView {
 							/* ------------------------------------------------------- */
 							
 							List<Integer> newLines = findUndrawnLines(this.mouseXold, e
-									.getPoint().x, gap, currPos);
+									.getPoint().x, currPos);
 
 							// find greatest new line
 							int dx = _dragArea.getX();
@@ -1771,7 +2051,10 @@ public abstract class CalendarView {
 							return;
 							/* ------------------------------------------------------- */
 						} 
-						else {
+						/* ------------------------------------------------------- */
+						// formerly known as else
+						/* ------------------------------------------------------- */
+						{
 							// remove the last frame area, if the mouseX is smaller
 							// than the boundX
 							if (lastCreatedFrameArea != null
@@ -1806,10 +2089,10 @@ public abstract class CalendarView {
 							List<Integer> newLines = null;
 							if (lastCreatedKey == null)
 								newLines = findUndrawnLines(this.mouseXold, e
-										.getPoint().x, gap, currPos);
+										.getPoint().x, currPos);
 							else
 								newLines = findUndrawnLines(this.mouseXold, e
-										.getPoint().x, gap, lastCreatedKey);
+										.getPoint().x,  lastCreatedKey);
 							/* ------------------------------------------------------- */
 							if (newLines != null && newLines.size() > 0) {
 								/* ------------------------------------------------------- */
@@ -1852,7 +2135,7 @@ public abstract class CalendarView {
 										findNextGreaterHorizontalLinePos(e
 												.getPoint().y));
 								/* ------------------------------------------------------- */
-								((FrameArea) lastCreatedFrameArea)
+								lastCreatedFrameArea
 										.setEndTime(getDate(currPos,
 												lastCreatedFrameArea.getY()
 														+ lastCreatedFrameArea
@@ -1882,6 +2165,12 @@ public abstract class CalendarView {
 
 					}
 				}
+				
+//				 ensure, that the event area is at leat as small as the
+				// time slot height!
+				if (_dragArea.getHeight() < getTimeSlotHeight())
+					_dragArea.setBounds(_dragArea.getX(), _dragArea.getY(), _dragArea.getWidth(), getTimeSlotHeight());
+				
 				/* ------------------------------------------------------- */
 				getComponent().revalidate();
 				draggingEnabled = false;
@@ -1908,27 +2197,30 @@ public abstract class CalendarView {
 	 * @param base
 	 * @return
 	 */
-	private FrameArea findLastFrameArea(FrameArea base) {
+	private synchronized FrameArea findLastFrameArea(FrameArea base) {
 		/* ================================================== */
-		if (base.getChildren() == null)
+		if (base.getChildren() == null || base.getChildren().size() < 1)
 			return null;
-		/* ------------------------------------------------------- */
-		FrameArea last = null;
-		for (FrameArea fa : base.getChildren()) {
-			/* ------------------------------------------------------- */
-			if (last == null)
-				if (fa.isVisible())
-					last = fa;
-				else
-					continue;
-			/* ------------------------------------------------------- */
-			if (fa.getX() > last.getX() && fa.isVisible())
-				last = fa;
-			/* ------------------------------------------------------- */
-		}
-		// if (last == null)
-		// return base;
-		return last;
+		
+		return base.getChildren().get(base.getChildren().size()-1);
+		
+//		/* ------------------------------------------------------- */
+//		FrameArea last = null;
+//		for (FrameArea fa : base.getChildren()) {
+//			/* ------------------------------------------------------- */
+//			if (last == null)
+//				if (fa.isVisible())
+//					last = fa;
+//				else
+//					continue;
+//			/* ------------------------------------------------------- */
+//			if (fa.getX() > last.getX() && fa.isVisible())
+//				last = fa;
+//			/* ------------------------------------------------------- */
+//		}
+//		// if (last == null)
+//		// return base;
+//		return last;
 		/* ================================================== */
 	}
 
@@ -2025,7 +2317,7 @@ public abstract class CalendarView {
 	 * @return
 	 */
 	private List<Integer> findUndrawnLines(int mouseXold, int mouseXnew,
-			int gap, Integer lastFrameX) {
+			 Integer lastFrameX) {
 		/* ================================================== */
 		List<Integer> returnList = new ArrayList<Integer>();
 		// can only find lines if the current mouseposition is greater
@@ -2455,6 +2747,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.31  2008/06/09 14:10:09  heine_
+//	 * <br>*** empty log message ***
+//	 * <br>
 //	 * <br>Revision 1.30  2008/05/30 11:36:47  heine_
 //	 * <br>*** empty log message ***
 //	 * <br>
@@ -2573,5 +2868,29 @@ public abstract class CalendarView {
 	public void clear() {
 		_selectedEvents.clear();
 	}
-
+	
+	
+	
+	/**
+	 * Converts a point from the source components coordinates system to the 
+	 * target components coordinates system.
+	 * 
+	 * @param p the point to convert
+	 * @param source the source component from which the point is inherited
+	 * @param target the component for which the point should be converted
+	 * @return
+	 */
+	public  static Point convertPoint(Point p, Component source, Component target) {
+		/* ================================================== */
+		Point pNew = new Point(p);
+		
+		// convert point from source to screen
+		SwingUtilities.convertPointToScreen(pNew, source);
+		// convert point from screen to target
+        SwingUtilities.convertPointFromScreen(pNew, target);
+        
+        return pNew;
+		/* ================================================== */
+	}
+	
 }

@@ -44,6 +44,7 @@ import java.awt.image.BufferedImage;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.List;
@@ -121,6 +122,18 @@ public class FrameArea extends JComponent implements ComponentListener {
 	private int lineWrap = -1;
 
 	private boolean isBackgroundMarker 	= false;
+
+	private int boundX;
+
+	private int boundY;
+
+	private int boundWidth;
+
+	private int boundHeight;
+
+	private boolean autoCommitBounds = true;
+	
+	
 	private static Color   backgroundMarkColor = new Color(205, 207, 255);
 	
 	public static final DateFormat timeFormat = new SimpleDateFormat("HH:mm",
@@ -157,6 +170,12 @@ public class FrameArea extends JComponent implements ComponentListener {
 		/* ================================================== */
 		this();
 		this.isBackgroundMarker  = backgroundMarker;
+		if (this.isBackgroundMarker) {
+			/* ------------------------------------------------------- */
+			setBackground(backgroundMarkColor);
+			
+			/* ------------------------------------------------------- */
+		}
 		/* ================================================== */
 	}
 	
@@ -182,6 +201,11 @@ public class FrameArea extends JComponent implements ComponentListener {
 		}
 		/* ------------------------------------------------------- */
 		this.alphaFontColor = new Color(fontColor.getRed(), fontColor.getGreen(), fontColor.getBlue(), 220);
+		try {
+			setBackground(event.getColor());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		/* ================================================== */
 	}
 
@@ -200,7 +224,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 	public void addChild(FrameArea fa) {
 		/* ================================================== */
 		if (this.children == null)
-			this.children = new ArrayList<FrameArea>();
+			this.children = Collections.synchronizedList(new ArrayList<FrameArea>(1));
 		/* ------------------------------------------------------- */
 		children.add(fa);
 		/* ================================================== */
@@ -222,7 +246,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 	public List<FrameArea> getChildren() {
 		/* ================================================== */
 		if (this.children == null)
-			return new ArrayList<FrameArea>();
+			this.children =  Collections.synchronizedList(new ArrayList<FrameArea>(0));
 		return this.children;
 		/* ================================================== */
 	}
@@ -241,8 +265,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @param str
 	 */
-	public void setMovingTimeString(Date moveStartDate, Date moveEndDate) {
+	public synchronized void setMovingTimeString(Date moveStartDate, Date moveEndDate) {
 		/* ================================================== */
+//		System.out.println("FrameArea::setMovingTimeString " + moveStartDate + " -" + moveEndDate);
 		this.moveDate = moveStartDate;
 		this.movingString = timeFormat.format(moveDate) + " - "
 				+ timeFormat.format(moveEndDate);
@@ -288,15 +313,14 @@ public class FrameArea extends JComponent implements ComponentListener {
 	// The toolkit will invoke this method when it's time to paint
 	public void paint(Graphics g) {
 		/* ================================================== */
-//		if (!this.isVisible())
-//			return;
-//		if (this.event.isBackground())
-//			System.out.println("Paint:: " + this.hashCode() + " -- " + this.event.getStart());
 		try {
+			if (!this.getBackground().equals(event.getColor()))
 			setBackground(event.getColor());
 		} catch (Exception e) {
+//			e.printStackTrace();
 		}
-		/* ------------------------------------------------------- */
+		
+		
 		// increase the alpha value if the event is a background event
 		if (event != null && event.isBackground())
 			this.alphaValue = ALPHA_DEFAULT + SELECT_OFFSET - 0.3f;
@@ -327,7 +351,6 @@ public class FrameArea extends JComponent implements ComponentListener {
 		if (isBackgroundMarker) {
 			/* ------------------------------------------------------- */
 			// do some modifications
-			setBackground(backgroundMarkColor);
 			event.setSelectable(false);
 			event.setBackground(true);
 			/* ------------------------------------------------------- */
@@ -687,6 +710,17 @@ public class FrameArea extends JComponent implements ComponentListener {
 	}
 	
 	
+	/**
+	 * Enable auto set bounds
+	 * 
+	 * @param b
+	 */
+	public void enableAutoCommit(boolean b) {
+		/* ================================================== */
+		this.autoCommitBounds = b;
+		/* ================================================== */
+	}
+	
 	// ========================================================================
 	// Methods for the component listener
 	// ------------------------------------------------------------------------
@@ -711,6 +745,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.9  2008/06/09 14:10:09  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.8  2008/05/30 11:36:47  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -839,6 +876,25 @@ public class FrameArea extends JComponent implements ComponentListener {
 		/* ================================================== */
 	}
 	
+//	@Override
+//	public void setBounds(int x, int y, int width, int height) {
+//		/* ================================================== */
+//		super.setBounds(x, y, width, height);
+//		System.out.println(this.toString() + " - " + getBounds());
+//		this.boundX 		= x;
+//		this.boundY 		= y;
+//		this.boundWidth 	= width;
+//		this.boundHeight 	= height;
+//		if (this.autoCommitBounds)
+//			commitBounds();
+		/* ================================================== */
+//	}
+	
+	public void commitBounds() {
+		/* ================================================== */
+		super.setBounds(boundX, boundY, boundWidth, boundHeight);
+		/* ================================================== */
+	}
 	
 	  /**
 	   * Draw nice lines in the area

@@ -39,7 +39,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -189,7 +188,8 @@ public class DayView extends CalendarView {
 
 	public void refresh0() throws Exception {
 		/* ================================================== */
-
+//		System.out.println("DayView::refresh0");
+//		System.out.println("----");
 		if (calPanel == null || this.getModel() == null)
 			return;
 		/* ------------------------------------------------------- */
@@ -317,7 +317,15 @@ public class DayView extends CalendarView {
 		// put the timelines in the background
 		/* ------------------------------------------------------- */
 		for (JLabel l : timeLines.values()) {
-			calPanel.setComponentZOrder(l, calPanel.getComponents().length-2);
+			try {
+				/* --------------------------------------------- */
+				calPanel.setComponentZOrder(l, calPanel.getComponents().length-2);
+				/* --------------------------------------------- */
+			} catch (Exception e) {
+				/* --------------------------------------------- */
+				e.printStackTrace();
+				/* --------------------------------------------- */
+			}
 		}
 		/* ------------------------------------------------------- */
 		scrollPane.validate();
@@ -557,6 +565,9 @@ public class DayView extends CalendarView {
 			yPos++;
 			if (yPos < 0 )
 				break;
+			if (yPos >= getHeight()) 
+				yPos = getHeight();
+//				break;
 			/* ------------------------------------------------------- */
 		}
 		/* ------------------------------------------------------- */
@@ -672,6 +683,9 @@ public class DayView extends CalendarView {
 	 *
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.35  2008/06/09 14:10:09  heine_
+	 *          *** empty log message ***
+	 *
 	 *          Revision 1.34  2008/05/30 11:36:48  heine_
 	 *          *** empty log message ***
 	 *
@@ -842,8 +856,11 @@ public class DayView extends CalendarView {
 						if (!event.isBackground()) {
 							/* ------------------------------------------------------- */
 							if (prevArea != null) {
-								Rectangle r = prevArea.getBounds();
-								int prevY2 = r.y + r.height;
+//								Rectangle r = prevArea.getBounds();
+//								int prevY2 = r.y + r.height;
+								
+								int prevY2 = prevArea.getY() + prevArea.getHeight();
+								
 								if (prevY2 > y1) {
 									// Previous event overlap
 									overlapCol++;
@@ -901,8 +918,10 @@ public class DayView extends CalendarView {
 									}
 								} catch (Exception e) {}
 								/* ------------------------------------------------------- */
-								Rectangle r = area.getBounds();
-								area.setBounds(r.x + index*currWidth, r.y, currWidth, r.height);
+//								Rectangle r = area.getBounds();
+//								area.setBounds(r.x + index*currWidth, r.y, currWidth, r.height);
+								
+								area.setBounds(area.getX() + index*currWidth, area.getY(), currWidth, area.getHeight());
 							}
 						}
 					}
@@ -937,7 +956,7 @@ public class DayView extends CalendarView {
 									calPanel.setComponentZOrder(fa, calPanel.getComponents().length-5);
 								/* --------------------------------------------- */
 							} catch (Exception e) {
-								e.printStackTrace();
+//								e.printStackTrace();
 							}
 							/* ------------------------------------------------------- */
 						}
@@ -976,7 +995,7 @@ public class DayView extends CalendarView {
 					/* ------------------------------------------------------- */
 					int minutes = Integer.parseInt((String) key.elementAt(1));
 					/* ------------------------------------------------------- */
-					JLabel line = (JLabel) timeLines.get(key);
+					JLabel line = timeLines.get(key);
 					Date date1 = new Date(date.getTime() + minutes * 60 * 1000);
 					
 					int y1 = getYPos(date1, 0);

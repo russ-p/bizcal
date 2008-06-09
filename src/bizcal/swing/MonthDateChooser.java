@@ -516,8 +516,8 @@ public class MonthDateChooser
 	
 	public void componentResized(ComponentEvent e)
 	{
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
+//		SwingUtilities.invokeLater(new Runnable() {
+//			public void run() {
 				/* ================================================== */
 				try {
 					
@@ -530,8 +530,8 @@ public class MonthDateChooser
 					ErrorHandler.handleError(exc);
 				}
 				/* ================================================== */
-			}
-		});
+//			}
+//		});
 	}		
 }
 	
