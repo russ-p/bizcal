@@ -70,6 +70,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.32  2008/06/10 13:16:36  heine_
+ *          *** empty log message ***
+ *
  *          Revision 1.31  2008/06/09 14:10:09  heine_
  *          *** empty log message ***
  *
@@ -789,15 +792,6 @@ public abstract class CalendarView {
 		}
 		
 		
-		private void enableCommit(FrameArea bArea, boolean b) {
-			/* ================================================== */
-			bArea.enableAutoCommit(b);
-			if (bArea.getChildren() != null)
-				for (FrameArea f : bArea.getChildren())
-					f.enableAutoCommit(b);
-			/* ================================================== */
-		}
-		
 		public void mouseDragged(MouseEvent e) {
 			/* ================================================== */
 			// filter events by time
@@ -1092,7 +1086,7 @@ public abstract class CalendarView {
 			int gap2leftColumn = currX - nextSmaller;
 			int gap2rightColumn = nextGreater - currX - currWidth;
 			// **************************************************************************
-			enableCommit(baseFrameArea, false);
+			
 			baseFrameArea.setIsMoving(true);
 			/* ------------------------------------------------------- */
 			// try to make a new frame for a new day
@@ -1137,7 +1131,6 @@ public abstract class CalendarView {
 					.getMinimumTimeSlotHeight()
 					|| (currentArea.getHeight() + currentPoint.y) < getTimeSlotHeight()) {
 				/* ------------------------------------------------------- */
-				enableCommit(baseFrameArea, true);
 					return;
 				/* ------------------------------------------------------- */
 			}
@@ -1307,7 +1300,8 @@ public abstract class CalendarView {
 													currWidth,
 													findNextGreaterHorizontalLinePos(currY
 															+ currentPoint.y));
-//									fa.setEvent(_event);
+									fa.setEvent(_event);
+									
 									/* ------------------------------------------------------- */
 									calPanel.add(fa, new Integer(3));
 									calPanel.validate();
@@ -1315,8 +1309,6 @@ public abstract class CalendarView {
 									fa.setVisible(true);
 									additionalFrames.put(i, fa);
 									baseFrameArea.addChild(fa);
-									
-									
 									
 									/* ------------------------------------------------------- */
 									if (lastCreatedFrameArea != null) {
@@ -1517,6 +1509,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.32  2008/06/10 13:16:36  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.31  2008/06/09 14:10:09  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1607,6 +1602,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.32  2008/06/10 13:16:36  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.31  2008/06/09 14:10:09  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1706,6 +1704,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.32  2008/06/10 13:16:36  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.31  2008/06/09 14:10:09  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -2747,6 +2748,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.32  2008/06/10 13:16:36  heine_
+//	 * <br>*** empty log message ***
+//	 * <br>
 //	 * <br>Revision 1.31  2008/06/09 14:10:09  heine_
 //	 * <br>*** empty log message ***
 //	 * <br>

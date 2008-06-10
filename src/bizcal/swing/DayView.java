@@ -40,7 +40,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.swing.JComponent;
@@ -58,6 +57,7 @@ import bizcal.util.DateUtil;
 import bizcal.util.Interval;
 import bizcal.util.TimeOfDay;
 import bizcal.util.Tuple;
+
 
 public class DayView extends CalendarView {
 	public static int PIXELS_PER_HOUR = 80;
@@ -488,11 +488,25 @@ public class DayView extends CalendarView {
 
 	// F�r in ett events start- eller slutdatum, h�jden p� f�nstret samt
 	// intervallet som positionen ska ber�knas utifr�n
+	/**
+	 * Returns the y position for the date and the day
+	 * 
+	 * @param aDate
+	 * @param dayNo
+	 * @return
+	 * @throws Exception
+	 */
 	private int getYPos(Date aDate, int dayNo) throws Exception {
 		long time = aDate.getTime();
 		return getYPos(time, dayNo);
 	}
 
+	/**
+	 * @param time
+	 * @param dayNo
+	 * @return
+	 * @throws Exception
+	 */
 	private int getYPos(long time, int dayNo) throws Exception {
 		/* ================================================== */
 		DateInterval interval = getInterval(dayNo);
@@ -683,6 +697,9 @@ public class DayView extends CalendarView {
 	 *
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.36  2008/06/10 13:16:36  heine_
+	 *          *** empty log message ***
+	 *
 	 *          Revision 1.35  2008/06/09 14:10:09  heine_
 	 *          *** empty log message ***
 	 *
@@ -771,22 +788,25 @@ public class DayView extends CalendarView {
 
 		@SuppressWarnings("unchecked")
 		public void layoutContainer(Container parent0) {
+			/* ================================================== */
 			try {
 				DayView.this.resetVerticalLines();
-				int width = getWidth();
-				int height = getHeight();
+				int width 	= getWidth();
+				int height 	= getHeight();
 				DateInterval day = getFirstInterval();
 
 				int numberOfCols = getColCount();
 				if (numberOfCols == 0)
 					numberOfCols = 1;
 
-
+				/* ------------------------------------------------------- */
+				// iterate over all columns (a column per day)
+				/* ------------------------------------------------------- */
 				for (int i = 0; i < eventColList.size(); i++) {
+					/* ------------------------------------------------------- */
 					int dayNo = i % dayCount;
 					int xpos = getXPos(i);
-					int captionYOffset = getCaptionRowHeight()
-							- CAPTION_ROW_HEIGHT0;
+					int captionYOffset = getCaptionRowHeight() - CAPTION_ROW_HEIGHT0;
 					int colWidth = getXPos(i + 1) - getXPos(i);
 					// Obs. tempor�r l�sning med korrigering med +2. L�gg till
 					// korrigeringen p� r�tt st�lle
@@ -796,44 +816,60 @@ public class DayView extends CalendarView {
 						vLineTop = 0;
 						day = getFirstInterval();
 					}
-
-					Calendar startinterv = Calendar.getInstance(Locale
-							.getDefault());
-					startinterv.setTime(day.getStartDate());
-
+					
+//					Calendar startinterv = Calendar.getInstance(Locale.getDefault());
+//					startinterv.setTime(day.getStartDate());
+					
+					/* ------------------------------------------------------- */
+					//
+					/* ------------------------------------------------------- */
 					if (i > 0) {
-						JLabel verticalLine = (JLabel) vLines.get(i-1);
+						JLabel verticalLine = vLines.get(i-1);
 						int vLineHeight = height - vLineTop;
 						verticalLine.setBounds(xpos, vLineTop, 1, vLineHeight);
 						// add the line position to the list
 						addVerticalLine(verticalLine);
 					}
-
+					/* ------------------------------------------------------- */
+					// show a footer. Haven't seen it working....
+					/* ------------------------------------------------------- */
 					if (config.isShowDateFooter()) {
-						JLabel dayFooter = (JLabel) dateFooters.get(i);
+						JLabel dayFooter = dateFooters.get(i);
 						dayFooter.setBounds(xpos, getTimeHeight(), colWidth, getFooterHeight());
 					}
-
+					/* ------------------------------------------------------- */
+					// get the date interval for the current day
+					/* ------------------------------------------------------- */
 					DateInterval currIntervall = getInterval(dayNo);
-					FrameArea prevArea = null;
-					int overlapCol = 0;
+					FrameArea previousArea = null;
+					/* ------------------------------------------------------- */
+					// this indicates the position of the event inside the day-column
+					// if it is overlapping with other events
+					/* ------------------------------------------------------- */
+					int overlapCol 		= 0;
+					/* ------------------------------------------------------- */
+					// this is the total amount of columns inside a day-column.
+					// Overlapping events will be painted in columns inside the day-column
+					/* ------------------------------------------------------- */
 					int overlapColCount = 0;
 					// ======================================================
 					// eventColList contains a list of ArrayLists that holds the
 					// events per day
 					// the same with the frameAreaCols
 					// =======================================================
-					List events = eventColList.get(i);
+					List<Event> events	  = eventColList.get(i);
 					List<FrameArea> areas = frameAreaCols.get(i);
 					/* ------------------------------------------------------- */
 					int overlapCols[] = new int[events.size()];
+					// for each event of the day
 					for (int j = 0; j < events.size(); j++) {
 						/* ------------------------------------------------------- */
 						FrameArea area = areas.get(j);
-						Event event = (Event) events.get(j);
+						Event event    = events.get(j);
 						// adapt the FrameArea according the appropriate event
 						// data
 						Date startTime = event.getStart();
+						// if the starttime is before the displayable time, we take the first displayable time
 						if (startTime.before(currIntervall.getStartDate()))
 							startTime = currIntervall.getStartDate();
 						/* ------------------------------------------------------- */
@@ -843,88 +879,109 @@ public class DayView extends CalendarView {
 						if (endTime.after(currIntervall.getEndDate()))
 							endTime = currIntervall.getEndDate();
 						/* ------------------------------------------------------- */
+						// compute the new bounds of the framearea
+						/* ------------------------------------------------------- */
+						// get the ypos for the start time
 						int y1 = getYPos(startTime, dayNo);
 						if (y1 < getCaptionRowHeight())
 							y1 = getCaptionRowHeight();
-
+						// get the y position for the end time
 						int y2 = getYPos(endTime, dayNo);
-						int dy = y2 - y1;
+						
+						int dHeight = y2 - y1;
 						int x1 = xpos;
-						area.setBounds(x1, y1, colWidth, dy);
+						area.setBounds(x1, y1, colWidth, dHeight);
 						/* ------------------------------------------------------- */
 						// Overlap logic
+						// 
+						// overlapping works only for events that are not
+						// in the background
+						/* ------------------------------------------------------- */
 						if (!event.isBackground()) {
 							/* ------------------------------------------------------- */
-							if (prevArea != null) {
-//								Rectangle r = prevArea.getBounds();
-//								int prevY2 = r.y + r.height;
-								
-								int prevY2 = prevArea.getY() + prevArea.getHeight();
-								
-								if (prevY2 > y1) {
+							if (previousArea != null) {
+								/* ------------------------------------------------------- */
+								int previousY2 = previousArea.getY() + previousArea.getHeight();
+								// if the previous ends after the current starts
+								if (previousY2 > y1) {
 									// Previous event overlap
 									overlapCol++;
-									if (prevY2 < y2) {
-										// This events finish later than
-										// previous
-										prevArea = area;
+									if (previousY2 < y2) {
+										/* ------------------------------------------------------- */
+										// This events ends after the previous
+										/* ------------------------------------------------------- */
+										previousArea = area;
+										/* ------------------------------------------------------- */
 									}
 								} else {
+									/* ------------------------------------------------------- */
+									// set the overlap column to 0. this is the column in which the 
+									// overlap event will be painted afterwards.
+									/* ------------------------------------------------------- */
 									overlapCol = 0;
-									prevArea = area;
+									previousArea = area;
+									/* ------------------------------------------------------- */
 								}
-							}  else
-								prevArea = area;
+								/* ------------------------------------------------------- */
+							}  else {
+								previousArea = area;
+//								overlapCols[j] = 0;
+							}
+							// store the column position for the overlapping event
 							overlapCols[j] = overlapCol;
+							
 							if (overlapCol > overlapColCount)
 								overlapColCount = overlapCol;
 							/* ------------------------------------------------------- */
-						} else
-							overlapCols[j] = 0;
-						}
+						} 
+						else
+							overlapCols[j] = -1;
+					}
 					/* ------------------------------------------------------- */
 						// Overlap logic. Loop the events/frameareas a second
 						// time and set the xpos and widths
 					/* ------------------------------------------------------- */
-						if (overlapColCount > 0) {
+					if (overlapColCount > 0) {
+						/* ------------------------------------------------------- */
+						int currWidth = colWidth;
+						for (int k = 0; k < areas.size(); k++) {
 							/* ------------------------------------------------------- */
-							int currWidth = colWidth;
-							for (int j = 0; j < areas.size(); j++) {
+							Event event = events.get(k);
+							/* ------------------------------------------------------- */
+							if (event.isBackground())
+								continue;
+							/* ------------------------------------------------------- */
+							FrameArea area = areas.get(k);
+							int overlapIndex = overlapCols[k];
+							if (overlapIndex == 0)
+								currWidth = colWidth;
+							/* ------------------------------------------------------- */
+							try {
 								/* ------------------------------------------------------- */
-								Event event = (Event) events.get(j);
-								/* ------------------------------------------------------- */
-								if (event.isBackground())
-									continue;
-								/* ------------------------------------------------------- */
-								FrameArea area = (FrameArea) areas.get(j);
-								int index = overlapCols[j];
-								if (index == 0)
-									currWidth = colWidth;
-								/* ------------------------------------------------------- */
-								try {
-									/* ------------------------------------------------------- */
-									if ( overlapCols[j+1] > 0){
-										// find greates in line
-										int curr = index;
-										for (int a = j+1; a < areas.size();a++) {
-											/* ------------------------------------------------------- */
-											if (overlapCols[a] == 0)
-												break;
-											if (overlapCols[a] > curr)
-												curr = overlapCols[a];
-											/* ------------------------------------------------------- */
-										}
-										currWidth = colWidth / (curr+1);
-									}
-								} catch (Exception e) {}
-								/* ------------------------------------------------------- */
-//								Rectangle r = area.getBounds();
-//								area.setBounds(r.x + index*currWidth, r.y, currWidth, r.height);
+								int kOffset = 1;
+								while (events.get(k+kOffset).isBackground())
+									kOffset++;
 								
-								area.setBounds(area.getX() + index*currWidth, area.getY(), currWidth, area.getHeight());
-							}
+								if ( overlapCols[k+kOffset] > 0){
+									// find biggest in line
+									int curr = overlapIndex;
+									for (int a = k+1; a < areas.size();a++) {
+										/* ------------------------------------------------------- */
+										if (overlapCols[a] == 0)
+//											break;
+											continue;
+										if (overlapCols[a] > curr)
+											curr = overlapCols[a];
+										/* ------------------------------------------------------- */
+									}
+									currWidth = colWidth / (curr+1);
+								}
+							} catch (Exception e) {}
+							/* ------------------------------------------------------- */
+							area.setBounds(area.getX() + overlapIndex*currWidth, area.getY(), currWidth, area.getHeight());
 						}
 					}
+				}
 				/* ------------------------------------------------------- */
 				// Loop the frameareas a third time
 				// and set areas that belong to an event to the same width
@@ -979,6 +1036,12 @@ public class DayView extends CalendarView {
 // area.setBounds(r.x + index*slotWidth, r.y, slotWidth, r.height);
 // }
 // }
+				/* ================================================== */
+				// set up the line to minute mapping hashmap.
+				// we create a hashmap of puxel to minute mapping to
+				// have a fixed resource for resolving the expoicit time 
+				// for a position on the calendar panel
+				/* ================================================== */
 				if (dayCount > 1)
 					day = incDay(day);
 

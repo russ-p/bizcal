@@ -131,9 +131,6 @@ public class FrameArea extends JComponent implements ComponentListener {
 
 	private int boundHeight;
 
-	private boolean autoCommitBounds = true;
-	
-	
 	private static Color   backgroundMarkColor = new Color(205, 207, 255);
 	
 	public static final DateFormat timeFormat = new SimpleDateFormat("HH:mm",
@@ -710,17 +707,6 @@ public class FrameArea extends JComponent implements ComponentListener {
 	}
 	
 	
-	/**
-	 * Enable auto set bounds
-	 * 
-	 * @param b
-	 */
-	public void enableAutoCommit(boolean b) {
-		/* ================================================== */
-		this.autoCommitBounds = b;
-		/* ================================================== */
-	}
-	
 	// ========================================================================
 	// Methods for the component listener
 	// ------------------------------------------------------------------------
@@ -745,6 +731,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.10  2008/06/10 13:16:36  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.9  2008/06/09 14:10:09  heine_
 	 * <br>*** empty log message ***
 	 * <br>
