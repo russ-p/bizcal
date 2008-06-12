@@ -43,6 +43,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version
  * <br>$Log: DayViewConfig.java,v $
+ * <br>Revision 1.11  2008/06/12 13:04:18  heine_
+ * <br>*** empty log message ***
+ * <br>
  * <br>Revision 1.10  2008/03/28 08:45:12  heine_
  * <br>*** empty log message ***
  * <br>
@@ -118,7 +121,7 @@ public class DayViewConfig
 	private int dayViewEnd   = 12;
 
 	private int weekStart = Calendar.MONDAY;
-	private int weekEnd   = Calendar.FRIDAY;
+	private int weekEnd   = Calendar.SUNDAY;
 
 
 	public DayViewConfig()

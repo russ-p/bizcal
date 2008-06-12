@@ -57,6 +57,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version
  * <br>$Log: TimeLabelPanel.java,v $
+ * <br>Revision 1.7  2008/06/12 13:04:18  heine_
+ * <br>*** empty log message ***
+ * <br>
  * <br>Revision 1.6  2008/03/28 08:45:11  heine_
  * <br>*** empty log message ***
  * <br>
@@ -307,7 +310,8 @@ public class TimeLabelPanel
 				}
 				gradientArea.setBounds(0, 0, parent.getWidth(), parent.getHeight());
 			} catch (Exception e) {
-				throw BizcalException.create(e);
+				e.printStackTrace();
+//				throw BizcalException.create(e);
 			}
 		}
 	}

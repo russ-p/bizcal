@@ -260,9 +260,17 @@ public class CalendarPanel extends JPanel implements MouseListener {
 		/* ------------------------------------------------------- */
 		// slider for zoom
 		this.slider = new JSlider();
-		this.slider.setMinimum(30);
-		this.slider.setMaximum(500);
-		this.slider.setValue(DayView.PIXELS_PER_HOUR);
+		try {
+			/* --------------------------------------------- */
+			this.slider.setMinimum(30);
+			this.slider.setMaximum(500);
+			this.slider.setValue(DayView.PIXELS_PER_HOUR);
+			/* --------------------------------------------- */
+		} catch (Exception e) {
+			/* --------------------------------------------- */
+			e.printStackTrace();
+			/* --------------------------------------------- */
+		}
 		
 		slider.setOpaque(false);
 
