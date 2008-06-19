@@ -59,6 +59,15 @@ import bizcal.util.BizcalException;
 import bizcal.util.DateUtil;
 import bizcal.util.TextUtil;
 
+/**
+ *
+ * @version
+ * <br>$Log: MonthView.java,v $
+ * <br>Revision 1.19  2008/06/19 12:20:00  heine_
+ * <br>*** empty log message ***
+ * <br>
+ *   
+ */
 public class MonthView extends CalendarView
 {
 	private ColumnHeaderPanel columnHeader;
@@ -68,9 +77,8 @@ public class MonthView extends CalendarView
 	private JScrollPane scrollPane;
 	private JPanel calPanel;
 
-	public MonthView(CalendarViewConfig desc)
-		throws Exception
-	{
+	public MonthView(CalendarViewConfig desc) throws Exception	{
+		/* ================================================== */
 		super(desc);
 		calPanel = new JPanel();
 		calPanel.setLayout(new Layout());
@@ -89,50 +97,80 @@ public class MonthView extends CalendarView
 		columnHeader.setShowExtraDateHeaders(true);
 		columnHeader.setMonthView(true);
         scrollPane.setColumnHeaderView(columnHeader.getComponent());
+        /* ================================================== */
 	}
 
+	/* (non-Javadoc)
+	 * @see bizcal.swing.CalendarView#refresh0()
+	 */
 	@SuppressWarnings("unchecked")
-	public void refresh0()
-		throws Exception
-	{
+	public void refresh0() throws Exception {
+		/* ================================================== */
+		// clear all containers
+		/* ------------------------------------------------------- */
 		calPanel.removeAll();
 		cells.clear();
 		hLines.clear();
 		vLines.clear();
-
+		/* ------------------------------------------------------- */
 		Calendar cal = DateUtil.newCalendar();
-
+		/* ------------------------------------------------------- */
+		// get the current date constraint for the month
+		/* ------------------------------------------------------- */
+		// create a new calendar object for this month
 		cal.setTime(getInterval().getStartDate());
+		/* ------------------------------------------------------- */
+		// add 15 days to the start of the month, to get nealry
+		// the middle of the month
+		/* ------------------------------------------------------- */
 		cal.add(Calendar.DAY_OF_YEAR, 15);
 		int month = cal.get(Calendar.MONTH);
-
+		/* ------------------------------------------------------- */
+		// do something for the start of the week
+		/* ------------------------------------------------------- */
     	int lastDayOfWeek = cal.getFirstDayOfWeek();
     	lastDayOfWeek--;
     	if (lastDayOfWeek < 1)
     		lastDayOfWeek += 7;
-
+    	
+    	/* ------------------------------------------------------- */
+    	// iterate over all selected calendars
+    	/* ------------------------------------------------------- */
     	Iterator j = getModel().getSelectedCalendars().iterator();
     	while (j.hasNext()) {
+    		/* ------------------------------------------------------- */
     		bizcal.common.Calendar calInfo = (bizcal.common.Calendar) j.next();
+    		
     		cal.setTime(getInterval().getStartDate());
-    		cal.set(Calendar.DAY_OF_MONTH, 1);
-    		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
-	    	Map eventMap = createEventsPerDay(calInfo.getId());
+    		cal.set(    Calendar.DAY_OF_MONTH, 1);
+    		cal.set(    Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+    		/* ------------------------------------------------------- */
+    		// get the events of this calendar
+    		/* ------------------------------------------------------- */
+	    	Map<Date, List<Event>> eventMap = createEventsPerDay(calInfo.getId());
+	    	
 	    	int rowno = 0;
+	    	
 	        while (true) {
+	        	/* ------------------------------------------------------- */
 		    	List<JComponent> row;
 		    	if (cells.size() <= rowno) {
+		    		/* ------------------------------------------------------- */
 		    		row = new ArrayList<JComponent>();
 		    		cells.add(row);
+		    		/* ------------------------------------------------------- */
 		    	} else
-		    		row = (List) cells.get(rowno);
+		    		row = cells.get(rowno);
+		    	
 	        	JComponent cell = createDayCell(cal, eventMap, month, calInfo.getId());
 	        	calPanel.add(cell);
 	        	row.add(cell);
 	            if (cal.get(Calendar.DAY_OF_WEEK) == lastDayOfWeek) {
+	            	/* ------------------------------------------------------- */
 	            	if (cal.get(Calendar.MONTH) != month)
 	            		break;
 	            	rowno++;
+	            	/* ------------------------------------------------------- */
 	            }
 	            cal.add(Calendar.DAY_OF_MONTH, 1);
 	        }
@@ -161,6 +199,7 @@ public class MonthView extends CalendarView
 		columnHeader.setModel(getModel());
 		columnHeader.setPopupMenuCallback(popupMenuCallback);
 		columnHeader.refresh();
+		/* ================================================== */
 	}
 
 
@@ -172,9 +211,8 @@ public class MonthView extends CalendarView
 	 * @return
 	 * @throws Exception
 	 */
-	private JComponent createDayCell(Calendar cal, Map eventMap, int month, Object calId)
-		throws Exception
-	{
+	private JComponent createDayCell(Calendar cal, Map<Date, List<Event>> eventMap, int month, Object calId) throws Exception	{
+		/* ================================================== */
 		Font eventFont = this.font;
 		TableLayoutPanel panel = new TableLayoutPanel();
 		
@@ -197,12 +235,12 @@ public class MonthView extends CalendarView
 		panel.createRow(TableLayoutPanel.FILL);
 
 		DateFormat format = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
-		List events = (List) eventMap.get(DateUtil.round2Day(cal.getTime()));
+		List<Event> events = eventMap.get(DateUtil.round2Day(cal.getTime()));
 
 		if(events != null) {
-			Iterator i = events.iterator();
-			while (i.hasNext()) {
-				Event event = (Event) i.next();
+			/* ------------------------------------------------------- */
+			for (Event event : events) {
+				/* ------------------------------------------------------- */
 				row = panel.createRow();
 				String time = format.format(event.getStart());
 				String summary = "";
@@ -223,7 +261,9 @@ public class MonthView extends CalendarView
 					eventLabel.setIcon(event.getIcon());
 				eventLabel.addMouseListener(new EventMouseListener(event, calId));
 				row.createCell(eventLabel, TableLayoutPanel.TOP, TableLayoutPanel.FULL);
+				/* ------------------------------------------------------- */
 			}
+			/* ------------------------------------------------------- */
 		}
 		panel.addMouseListener(new DayMouseListener(calId, cal.getTime()));
 		JScrollPane scrollPanel =
@@ -231,6 +271,7 @@ public class MonthView extends CalendarView
 		scrollPanel.setPreferredSize(new Dimension(100,100));
 		//return scrollPanel;
 		return panel;
+		/* ================================================== */
 	}
 
 	/**
@@ -241,6 +282,9 @@ public class MonthView extends CalendarView
 	 *
 	 * @version
 	 * <br>$Log: MonthView.java,v $
+	 * <br>Revision 1.19  2008/06/19 12:20:00  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.18  2008/01/21 14:13:26  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -255,30 +299,32 @@ public class MonthView extends CalendarView
 	 * <br>
 	 *
 	 */
-	private class EventMouseListener
-		extends MouseAdapter
-	{
+	private class EventMouseListener extends MouseAdapter {
+
 		private Event event;
+
 		private Object calId;
 
 		/**
 		 * @param event
 		 * @param calId
 		 */
-		public EventMouseListener(Event event, Object calId)
-		{
+		public EventMouseListener(Event event, Object calId) {
+			/* ================================================== */
 			this.calId = calId;
 			this.event = event;
+			/* ================================================== */
 		}
 
-		public void mouseClicked(MouseEvent mevent)
-		{
+		public void mouseClicked(MouseEvent mevent) {
+			/* ================================================== */
 			try {
 				if (mevent.getClickCount() == 2)
 					listener.showEvent(calId, event);
 			} catch (Exception e) {
 				ErrorHandler.handleError(e);
 			}
+			/* ================================================== */
 		}
 	}
 
@@ -332,23 +378,34 @@ public class MonthView extends CalendarView
 		}
 	}
 
-	protected Date getDate(int xPos, int yPos)
-	throws Exception
-	{
+	protected Date getDate(int xPos, int yPos) throws Exception {
+		/* ================================================== */
 		return null;
+		/* ================================================== */
 	}
 
-	public long getTimeInterval()
-	throws Exception
-	{
-		return 24*3600*1000*30;
+	/**
+	 * @return
+	 * @throws Exception
+	 */
+	public long getTimeInterval() throws Exception {
+		/* ================================================== */
+//		return 24*3600*1000*30;
+		return DateUtil.MILLIS_DAY*30;
+		/* ================================================== */
 	}
 
+	/**
+	 * @return
+	 * @throws Exception
+	 */
 	protected String getHeaderText() throws Exception {
+		/* ================================================== */
 		Calendar cal = DateUtil.newCalendar();
 		cal.setTime(getInterval().getStartDate());
 		DateFormat format = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
 		return TextUtil.formatCase(format.format(cal.getTime()));
+		/* ================================================== */
 	}
 
 //	protected JComponent createCalendarPanel()
@@ -366,7 +423,22 @@ public class MonthView extends CalendarView
 	}
 
 
+	/**
+	 * @author martin.heinemann@tudor.lu
+	 * 19.06.2008
+	 * 10:34:43
+	 *
+	 *
+	 * @version
+	 * <br>$Log: MonthView.java,v $
+	 * <br>Revision 1.19  2008/06/19 12:20:00  heine_
+	 * <br>*** empty log message ***
+	 * <br>
+	 *   
+	 */
 	private class Layout implements LayoutManager {
+		
+		
 		public void addLayoutComponent(String name, Component comp) {
 		}
 
@@ -389,8 +461,8 @@ public class MonthView extends CalendarView
 		/* (non-Javadoc)
 		 * @see java.awt.LayoutManager#layoutContainer(java.awt.Container)
 		 */
-		public void layoutContainer(Container parent)
-		{
+		public void layoutContainer(Container parent) {
+			/* ================================================== */
 			try {
 				double width = parent.getWidth();
 				width = width / getModel().getSelectedCalendars().size();
@@ -398,30 +470,39 @@ public class MonthView extends CalendarView
 				double height = parent.getHeight();
 				height = height / cells.size();
 				for (int row=0; row < cells.size(); row++) {
-					List rowList = (List) cells.get(row);
+					/* ------------------------------------------------------- */
+					List rowList = cells.get(row);
 					for (int col=0; col < rowList.size(); col++) {
+						/* ------------------------------------------------------- */
 						JComponent cell = (JComponent) rowList.get(col);
 						cell.setBounds((int) (col*width+1),
 								(int) (row*height+1),
 								(int) width-1,
 								(int) height-1);
+						/* ------------------------------------------------------- */
 					}
+					/* ------------------------------------------------------- */
 				}
 
 		        int colCount = getModel().getSelectedCalendars().size()*7;
 		        for (int i=0; i < colCount-1; i++) {
+		        	/* ------------------------------------------------------- */
 		        	try {
+		        		/* ------------------------------------------------------- */
 						JLabel line = (JLabel) vLines.get(i);
 						line.setBounds((int) ((i+1)*width),
 								0,
 								1,
 								parent.getHeight());
+						/* ------------------------------------------------------- */
 		        	} catch (Exception e) {
 //		        		e.printStackTrace();
 					}
+		        	/* ------------------------------------------------------- */
 		        }
 		        int rowCount = cells.size()-1;
 		        for (int i=0; i < rowCount; i++) {
+		        	/* ------------------------------------------------------- */
 		        	try {
 					JLabel line = (JLabel) hLines.get(i);
 					line.setBounds(0,
@@ -431,26 +512,28 @@ public class MonthView extends CalendarView
 		        	} catch (Exception e) {
 
 					}
+		        	/* ------------------------------------------------------- */
 		        }
 
 			} catch (Exception e) {
 				throw BizcalException.create(e);
 			}
 		}
+		/* ================================================== */
 	}
 
-	private int getPreferredHeight()
-	{
+	/**
+	 * @return
+	 */
+	private int getPreferredHeight() {
 		return cells.size() * 40;
 	}
 
-	public JComponent getComponent()
-	{
+	public JComponent getComponent() {
 		return scrollPane;
 	}
 
-	public void addListener(CalendarListener listener)
-	{
+	public void addListener(CalendarListener listener) {
 		super.addListener(listener);
 		columnHeader.addCalendarListener(listener);
 	}

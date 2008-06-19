@@ -221,7 +221,7 @@ public class DateUtil
 	}
 	
 	
-	public static int getYear(Date date) throws Exception
+	public static int getYear(Date date)
     {
 		Calendar cal = newCalendar();
         cal.setTime(date);
@@ -252,7 +252,19 @@ public class DateUtil
         cal.setTime(date);
         return cal.get(Calendar.DAY_OF_MONTH);
     }
-
+	
+	/**
+	 * @param date
+	 * @return
+	 */
+	public static int getDayOfYear(Date date)
+    {
+		Calendar cal = newCalendar();
+        cal.setTime(date);
+        return cal.get(Calendar.DAY_OF_YEAR);
+    }
+	
+	
 	/**
 	 * Returns the date in distance to the given one, according to the offset (diff) given in days.<br/>
 	 * Example:<br/> <strong>date =</strong> 2007-03-23 (Friday)<br/>
@@ -615,7 +627,37 @@ public class DateUtil
 		return (cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR));
 		/* ================================================== */
 	}
-
+	
+	
+	/**
+	 * True if the date1 is a day before date2
+	 * 
+	 * @param d1
+	 * @param d2
+	 * @return
+	 */
+	public static boolean isBeforeDay(Date d1, Date d2) {
+		/* ====================================================== */
+		int dy1 = getDayOfYear(d1);
+		int dy2 = getDayOfYear(d2);
+		/* ------------------------------------------------------- */
+		int y1 = getYear(d1);
+		int y2 = getYear(d2);
+		/* ------------------------------------------------------- */
+		if (y1 < y2)
+			return true;
+		if (y1 > y2)
+			return false;
+		/* ------------------------------------------------------- */
+		// else, we are in the same year
+		/* ------------------------------------------------------- */
+		return (dy1 < dy2);
+		/* ====================================================== */
+	}
+	
+	
+	
+	
 	/**
 	 * Returns the number of dates that are between the two given dates
 	 * 
@@ -784,4 +826,6 @@ public class DateUtil
 			return cal;
 		}
 	}
+
+	
 }

@@ -31,8 +31,6 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import tracing.SwingTracing;
-
 import lu.tudor.santec.bizcal.listeners.NamedCalendarListener;
 import lu.tudor.santec.bizcal.util.ObservableEventList;
 import lu.tudor.santec.bizcal.views.DayViewPanel;
@@ -51,6 +49,9 @@ import bizcal.util.DateInterval;
  *
  * @version
  * <br>$Log: CalendarDemo.java,v $
+ * <br>Revision 1.8  2008/06/19 12:20:00  heine_
+ * <br>*** empty log message ***
+ * <br>
  * <br>Revision 1.7  2008/06/09 14:10:09  heine_
  * <br>*** empty log message ***
  * <br>
@@ -141,7 +142,7 @@ public class CalendarDemo extends JFrame{
 		calendarPanel.addNamedCalendar(new TestNamedCalendar("Max", "dem Max seiner", Color.BLUE));
 		calendarPanel.addNamedCalendar(new TestNamedCalendar("Office", "allen ihrer", Color.GRAY));
 		/* ------------------------------------------------------- */
-		// next step is to create a listener that is responsible for selecting and deselcting of
+		// next step is to create a listener that is responsible for selecting and deselecting of
 		// the calendars created above.
 		//
 		// we distinguish between active and selected calendars.
@@ -176,7 +177,7 @@ public class CalendarDemo extends JFrame{
 		});
 
 		this.add(calendarPanel);
-
+		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //		this.pack();
 		this.setSize(1000, 700);
@@ -388,6 +389,9 @@ public class CalendarDemo extends JFrame{
 	 *
 	 * @version
 	 * <br>$Log: CalendarDemo.java,v $
+	 * <br>Revision 1.8  2008/06/19 12:20:00  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.7  2008/06/09 14:10:09  heine_
 	 * <br>*** empty log message ***
 	 * <br>

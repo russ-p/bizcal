@@ -70,6 +70,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.33  2008/06/19 12:20:00  heine_
+ *          *** empty log message ***
+ *
  *          Revision 1.32  2008/06/10 13:16:36  heine_
  *          *** empty log message ***
  *
@@ -1509,6 +1512,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.33  2008/06/19 12:20:00  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.32  2008/06/10 13:16:36  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1602,6 +1608,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.33  2008/06/19 12:20:00  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.32  2008/06/10 13:16:36  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1704,6 +1713,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.33  2008/06/19 12:20:00  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.32  2008/06/10 13:16:36  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -2748,6 +2760,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.33  2008/06/19 12:20:00  heine_
+//	 * <br>*** empty log message ***
+//	 * <br>
 //	 * <br>Revision 1.32  2008/06/10 13:16:36  heine_
 //	 * <br>*** empty log message ***
 //	 * <br>
@@ -2851,20 +2866,60 @@ public abstract class CalendarView {
 		return frameAreaHash.get(e);
 	}
 
-	protected Map createEventsPerDay(Object calId) throws Exception {
+	/**
+	 * @param calId
+	 * @return
+	 * @throws Exception
+	 */
+	protected Map<Date, List<Event>> createEventsPerDay(Object calId) throws Exception {
+		/* ================================================== */
 		Map<Date, List<Event>> map = new HashMap<Date, List<Event>>();
-		Iterator i = getModel().getEvents(calId).iterator();
-		while (i.hasNext()) {
-			Event event = (Event) i.next();
-			Date date = DateUtil.round2Day(event.getStart());
-			List<Event> events = (List<Event>) map.get(date);
-			if (events == null) {
-				events = new ArrayList<Event>();
-				map.put(date, events);
+		/* ------------------------------------------------------- */
+		// iterate over all events
+		/* ------------------------------------------------------- */
+		List<Event> eventList = getModel().getEvents(calId);
+
+		if (eventList != null)
+			for (Event event : eventList) {
+				/* ------------------------------------------------------- */
+				Date date = DateUtil.round2Day(event.getStart());
+				List<Event> events = map.get(date);
+				if (events == null) {
+					/* ------------------------------------------------------- */
+					events = new ArrayList<Event>();
+					map.put(date, events);
+					/* ------------------------------------------------------- */
+				}
+				events.add(event);
+				/* ------------------------------------------------------- */
+				// check if the event takes place in more than one day
+				/* ------------------------------------------------------- */
+				if (!DateUtil.isSameDay(event.getStart(), event.getEnd())) {
+					/* ------------------------------------------------------- */
+					// we iterate over the time as long as its finished
+					/* ------------------------------------------------------- */
+					Date next = DateUtil.move(event.getStart(), 1);
+					// as long end date is not the same day as the next, continue
+					while (DateUtil.isBeforeDay(next, event.getEnd()) || DateUtil.isSameDay(event.getEnd(), next)) {
+						/* ------------------------------------------------------- */
+						date = DateUtil.round2Day(next);
+						events = map.get(date);
+						if (events == null) {
+							/* ------------------------------------------------------- */
+							events = new ArrayList<Event>();
+							map.put(date, events);
+							/* ------------------------------------------------------- */
+						}
+						events.add(event);
+						
+						next = DateUtil.move(next, 1);
+						/* ------------------------------------------------------- */
+					}
+				/* ------------------------------------------------------- */
 			}
-			events.add(event);
 		}
 		return map;
+		/* ================================================== */
 	}
 
 	public abstract JComponent getComponent();

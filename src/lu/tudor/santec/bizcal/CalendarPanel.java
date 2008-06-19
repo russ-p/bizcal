@@ -659,32 +659,31 @@ public class CalendarPanel extends JPanel implements MouseListener {
 
 			// setSelectedCalendar(nc);
 			return nc;
-		} else {
+		} 
+		/* ------------------------------------------------------- */
+		// if there are no selected and no active calendars,
+		// we will select and activate the first in the list
+		if (getActiveCalendars() == null || getActiveCalendars().size() < 1) {
 			/* ------------------------------------------------------- */
-			// if there are no selected and no active calendars,
-			// we will select and activate the first in the list
-			if (getActiveCalendars() == null || getActiveCalendars().size() < 1) {
+			List<NamedCalendar> allCals = getCalendars();
+			if (allCals != null && allCals.size() > 0) {
 				/* ------------------------------------------------------- */
-				List<NamedCalendar> allCals = getCalendars();
-				if (allCals != null && allCals.size() > 0) {
-					/* ------------------------------------------------------- */
-					NamedCalendar nc = allCals.get(0);
-					nc.setActive(true);
-					nc.getCheckBox().setSelected(true);
-					nc.setSelected(true);
+				NamedCalendar nc = allCals.get(0);
+				nc.setActive(true);
+				nc.getCheckBox().setSelected(true);
+				nc.setSelected(true);
 
-					// triggerUpdate();
-					// inform listeners
-					informListeners();
+				// triggerUpdate();
+				// inform listeners
+				informListeners();
 
-					// setSelectedCalendar(nc);
-					return nc;
-					/* ------------------------------------------------------- */
-				}
+				// setSelectedCalendar(nc);
+				return nc;
 				/* ------------------------------------------------------- */
 			}
 			/* ------------------------------------------------------- */
 		}
+		/* ------------------------------------------------------- */
 
 		return null;
 		/* ================================================== */
@@ -794,8 +793,7 @@ public class CalendarPanel extends JPanel implements MouseListener {
 	private void deactivateOthers(NamedCalendar activeCal) {
 		/* ================================================== */
 		ArrayList<NamedCalendar> list = new ArrayList<NamedCalendar>(namedCalendars.keySet());
-		if (list == null)
-			return;
+		
 		for (NamedCalendar nc : list) {
 			/* ------------------------------------------------------- */
 			if (!activeCal.equals(nc)) {
@@ -824,8 +822,7 @@ public class CalendarPanel extends JPanel implements MouseListener {
 			lastShowingCalendarBeforeShowAll = getSelectedCalendar();
 			/* ------------------------------------------------------- */
 			ArrayList<NamedCalendar> list = new ArrayList<NamedCalendar>(namedCalendars.keySet());
-			if (list == null)
-				return;
+			
 			for (NamedCalendar nc : list) {
 				/* ------------------------------------------------------- */
 					nc.setActive(true);
@@ -846,8 +843,7 @@ public class CalendarPanel extends JPanel implements MouseListener {
 			namedCalendars.get(cal).setActiv(true);
 			
 			ArrayList<NamedCalendar> list = new ArrayList<NamedCalendar>(namedCalendars.keySet());
-			if (list == null)
-				return;
+			
 			for (NamedCalendar nc : list) {
 				/* ------------------------------------------------------- */
 				if (!cal.equals(nc)) {
