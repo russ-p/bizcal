@@ -46,6 +46,19 @@ import bizcal.swing.CalendarView;
 import bizcal.swing.DayView;
 import bizcal.util.Interval;
 
+/**
+ * @author martin.heinemann@tudor.lu
+ * 19.06.2008
+ * 14:49:51
+ *
+ *
+ * @version
+ * <br>$Log: DayViewPanel.java,v $
+ * <br>Revision 1.3  2008/06/24 12:53:25  heine_
+ * <br>*** empty log message ***
+ * <br>
+ *   
+ */
 public class DayViewPanel extends AbstractCalendarView {
 
 	private static final long serialVersionUID = 1L;
