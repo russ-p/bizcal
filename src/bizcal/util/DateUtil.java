@@ -126,15 +126,48 @@ public class DateUtil
 	    /* ================================================== */
 	}
 
-	public static Date round2Minute(Date date)
-	{
+	/**
+	 * @param date
+	 * @return
+	 */
+	public static Date round2Minute(Date date) {
+		/* ================================================== */
 		Calendar cal = newCalendar();
 		cal.setTime(date);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
 	    return cal.getTime();
+	    /* ================================================== */
 	}
-
+	
+	/**
+	 * Rounds the time to a nicer value. One of 
+	 * 00, 15, 30, 45 depending of the current time.
+	 * Minutes are rounded off.
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static Date roundNice(Date date) {
+		/* ================================================== */
+		Calendar cal = newCalendar();
+		cal.setTime(date);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		/* ------------------------------------------------------- */
+		int minutes = cal.get(Calendar.MINUTE);
+		
+		int multiplier = (minutes / 15);
+		
+		minutes = multiplier * 15;
+		
+		cal.set(Calendar.MINUTE, minutes);
+		
+		return cal.getTime();
+		/* ================================================== */
+	}
+	
+	
 	/**
 	 * Returns the day of the week as int
 	 * 
