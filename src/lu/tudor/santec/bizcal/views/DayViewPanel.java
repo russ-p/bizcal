@@ -54,6 +54,9 @@ import bizcal.util.Interval;
  *
  * @version
  * <br>$Log: DayViewPanel.java,v $
+ * <br>Revision 1.4  2008/08/12 12:47:28  heine_
+ * <br>fixed some bugs and made code improvements
+ * <br>
  * <br>Revision 1.3  2008/06/24 12:53:25  heine_
  * <br>*** empty log message ***
  * <br>
@@ -64,9 +67,9 @@ public class DayViewPanel extends AbstractCalendarView {
 	private static final long serialVersionUID = 1L;
 
 
-	private final int STATE_FULL 		= 1;
-	private final int STATE_MORNING 	= 2;
-	private final int STATE_AFTERNOON 	= 3;
+	private final static int STATE_FULL 		= 1;
+	private final static int STATE_MORNING 		= 2;
+	private final static int STATE_AFTERNOON 	= 3;
 
 	private int state = STATE_FULL;
 

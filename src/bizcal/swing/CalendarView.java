@@ -70,6 +70,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.34  2008/08/12 12:47:27  heine_
+ *          fixed some bugs and made code improvements
+ *
  *          Revision 1.33  2008/06/19 12:20:00  heine_
  *          *** empty log message ***
  *
@@ -375,7 +378,8 @@ public abstract class CalendarView {
 			}
 			/* ------------------------------------------------------- */
 			// compute gap
-			return (-1) * (y1 - y2);
+			if (y1 != null && y2 != null)
+				return (-1) * (y1 - y2);
 		}
 		return -1;
 
@@ -921,7 +925,6 @@ public abstract class CalendarView {
 			int nextSmaller = findNextSmallerVerticalLine(currX	+ LINE_OFFSET);
 			int nextGreater = findNextGreaterVerticalLine(currX	+ LINE_OFFSET);
 			/* ------------------------------------------------------- */
-			int colWidth = getColumnWidth();
 			int gap2left = currX - nextSmaller;
 			int gap2right = nextGreater - currX - currWidth;
 			// **************************************************************************
@@ -1085,7 +1088,6 @@ public abstract class CalendarView {
 			int nextSmaller = findNextSmallerVerticalLine(currX	+ LINE_OFFSET);
 			int nextGreater = findNextGreaterVerticalLine(currX	+ LINE_OFFSET);
 			/* ------------------------------------------------------- */
-			int colWidth = getColumnWidth();
 			int gap2leftColumn = currX - nextSmaller;
 			int gap2rightColumn = nextGreater - currX - currWidth;
 			// **************************************************************************
@@ -1306,7 +1308,7 @@ public abstract class CalendarView {
 									fa.setEvent(_event);
 									
 									/* ------------------------------------------------------- */
-									calPanel.add(fa, new Integer(3));
+									calPanel.add(fa, Integer.valueOf(3));
 									calPanel.validate();
 									calPanel.updateUI();
 									fa.setVisible(true);
@@ -1512,6 +1514,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.34  2008/08/12 12:47:27  heine_
+	 * <br>fixed some bugs and made code improvements
+	 * <br>
 	 * <br>Revision 1.33  2008/06/19 12:20:00  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1608,6 +1613,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.34  2008/08/12 12:47:27  heine_
+	 * <br>fixed some bugs and made code improvements
+	 * <br>
 	 * <br>Revision 1.33  2008/06/19 12:20:00  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1713,6 +1721,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.34  2008/08/12 12:47:27  heine_
+	 * <br>fixed some bugs and made code improvements
+	 * <br>
 	 * <br>Revision 1.33  2008/06/19 12:20:00  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1917,8 +1928,9 @@ public abstract class CalendarView {
 				/* ------------------------------------------------------- */
 				// hide all additional lassos
 				/* ------------------------------------------------------- */
-				for (FrameArea a : additionalFrames.values())
-					a.setVisible(false);
+				if (additionalFrames != null && additionalFrames.values() != null)
+					for (FrameArea a : additionalFrames.values())
+						a.setVisible(false);
 				/* ------------------------------------------------------- */
 				// reset the mouse pointer
 				/* ------------------------------------------------------- */
@@ -2120,7 +2132,7 @@ public abstract class CalendarView {
 									FrameArea fa = new FrameArea();
 									fa.setBounds(i, 0, gap, pY);
 									/* ------------------------------------------------------- */
-									calPanel.add(fa, new Integer(3));
+									calPanel.add(fa, Integer.valueOf(3));
 									fa.setVisible(true);
 									additionalFrames.put(i, fa);
 									/* ------------------------------------------------------- */
@@ -2340,7 +2352,7 @@ public abstract class CalendarView {
 			for (JLabel l : vLines) {
 				/* ------------------------------------------------------- */
 				if (l.getX() > lastFrameX) {
-					if (l.getX() < mouseXnew && !returnList.contains(l)) {
+					if (l.getX() < mouseXnew && !returnList.contains(l.getX())) {
 						returnList.add(l.getX());
 					}
 				}
@@ -2460,7 +2472,7 @@ public abstract class CalendarView {
 		calPanel.add(_lassoArea, 1000);
 		_newEventArea = new FrameArea();
 		_newEventArea.setVisible(false);
-		calPanel.add(_newEventArea, new Integer(2));
+		calPanel.add(_newEventArea, Integer.valueOf(2));
 		this.calPanel = calPanel;
 	}
 
@@ -2760,6 +2772,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.34  2008/08/12 12:47:27  heine_
+//	 * <br>fixed some bugs and made code improvements
+//	 * <br>
 //	 * <br>Revision 1.33  2008/06/19 12:20:00  heine_
 //	 * <br>*** empty log message ***
 //	 * <br>

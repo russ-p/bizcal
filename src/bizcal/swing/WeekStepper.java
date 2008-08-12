@@ -133,7 +133,8 @@ public class WeekStepper
 		yearCombo = new JComboBox();
 		int year = cal.get(Calendar.YEAR);
 		for (int i=year-1; i < year+4; i++)
-			yearCombo.addItem(new Integer(i));
+//			yearCombo.addItem(new Integer(i));
+			yearCombo.addItem(Integer.valueOf(i));
 		yearCombo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				try {
@@ -175,7 +176,7 @@ public class WeekStepper
 		throws Exception
 	{
 		int year = cal.get(Calendar.YEAR);
-		yearCombo.setSelectedItem(new Integer(year));
+		yearCombo.setSelectedItem(Integer.valueOf(year));
 		int week = cal.get(Calendar.WEEK_OF_YEAR);
 		if (weekCombo.getItemCount() < week)
 			week = weekCombo.getItemCount();		
@@ -195,7 +196,7 @@ public class WeekStepper
 		weekCombo.removeAllItems();
 		int maxWeekNo = cal.getActualMaximum(Calendar.WEEK_OF_YEAR);
 		for (int i=1; i <= maxWeekNo; i++) {
-			weekCombo.addItem(new Integer(i));
+			weekCombo.addItem(Integer.valueOf(i));
 		}		
 		cal.set(Calendar.WEEK_OF_YEAR, currWeek);
 	}

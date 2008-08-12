@@ -41,12 +41,12 @@ public class CalendarIcons {
 		protected static final int MINIPIX = 12;
 
 		public static String AGENDA 				= "agendamodule.png";
-		public static String DAYVIEW 				= "cal_day.png";
-		public static String WEEKVIEW 				= "cal_week.png";
-		public static String MONTHVIEW 				= "cal_month.png";
-		public static String LISTVIEW 				= "cal_list.png";
+		public static final String DAYVIEW 				= "cal_day.png";
+		public static final String WEEKVIEW 				= "cal_week.png";
+		public static final String MONTHVIEW 				= "cal_month.png";
+		public static final String LISTVIEW 				= "cal_list.png";
 
-		public static String TODAY 					= "today.png";
+		public static final String TODAY 					= "today.png";
 
 
 		// day views
@@ -70,7 +70,7 @@ public class CalendarIcons {
 		URL 			l_Location;
 		ImageIcon 	l_Icon = null;
 
-		l_IconPath = new String("resources/icons/" + p_IconName);
+		l_IconPath = "resources/icons/" + p_IconName;
 		l_Location = CalendarIcons.class.getResource(l_IconPath);
 
 		if (l_Location != null) l_Icon = new ImageIcon(l_Location);

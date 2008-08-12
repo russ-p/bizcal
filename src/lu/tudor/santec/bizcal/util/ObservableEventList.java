@@ -26,6 +26,9 @@
  *
  * @version
  * <br>$Log: ObservableEventList.java,v $
+ * <br>Revision 1.3  2008/08/12 12:47:28  heine_
+ * <br>fixed some bugs and made code improvements
+ * <br>
  * <br>Revision 1.2  2007/09/20 07:23:16  heine_
  * <br>new version commit
  * <br>
@@ -64,6 +67,9 @@ import bizcal.common.Event;
  *
  * @version
  * <br>$Log: ObservableEventList.java,v $
+ * <br>Revision 1.3  2008/08/12 12:47:28  heine_
+ * <br>fixed some bugs and made code improvements
+ * <br>
  * <br>Revision 1.2  2007/09/20 07:23:16  heine_
  * <br>new version commit
  * <br>
@@ -239,7 +245,7 @@ public class ObservableEventList extends Observable implements List<Event> {
 		/* ====================================================== */
 		setChanged();
 		notifyObservers();
-		return retainAll(c);
+		return list.retainAll(c);
 		/* ====================================================== */
 	}
 
@@ -289,7 +295,7 @@ public class ObservableEventList extends Observable implements List<Event> {
 	}
 
 
-	public void setEnableNotify(boolean b) {
+	public synchronized void setEnableNotify(boolean b) {
 		/* ================================================== */
 		this.notifyEnabled = b;
 		/* ================================================== */

@@ -135,7 +135,7 @@ public class DayStepper
 		yearCombo = new JComboBox();
 		int year = cal.get(Calendar.YEAR);
 		for (int i=year-1; i < year+4; i++)
-			yearCombo.addItem(new Integer(i));
+			yearCombo.addItem(Integer.valueOf(i));
 		yearCombo.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent event) {
 				try {
@@ -195,11 +195,11 @@ public class DayStepper
 	private void setCombos()
 	{
 		int year = cal.get(Calendar.YEAR);
-		yearCombo.setSelectedItem(new Integer(year));
+		yearCombo.setSelectedItem(Integer.valueOf(year));
 		int month = cal.get(Calendar.MONTH);
 		monthCombo.setSelectedIndex(month);
 		int day = cal.get(Calendar.DAY_OF_MONTH);
-		dayCombo.setSelectedItem(new Integer(day));
+		dayCombo.setSelectedItem(Integer.valueOf(day));
 	}
 	
 	private void refreshDayCombo()
@@ -211,9 +211,9 @@ public class DayStepper
 		dayCombo.removeAllItems();
 		int maxDayNo = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
 		for (int i=1; i <= maxDayNo; i++) {
-			dayCombo.addItem(new Integer(i));
+			dayCombo.addItem(Integer.valueOf(i));
 		}		
-		dayCombo.setSelectedItem(new Integer(dayNo));
+		dayCombo.setSelectedItem(Integer.valueOf(dayNo));
 	}
 	
 	public JComponent getComponent()

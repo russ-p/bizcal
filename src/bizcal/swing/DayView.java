@@ -33,7 +33,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.LayoutManager;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -66,7 +65,7 @@ public class DayView extends CalendarView {
 
 	public static final int PREFERRED_DAY_WIDTH = 10;
 
-	public static final Integer GRID_LEVEL = new Integer(1);
+	public static final Integer GRID_LEVEL = Integer.valueOf(1);
 
 	private List<List<FrameArea>> frameAreaCols = new ArrayList<List<FrameArea>>();
 
@@ -457,7 +456,7 @@ public class DayView extends CalendarView {
 				frameAreas.add(area);
 				colEvents.add(event);
 			
-				calPanel.add(area, new Integer(event.getLevel()));
+				calPanel.add(area, Integer.valueOf(event.getLevel()));
 				iEvent++;
 				
 				
@@ -564,13 +563,13 @@ public class DayView extends CalendarView {
 		
 //		double ratio = ((double) yPos) / ((double) getTimeHeight());
 		
-		long time = (long) Math.round((double)(interval.getDuration()/60000  * yPos) / (double)getTimeHeight());
+//		long time = (long) Math.round((double)(interval.getDuration()/60000  * yPos) / (double)getTimeHeight());
 //		
 //		BigDecimal b = new BigDecimal(interval.getDuration());
 //		
 //		b.round(new MathContext(60000));
-		time *= 60000;
-		time += interval.getStartDate().getTime();
+//		time *= 60000;
+//		time += interval.getStartDate().getTime();
 		/* ------------------------------------------------------- */
 		Date foundDate = null;
 		while (foundDate == null) {
@@ -697,6 +696,9 @@ public class DayView extends CalendarView {
 	 *
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.37  2008/08/12 12:47:27  heine_
+	 *          fixed some bugs and made code improvements
+	 *
 	 *          Revision 1.36  2008/06/10 13:16:36  heine_
 	 *          *** empty log message ***
 	 *
@@ -1059,7 +1061,7 @@ public class DayView extends CalendarView {
 					int minutes = Integer.parseInt((String) key.elementAt(1));
 					/* ------------------------------------------------------- */
 					JLabel line = timeLines.get(key);
-					Date date1 = new Date(date.getTime() + minutes * 60 * 1000);
+					Date date1 = new Date(date.getTime() + ((long) minutes) * 60 * 1000);
 					
 					int y1 = getYPos(date1, 0);
 					

@@ -50,9 +50,9 @@ import bizcal.util.LocaleBroker;
  * @author Fredrik Bertilsson
  */
 public class TabularView extends CalendarView {
-	private JPanel panel;
+//	private JPanel panel;
 
-	private int dayCount = 14;
+//	private int dayCount = 14;
 	private JTable table;
 	private JScrollPane scroll;
 

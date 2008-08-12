@@ -129,7 +129,7 @@ public class MonthStepper
 		yearCombo = new JComboBox();
 		int year = cal.get(Calendar.YEAR);
 		for (int i=year-1; i < year+4; i++)
-			yearCombo.addItem(new Integer(i));
+			yearCombo.addItem(Integer.valueOf(i));
 		yearCombo.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent event) {
 				try {
@@ -170,7 +170,7 @@ public class MonthStepper
 	private void setCombos()
 	{
 		int year = cal.get(Calendar.YEAR);
-		yearCombo.setSelectedItem(new Integer(year));
+		yearCombo.setSelectedItem(Integer.valueOf(year));
 		int month = cal.get(Calendar.MONTH);
 		monthCombo.setSelectedIndex(month);
 	}

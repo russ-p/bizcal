@@ -138,11 +138,28 @@ public class Event
 		this.editable = editable;
 	}
 
-	public boolean equals(Event event)
-	{
-		return getId().equals(event.getId());
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object event) {
+		/* ================================================== */
+		if (event instanceof Event)
+			return getId().equals(((Event) event).getId());
+		else
+			return super.equals(event);
+		/* ================================================== */
 	}
-
+	
+	 /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode () {
+		int	l_Code = 17;
+		l_Code = (int) (37*l_Code + this.getStart().getTime()+this.getEnd().getTime());
+		return l_Code;
+	}
+	
+	
 	@SuppressWarnings("unchecked")
 	public void set(String property, Object value)
 	{

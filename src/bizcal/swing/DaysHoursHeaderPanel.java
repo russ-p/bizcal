@@ -110,8 +110,8 @@ public class DaysHoursHeaderPanel
 			DateFormat dateFormat = 
 				DateFormat.getDateInstance(DateFormat.SHORT, LocaleBroker.getLocale());
 			DateFormat hourFormat = new SimpleDateFormat("HH"); 
-			if (dayCount == 5 || dayCount == 7) {
-			}
+//			if (dayCount == 5 || dayCount == 7) {
+//			}
 			JPanel dateHeaderPanel = new JPanel();
 			dateHeaderPanel.setLayout(new TrueGridLayout(1, dayCount));
 			dateHeaderPanel.setOpaque(false);

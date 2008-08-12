@@ -115,4 +115,14 @@ public class TimeOfDay
     {
         return compareTo(other) == 0;
     }
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode () {
+		int	l_Code = 17;
+		l_Code = (int) (37*l_Code + this.getValue());
+		return l_Code;
+	}
+    
 }

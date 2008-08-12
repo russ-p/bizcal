@@ -217,7 +217,7 @@ public class DayView
 			cal.set(java.util.Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
 			date = cal.getTime();
 		}
-		Date endDate = new Date(date.getTime() + getDayCount()*24*3600*1000);
+		Date endDate = new Date(date.getTime() + ((long) getDayCount())*24*3600*1000);
 		setInterval(new DateInterval(date, endDate));
 	}	
 	

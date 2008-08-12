@@ -112,7 +112,7 @@ public class MonthDateChooser
 		Calendar cal = Calendar.getInstance(Locale.getDefault());
 		cal.setTime(navigationDate);
 		cal.set(Calendar.DAY_OF_MONTH, 1);
-		Date start = cal.getTime();
+//		Date start = cal.getTime();
 		cal.add(Calendar.MONTH, +1);
 	}
 	
@@ -416,9 +416,10 @@ public class MonthDateChooser
 				for(int iw = 0; iw<=weeks; iw++)
 				{
 					Integer intDayNo = new Integer(label.getText());
-					intDayNo = new Integer(intDayNo.intValue() + (7*iw));
+//					intDayNo = new Integer(intDayNo.intValue() + (7*iw));
+					intDayNo = Integer.valueOf(intDayNo.intValue() + (7*iw));
 					while(!_rowByDayno.containsKey(intDayNo.toString()))
-						intDayNo = new Integer(intDayNo.intValue()-1);
+						intDayNo = Integer.valueOf(intDayNo.intValue()-1);
 					
 					List cellList = (List) _rowByDayno.get(intDayNo.toString());
 					Iterator i = cellList.iterator();
@@ -446,9 +447,9 @@ public class MonthDateChooser
 				for(int iw = 0; iw<=weeks; iw++)
 				{
 					Integer intDayNo = new Integer(label.getText());
-					intDayNo = new Integer(intDayNo.intValue() + (7*iw));
+					intDayNo = Integer.valueOf(intDayNo.intValue() + (7*iw));
 					while(!_rowByDayno.containsKey(intDayNo.toString()))
-						intDayNo = new Integer(intDayNo.intValue()-1);
+						intDayNo = Integer.valueOf(intDayNo.intValue()-1);
 					
 					List cellList = (List) _rowByDayno.get(intDayNo.toString());
 					Iterator i = cellList.iterator();

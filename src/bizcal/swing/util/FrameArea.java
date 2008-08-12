@@ -133,7 +133,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 
 	private static Color   backgroundMarkColor = new Color(205, 207, 255);
 	
-	public static final DateFormat timeFormat = new SimpleDateFormat("HH:mm",
+	public final DateFormat timeFormat = new SimpleDateFormat("HH:mm",
 			Locale.getDefault());
 
 	/**
@@ -184,7 +184,8 @@ public class FrameArea extends JComponent implements ComponentListener {
 		/* ================================================== */
 		this.event = event;
 		// compute colors
-		this.bgColor = event.getColor();
+		if (this.event != null)
+			this.bgColor = event.getColor();
 
 		if (this.event != null && this.event.isBackground()) {
 			/* ------------------------------------------------------- */
@@ -265,7 +266,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 	public synchronized void setMovingTimeString(Date moveStartDate, Date moveEndDate) {
 		/* ================================================== */
 //		System.out.println("FrameArea::setMovingTimeString " + moveStartDate + " -" + moveEndDate);
-		this.moveDate = moveStartDate;
+		this.moveDate = (Date) moveStartDate.clone();
 		this.movingString = timeFormat.format(moveDate) + " - "
 				+ timeFormat.format(moveEndDate);
 		/* ================================================== */
@@ -276,7 +277,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 */
 	public void setEndTime(Date endTime) {
 		/* ================================================== */
-		this.endTime = endTime;
+		this.endTime = (Date) endTime.clone();
 		/* ================================================== */
 	}
 
@@ -285,7 +286,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 */
 	public void setStartTime(Date startTime) {
 		/* ================================================== */
-		this.startTime = startTime;
+		this.startTime = (Date) startTime.clone();
 		/* ================================================== */
 	}
 
@@ -306,6 +307,13 @@ public class FrameArea extends JComponent implements ComponentListener {
 	public float getAlphaValue() {
 		return this.alphaValue;
 	}
+	
+	private synchronized String getMovingTimeString() {
+		/* ================================================== */
+		return this.movingString;
+		/* ================================================== */
+	}
+	
 
 	// The toolkit will invoke this method when it's time to paint
 	public void paint(Graphics g) {
@@ -615,7 +623,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 			/* ------------------------------------------------------- */
 
 			g2.setFont(timeFont);
-			g2.drawString(movingString, xpos + this.getBounds().width - 85,
+//			g2.drawString(movingString, xpos + this.getBounds().width - 85,
+//					ypos + this.getBounds().height - 35);
+			g2.drawString(getMovingTimeString(), xpos + this.getBounds().width - 85,
 					ypos + this.getBounds().height - 35);
 			/* ------------------------------------------------------- */
 		}
@@ -731,6 +741,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.11  2008/08/12 12:47:28  heine_
+	 * <br>fixed some bugs and made code improvements
+	 * <br>
 	 * <br>Revision 1.10  2008/06/10 13:16:36  heine_
 	 * <br>*** empty log message ***
 	 * <br>

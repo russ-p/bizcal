@@ -91,7 +91,7 @@ public class CalendarPanel extends JPanel implements MouseListener {
 
 	private CardLayout viewsCardLayout;
 
-	private ActionListener viewListener;
+	private transient ActionListener viewListener;
 
 	private Vector<DateListener> dateListeners = new Vector<DateListener>();
 

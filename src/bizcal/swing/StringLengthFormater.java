@@ -53,7 +53,7 @@ public class StringLengthFormater
 	throws Exception
 	{
 		boolean fontFits = false;
-		String string = new String();
+		String string = "";
 		if(aPatternList==null)
 		{
 			aPatternList = new ArrayList();
@@ -91,7 +91,7 @@ public class StringLengthFormater
 	public static String getCommonDateFormat(List aDateList, Font aFont, int aWidth, ArrayList aPatternList)
 	throws Exception
 	{
-		String string = new String();
+		String string = "";
 		int minFormat = 0;
 		if(aPatternList==null)
 		{
@@ -155,14 +155,15 @@ public class StringLengthFormater
 	public static String formatNameString(String aName, Font aFont, int aWidth)
 	throws Exception
 	{
-		if(aName==null || aName =="")
+		if(aName == null || "".equals(aName))
 			return "";
-		String string = new String();
+		String string = "";
 		StringTokenizer tok = new StringTokenizer(aName);
-		String first = new String();
-		String last = new String();
-		ArrayList middleList = new ArrayList();
-		String middles = new String();
+		String first = "";
+		String last = "";
+		ArrayList<String> middleList = new ArrayList<String>();
+//		String middles = new String();
+		StringBuffer middles = new StringBuffer();
 		int noOfNames = tok.countTokens();
 		int i = 1;
 		while(tok.hasMoreTokens())
@@ -179,9 +180,17 @@ public class StringLengthFormater
 		FontMetrics currentMetrics = new JLabel().getFontMetrics(aFont);
 		
 		string = first;
-		Iterator iter = middleList.iterator();
-		while(iter.hasNext())
-			middles = " " + middles + iter.next();
+//		Iterator iter = middleList.iterator();
+//		while(iter.hasNext())
+//			middles = " " + middles + iter.next();
+		/* ------------------------------------------------------- */
+		for (String tokenString : middleList) {
+			/* ------------------------------------------------------- */
+			middles.insert(0, " ");
+			middles.append(tokenString);
+			/* ------------------------------------------------------- */
+		}
+		/* ------------------------------------------------------- */
 		string = string + middles; 
 		string = string + " " + last;
 		
@@ -189,21 +198,44 @@ public class StringLengthFormater
 			return string;
 				
 		string = first;
-		middles = "";
-		iter = middleList.iterator();
-		while(iter.hasNext())
-			middles = " " + middles + ((String)iter.next()).substring(0,1);
+		/* ------------------------------------------------------- */
+//		middles = "";
+		middles = new StringBuffer();
+		/* ------------------------------------------------------- */
+//		iter = middleList.iterator();
+//		while(iter.hasNext())
+//			middles = " " + middles + ((String)iter.next()).substring(0,1);
+		/* ------------------------------------------------------- */
+		for (String tokenString : middleList) {
+			/* ------------------------------------------------------- */
+			middles.insert(0, " ");
+			middles.append(tokenString.substring(0, 1));
+			/* ------------------------------------------------------- */
+		}
+		/* ------------------------------------------------------- */
 		string = string + middles; 
 		string = string + " " + last;
 		
 		if(currentMetrics.stringWidth(string) <= aWidth)
 			return string;
-		
+		/* ------------------------------------------------------- */
 		string = first;
-		middles = "";
-		iter = middleList.iterator();
-		while(iter.hasNext())
-			middles = " " + middles + ((String)iter.next()).substring(0,1);
+		/* ------------------------------------------------------- */
+//		middles = "";
+		middles = new StringBuffer();
+		/* ------------------------------------------------------- */
+//		iter = middleList.iterator();
+//		while(iter.hasNext())
+//			middles = " " + middles + ((String)iter.next()).substring(0,1);
+		/* ------------------------------------------------------- */
+		for (String tokenString : middleList) {
+			/* ------------------------------------------------------- */
+			middles.insert(0, " ");
+			middles.append(tokenString.substring(0, 1));
+			/* ------------------------------------------------------- */
+		}
+		/* ------------------------------------------------------- */
+		
 		string = string + middles; 
 		if (last.length() > 0)
 			string = string + " " + last.substring(0,1);
@@ -212,10 +244,21 @@ public class StringLengthFormater
 			return string;
 		
 		string = first.substring(0,1);
-		middles = "";
-		iter = middleList.iterator();
-		while(iter.hasNext())
-			middles = middles + ((String)iter.next()).substring(0,1);
+		/* ------------------------------------------------------- */
+//		middles = "";
+		middles = new StringBuffer();
+		/* ------------------------------------------------------- */
+//		iter = middleList.iterator();
+//		while(iter.hasNext())
+//			middles = middles + ((String)iter.next()).substring(0,1);
+		/* ------------------------------------------------------- */
+		for (String tokenString : middleList) {
+			/* ------------------------------------------------------- */
+			middles.insert(0, " ");
+			middles.append(tokenString.substring(0, 1));
+			/* ------------------------------------------------------- */
+		}
+		/* ------------------------------------------------------- */
 		string = string + middles;
 		if (last.length() > 0)
 			string = string + last.substring(0,1);

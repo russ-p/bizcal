@@ -72,7 +72,7 @@ public class CalendarList
     private Set _listeners = new HashSet();
     private Object _currCalId;
     private int width;
-	private Font font;
+	private Font font = new Font("Arial", 12, 10);
 	private Color primaryColor;
 	private Color secondaryColor;
 	private PopupMenuCallback popupMenuCallback;

@@ -229,6 +229,16 @@ public class Interval implements Serializable
 	        throw BizcalException.create(e);
 	    }
 	}
+	
+	 /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode () {
+		assert false : "hashCode not designed";
+    
+    	return 42;
+	}
+		
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()

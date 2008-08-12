@@ -75,26 +75,26 @@ public class CalendarRowHeader
 		line.setBackground(config.getLineColor());
 		line.setOpaque(true);
 		calLines.add(line);
-		panel.add(line, new Integer(2));
+		panel.add(line, Integer.valueOf(2));
 		
 		Iterator i = model.getSelectedCalendars().iterator();
  		while (i.hasNext()) {
  			Calendar cal = (Calendar) i.next();  			
  			JLabel label = new JLabel(cal.getSummary());
 			label.setVerticalTextPosition(JLabel.CENTER);
-			panel.add(label, new Integer(2));
+			panel.add(label, Integer.valueOf(2));
 			calLabels.add(label);
 			line = new JLabel();
 			line.setBackground(config.getLineColor());
 			line.setOpaque(true);
 			calLines.add(line);
-			panel.add(line, new Integer(2));
+			panel.add(line, Integer.valueOf(2));
 		}		
         gradientArea = new GradientArea(GradientArea.LEFT_RIGHT, Color.WHITE,
         		ColumnHeaderPanel.GRADIENT_COLOR);
         gradientArea.setOpaque(true);
 		gradientArea.setBorder(false);
-		panel.add(gradientArea, new Integer(1));		
+		panel.add(gradientArea, Integer.valueOf(1));		
 	}
 	
 	private class Layout implements LayoutManager {

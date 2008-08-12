@@ -85,7 +85,8 @@ public class TrueGridLayout
 			double y1 = row * height;
 			child.setBounds((int) x1, (int) y1, (int) width, (int) height);
 			col++;
-			if (col == cols) {
+//			if (col == this.cols) {
+			if (Math.abs(col - cols) < 0.0000001) {
 				col = 0;
 				row++;
 			}			

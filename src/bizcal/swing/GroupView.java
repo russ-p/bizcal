@@ -72,7 +72,7 @@ public class GroupView
 	public static final int PREFERRED_HOUR_WIDTH = 10;
 	public static final int PREFERRED_ROW_HEIGHT = 40;
 	
-	private List frameAreaRows = new ArrayList();
+	private List<List<FrameArea>> frameAreaRows = new ArrayList<List<FrameArea>>();
 	private List eventRows = new ArrayList();
 	private Map vLines = new HashMap();
 	private List hLines = new ArrayList();
@@ -129,7 +129,7 @@ public class GroupView
         JLabel hLine = new JLabel();
         hLine.setBackground(getDescriptor().getLineColor());
         hLine.setOpaque(true);
-        calPanel.add(hLine, new Integer(1));
+        calPanel.add(hLine, Integer.valueOf(1));
         hLines.add(hLine);
         
         Iterator i = getModel().getSelectedCalendars().iterator();
@@ -142,10 +142,10 @@ public class GroupView
             hLine = new JLabel();
             hLine.setBackground(getDescriptor().getLineColor());
             hLine.setOpaque(true);
-            calPanel.add(hLine, new Integer(1));
+            calPanel.add(hLine, Integer.valueOf(1));
             hLines.add(hLine);
 
-            List frameAreas = new ArrayList();
+            List<FrameArea> frameAreas = new ArrayList<FrameArea>();
             frameAreaRows.add(frameAreas);
 
             List events = getModel().getEvents(calId);
@@ -158,7 +158,7 @@ public class GroupView
                 Event event = (Event) j.next();
                 FrameArea area = createFrameArea(calId, event);
                 frameAreas.add(area);
-               	calPanel.add(area, new Integer(event.getLevel()));
+               	calPanel.add(area, Integer.valueOf(event.getLevel()));
             }           
         }		
 
@@ -171,7 +171,7 @@ public class GroupView
             JLabel line = new JLabel();
             line.setBackground(getDescriptor().getLineColor2());
             line.setOpaque(true);
-            calPanel.add(line, new Integer(2));
+            calPanel.add(line, Integer.valueOf(2));
             vLines.put(date, line);
             
             if (dayCount <= 7) {
@@ -189,7 +189,7 @@ public class GroupView
 	            	line = new JLabel();
 	                line.setBackground(getDescriptor().getLineColor());
 	                line.setOpaque(true);
-	                calPanel.add(line, new Integer(2));
+	                calPanel.add(line, Integer.valueOf(2));
 	                vLines.put(cal.getTime(), line);
 	            	cal.add(Calendar.HOUR, +1 * HOUR_RESOLUTION);
 	            }
@@ -210,7 +210,7 @@ public class GroupView
 			JPanel calBackground = new JPanel();
 			calBackground.setBackground(calendar.getColor());
 			calBackgrounds.add(calBackground);
-			calPanel.add(calBackground, new Integer(1));
+			calPanel.add(calBackground, Integer.valueOf(1));
 		}        
        
         calPanel.validate();
