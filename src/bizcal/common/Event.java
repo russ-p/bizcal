@@ -143,8 +143,9 @@ public class Event
 	 */
 	public boolean equals(Object event) {
 		/* ================================================== */
-		if (event instanceof Event)
+		if (event instanceof Event && getId() != null) {
 			return getId().equals(((Event) event).getId());
+		}
 		else
 			return super.equals(event);
 		/* ================================================== */
