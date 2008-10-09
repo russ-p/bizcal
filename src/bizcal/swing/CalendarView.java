@@ -70,6 +70,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.35  2008/10/09 12:33:09  heine_
+ *          shows now the summary of an event in the header of a FrameArea and the the description is now in the body.
+ *
  *          Revision 1.34  2008/08/12 12:47:27  heine_
  *          fixed some bugs and made code improvements
  *
@@ -288,13 +291,39 @@ public abstract class CalendarView {
 		String summary = event.getSummary();
 		if (summary != null)
 			area.setDescription(summary);
-
-		DateFormat format = DateFormat.getTimeInstance(DateFormat.SHORT, Locale
-				.getDefault());
+		
+		/* ------------------------------------------------------- */
+		// construct the headline of the date and the summary
+		/* ------------------------------------------------------- */
+		DateFormat formatter = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
+		/* ------------------------------------------------------- */
+		StringBuffer headLineBuff = new StringBuffer();
+		/* ------------------------------------------------------- */
+		// add the date if activated
+		/* ------------------------------------------------------- */
 		if (event.isShowTime()) {
-			area.setHeadLine(format.format(event.getStart()) + "-"
-					+ format.format(event.getEnd()));
+			/* ------------------------------------------------------- */
+			headLineBuff.append(formatter.format(event.getStart()) + "-"
+			+ formatter.format(event.getEnd()) + " ");
+			/* ------------------------------------------------------- */
 		}
+		/* ------------------------------------------------------- */
+		// add the summary to the headline
+		/* ------------------------------------------------------- */
+		if (event.getSummary() != null)
+			headLineBuff.append(event.getSummary());
+		/* ------------------------------------------------------- */
+		area.setHeadLine(headLineBuff.toString());
+		/* ------------------------------------------------------- */
+		// add the description to the description of the framearea
+		/* ------------------------------------------------------- */
+		if (event.getDescription() != null)
+			area.setDescription(event.getDescription());
+		
+//		if (event.isShowTime()) {
+//			area.setHeadLine(format.format(event.getStart()) + "-"
+//					+ format.format(event.getEnd()));
+//		}
 		area.setBackground(event.getColor());
 		area.setBorder(event.isFrame());
 		area.setRoundedRectangle(event.isRoundedCorner());
@@ -1514,6 +1543,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.35  2008/10/09 12:33:09  heine_
+	 * <br>shows now the summary of an event in the header of a FrameArea and the the description is now in the body.
+	 * <br>
 	 * <br>Revision 1.34  2008/08/12 12:47:27  heine_
 	 * <br>fixed some bugs and made code improvements
 	 * <br>
@@ -1613,6 +1645,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.35  2008/10/09 12:33:09  heine_
+	 * <br>shows now the summary of an event in the header of a FrameArea and the the description is now in the body.
+	 * <br>
 	 * <br>Revision 1.34  2008/08/12 12:47:27  heine_
 	 * <br>fixed some bugs and made code improvements
 	 * <br>
@@ -1721,6 +1756,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.35  2008/10/09 12:33:09  heine_
+	 * <br>shows now the summary of an event in the header of a FrameArea and the the description is now in the body.
+	 * <br>
 	 * <br>Revision 1.34  2008/08/12 12:47:27  heine_
 	 * <br>fixed some bugs and made code improvements
 	 * <br>
@@ -2772,6 +2810,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.35  2008/10/09 12:33:09  heine_
+//	 * <br>shows now the summary of an event in the header of a FrameArea and the the description is now in the body.
+//	 * <br>
 //	 * <br>Revision 1.34  2008/08/12 12:47:27  heine_
 //	 * <br>fixed some bugs and made code improvements
 //	 * <br>
