@@ -70,6 +70,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.36  2008/10/21 15:08:31  heine_
+ *          *** empty log message ***
+ *
  *          Revision 1.35  2008/10/09 12:33:09  heine_
  *          shows now the summary of an event in the header of a FrameArea and the the description is now in the body.
  *
@@ -327,6 +330,7 @@ public abstract class CalendarView {
 		area.setBackground(event.getColor());
 		area.setBorder(event.isFrame());
 		area.setRoundedRectangle(event.isRoundedCorner());
+		area.showHeader(event.showHeader());
 		// area.setAlphaValue(event.isFrame() ? 0.4f : 0.3f);
 		// area.setAlphaValue(event.isFrame() ? 0.3f : 0.3f);
 		// if (event.isBackground())
@@ -1543,6 +1547,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.36  2008/10/21 15:08:31  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.35  2008/10/09 12:33:09  heine_
 	 * <br>shows now the summary of an event in the header of a FrameArea and the the description is now in the body.
 	 * <br>
@@ -1645,6 +1652,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.36  2008/10/21 15:08:31  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.35  2008/10/09 12:33:09  heine_
 	 * <br>shows now the summary of an event in the header of a FrameArea and the the description is now in the body.
 	 * <br>
@@ -1756,6 +1766,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.36  2008/10/21 15:08:31  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.35  2008/10/09 12:33:09  heine_
 	 * <br>shows now the summary of an event in the header of a FrameArea and the the description is now in the body.
 	 * <br>
@@ -2509,6 +2522,8 @@ public abstract class CalendarView {
 		_lassoArea = new LassoArea();
 		calPanel.add(_lassoArea, 1000);
 		_newEventArea = new FrameArea();
+		_newEventArea.setRoundedRectangle(false);
+		
 		_newEventArea.setVisible(false);
 		calPanel.add(_newEventArea, Integer.valueOf(2));
 		this.calPanel = calPanel;
@@ -2810,6 +2825,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.36  2008/10/21 15:08:31  heine_
+//	 * <br>*** empty log message ***
+//	 * <br>
 //	 * <br>Revision 1.35  2008/10/09 12:33:09  heine_
 //	 * <br>shows now the summary of an event in the header of a FrameArea and the the description is now in the body.
 //	 * <br>

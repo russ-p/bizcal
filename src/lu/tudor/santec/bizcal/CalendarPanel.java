@@ -45,12 +45,15 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
+import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -120,6 +123,9 @@ public class CalendarPanel extends JPanel implements MouseListener {
 	private NamedCalendar lastShowingCalendarBeforeShowAll = null;
 
 	private static Color headerColor = new Color(153,204,255);
+	
+	private ButtonGroup calendarButtonGroup = new ButtonGroup();
+	
 
 	/**
 	 *
@@ -465,8 +471,8 @@ public class CalendarPanel extends JPanel implements MouseListener {
 		if (!namedCalendars.containsKey(namedCalendar)) {
 
 			final CheckBoxPanel calendarToggler = new CheckBoxPanel(
-					namedCalendar.getName(), namedCalendar.getColor(), true,
-					false);
+					namedCalendar.getName(), namedCalendar.getColor(), calendarButtonGroup);
+			
 			calendarToggler.setToolTipText(namedCalendar.getDescription());
 			calendarToggler.setActiv(namedCalendar.isActive());
 			namedCalendar.setCheckBox(calendarToggler);
@@ -512,7 +518,7 @@ public class CalendarPanel extends JPanel implements MouseListener {
 							for (NamedCalendar cal : namedCalendars.keySet()) {
 								if (!namedCalendars.get(cal).equals(
 										calendarToggler)) {
-									namedCalendars.get(cal).setSelected(false);
+//									namedCalendars.get(cal).setSelected(false);
 									cal.setSelected(false);
 								}
 							}
@@ -1039,7 +1045,7 @@ public class CalendarPanel extends JPanel implements MouseListener {
 		if (e.isPopupTrigger()) {
 			/* ------------------------------------------------------- */
 			try {
-				((CheckBoxPanel)e.getSource()).setSelected(true);
+				((CheckBoxPanel)((JToggleButton)e.getSource()).getParent()).setSelected(true);
 			} catch (Exception ee) {}
 			/* ------------------------------------------------------- */
 			this.popup.show((Component) e.getSource(), e.getX(), e.getY());

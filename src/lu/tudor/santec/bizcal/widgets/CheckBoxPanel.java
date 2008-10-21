@@ -23,100 +23,82 @@ package lu.tudor.santec.bizcal.widgets;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Vector;
 
-import javax.swing.JLabel;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
+import javax.swing.plaf.UIResource;
 
-public class CheckBoxPanel extends JPanel implements MouseListener {
+public class CheckBoxPanel extends JPanel implements ActionListener {
+
+
+
 
 	private static final long serialVersionUID = 1L;
-	private ColoredCheckBox cb;
-	private JLabel label;
-	private boolean drawBackground = true;
+	
+	private JCheckBox checkBox;
+	private JToggleButton button;
 	private Color bgColor;
-	private boolean isSelected;
+	private ColorBoxIcon icon;
 	private Vector<ActionListener> listeners = new Vector<ActionListener>();
-	private boolean unselectable;
 
-	public CheckBoxPanel(String text, Color c) {
-		this(text, c, false, true);
-	}
+	public CheckBoxPanel(String text, Color c, ButtonGroup group) {
 
-	public CheckBoxPanel(String text, Color c, boolean drawBG, boolean unselectable) {
-		this.drawBackground = drawBG;
-		this.unselectable = unselectable;
-		this.bgColor = new Color(c.getRed(),c.getGreen(),c.getBlue(),50);
-		this.setOpaque(false);
+		this.setOpaque(true);
+		
 		this.setLayout(new BorderLayout());
-		this.cb = new ColoredCheckBox("",c);
-		this.add(cb, BorderLayout.WEST);
+		this.checkBox = new JCheckBox();
+		this.checkBox.setOpaque(true);
+		this.checkBox.requestFocus(false);
+		this.add(checkBox, BorderLayout.EAST);
 		
-		cb.requestFocus(false);
+		this.button = new JToggleButton(text);
+		group.add(this.button);
+
+		this.button.addActionListener(this);
+		this.button.setForeground(c);
+
+		this.icon = new ColorBoxIcon(c);
+		this.button.setIcon(this.icon);
+		this.button.setHorizontalAlignment(SwingConstants.LEFT);
+		this.add(this.button, BorderLayout.CENTER);
 		
-		this.label = new  JLabel(text);
-		this.add(label);
-		this.addMouseListener(this);
-
-	}
-
-
-	@Override
-	protected void paintComponent(Graphics g) {
-		if (isSelected()) {
-			g.setColor(new Color(200,200,200));
-			g.fillRect(0,0, getWidth(), getHeight());
-		}
-		if (drawBackground) {
-			g.setColor(bgColor);
-			g.fillRoundRect(1, 1, getWidth()-2, getHeight()-2, 8,8);
-		}
-		super.paintComponent(g);
 	}
 
 	public void setActiv(boolean b) {
-		this.cb.setSelected(b);
-		this.cb.repaint();
+		this.checkBox.setSelected(b);
 	}
 
 	public synchronized void addActionListener(ActionListener listener) {
-		this.cb.addActionListener(listener);
+		this.checkBox.addActionListener(listener);
 		this.listeners .add(listener);
 	}
 
 	public synchronized void removeActionListener(ActionListener listener) {
-		this.cb.removeActionListener(listener);
+		this.checkBox.removeActionListener(listener);
 		this.listeners .remove(listener);
 	}
 
 	public boolean isActiv() {
-		return cb.isSelected();
+		return checkBox.isSelected();
 	}
-
-	public void mouseClicked(MouseEvent e) {
-		if (this.isSelected && unselectable)
-			this.setSelected(! this.isSelected());
-		else if (! this.isSelected)
-			this.setSelected(! this.isSelected());
-	}
-
-	public void mouseEntered(MouseEvent e) {}
-	public void mouseExited(MouseEvent e) {}
-	public void mousePressed(MouseEvent e) {}
-	public void mouseReleased(MouseEvent e) {}
 
 	/**
 	 * @return the isSelected
 	 */
 	public boolean isSelected() {
-		return isSelected;
+		return this.button.isSelected();
 	}
 
 	/**
@@ -124,20 +106,16 @@ public class CheckBoxPanel extends JPanel implements MouseListener {
 	 */
 	public void setSelected(boolean isSelected) {
 		/* ================================================== */
-		this.isSelected = isSelected;
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				repaint();
-			}
-		});
+		this.button.setSelected(isSelected);
 		asynchInformActionListeners();
 		/* ================================================== */
 	}
 
 	public void setColor(Color c) {
-		this.bgColor = new Color(c.getRed(),c.getGreen(),c.getBlue(),50);
-		this.cb.setBackground(c);
-		cb.setColor(c);
+		this.bgColor = c;
+		this.button.setForeground(bgColor);
+		this.icon.setColor(bgColor);
+		this.button.updateUI();
 	}
 
 	/**
@@ -147,10 +125,7 @@ public class CheckBoxPanel extends JPanel implements MouseListener {
 	 */
 	public void setText(String text) {
 		/* ================================================== */
-		this.label.setText(text);
-		this.label.validate();
-
-		this.label.updateUI();
+		this.button.setText(text);
 		/* ================================================== */
 	}
 	
@@ -160,17 +135,89 @@ public class CheckBoxPanel extends JPanel implements MouseListener {
 	 */
 	private synchronized void asynchInformActionListeners() {
 		/* ================================================== */
-		Thread t = new Thread() {
-			public void run() {
+//		Thread t = new Thread() {
+//			public void run() {
 				for (Iterator iter = listeners.iterator(); iter.hasNext();) {
 					ActionListener element = (ActionListener) iter.next();
 					element.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "selection changed"));
 				}
-			}
-		};
-		t.start();
+//			}
+//		};
+//		t.start();
 		/* ================================================== */
 	}
+
+	public void actionPerformed(ActionEvent e) {
+		/* ====================================================== */
+		if (this.button.equals(e.getSource())) {
+			/* ------------------------------------------------------- */
+			asynchInformActionListeners();
+			/* ------------------------------------------------------- */
+		}
+		/* ====================================================== */
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.awt.Component#addMouseListener(java.awt.event.MouseListener)
+	 */
+	@Override
+	public synchronized void addMouseListener(MouseListener l) {
+		/* ====================================================== */
+
+		this.button.addMouseListener(l);
+		/* ====================================================== */
+	}
+
+	
+	/**
+	 * @author martin.heinemann@tudor.lu
+	 * 21.10.2008
+	 * 15:32:27
+	 *
+	 *
+	 * @version
+	 * <br>$Log: CheckBoxPanel.java,v $
+	 * <br>Revision 1.4  2008/10/21 15:08:31  heine_
+	 * <br>*** empty log message ***
+	 * <br>
+	 *   
+	 */
+	public class ColorBoxIcon implements Icon, UIResource, Serializable {
+
+		private Color color;
+		
+		private static final double FAQ = 1.5;
+		
+		public ColorBoxIcon(Color color) {
+			this.color = color;
+		}
+
+		private static final long serialVersionUID = 1L;
+
+		protected int getControlSize() { return 16; }
+
+	    public void paintIcon(Component c, Graphics g, int x, int y) {
+
+			int controlSize = getControlSize();
+	
+			g.setColor(color);
+			g.fillRect(x, y+1, (int) ((controlSize-1)*FAQ), controlSize-1);
+			g.setColor(Color.BLACK);
+			g.drawRect(x, y+1, (int) ((controlSize-1)*FAQ), controlSize-1);
+		}
+
+	    public int getIconWidth() {
+	        return (int) (getControlSize()*FAQ);
+	    }
+
+	    public int getIconHeight() {
+	        return getControlSize();
+	    }
+	    
+	    public void setColor(Color c) {
+	    	this.color = c;
+	    }
+	 }
 	
 	
 }

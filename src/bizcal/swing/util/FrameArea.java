@@ -314,21 +314,40 @@ public class FrameArea extends JComponent implements ComponentListener {
 		/* ================================================== */
 	}
 	
-
+	
 	// The toolkit will invoke this method when it's time to paint
 	public void paint(Graphics g) {
 		/* ================================================== */
-		try {
-			if (!this.getBackground().equals(event.getColor()))
-			setBackground(event.getColor());
-		} catch (Exception e) {
-//			e.printStackTrace();
+		
+		Color backGroundColor = this.getBackground();
+		Color headerColor     = this.getBackground();
+		/* ------------------------------------------------------- */
+		if (event != null) {
+			/* ------------------------------------------------------- */
+			backGroundColor = event.getColor();
+			headerColor     = event.getColor();
+			/* ------------------------------------------------------- */
 		}
-		
-		
+		/* ------------------------------------------------------- */
 		// increase the alpha value if the event is a background event
-		if (event != null && event.isBackground())
-			this.alphaValue = ALPHA_DEFAULT + SELECT_OFFSET - 0.3f;
+		/* ------------------------------------------------------- */
+		
+		/* ------------------------------------------------------- */
+		// background settings
+		/* ------------------------------------------------------- */
+		if (event != null && event.isBackground()) {
+			/* ------------------------------------------------------- */
+			headerColor = Color.LIGHT_GRAY;
+			
+			this.alphaValue = ALPHA_DEFAULT + SELECT_OFFSET - 0.55f;
+			/* ------------------------------------------------------- */
+		}
+		/* ------------------------------------------------------- */
+		if (!this.getBackground().equals(backGroundColor))
+			setBackground(backGroundColor);
+		/* ------------------------------------------------------- */
+		
+		
 		/* ------------------------------------------------------- */
 		Graphics2D g2 = (Graphics2D) g;
 		// makes the graphics smoother
@@ -339,9 +358,8 @@ public class FrameArea extends JComponent implements ComponentListener {
 		int height = getHeight();
 		BufferedImage buffImg = null;
 		
-			/* ------------------------------------------------------- */
-			buffImg = new BufferedImage(width, height,
-						  				BufferedImage.TYPE_INT_ARGB);
+		/* ------------------------------------------------------- */
+		buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		
 		/* ------------------------------------------------------- */
 		Graphics2D gbi = buffImg.createGraphics();
@@ -391,9 +409,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 			gbi.setComposite(ac);
 			gbi.setPaint(this.getBackground());
 			/* ------------------------------------------------------- */
-			if (this.event != null && this.event.isBackground())
-				drawHatchedRect(gbi, 0, 0, width, height, false);
-			else
+//			if (this.event != null && this.event.isBackground())
+//				drawHatchedRect(gbi, 0, 0, width, height, false);
+//			else
 				gbi.fill(new RoundRectangle2D.Double(0, 0, width, height, 20, 20));
 			/* ------------------------------------------------------- */
 			if (this.border && (this.event == null || !this.event.isBackground())) {
@@ -412,12 +430,15 @@ public class FrameArea extends JComponent implements ComponentListener {
 			gbi.setComposite(ac);
 			gbi.setPaint(this.getBackground());
 			/* ------------------------------------------------------- */
-			if (this.event != null && this.event.isBackground())
-				drawHatchedRect(gbi, 0, 0, width, height, false);
-			else
+//			if (this.event != null && this.event.isBackground())
+//				gbi.setPaint(Color.LIGHT_GRAY);
+//				drawHatchedRect(gbi, 0, 0, width, height, false);
+//			else
 				gbi.fill(new Rectangle2D.Double(0, 0, width, height));
 			/* ------------------------------------------------------- */
-			if (this.border && (this.event == null || !this.event.isBackground())) {
+//			if (this.border && (this.event == null || !this.event.isBackground())) {
+			if (this.border && (this.event != null)) {
+//				if (this.event.isBackground())
 				gbi.setPaint(Color.black);
 				gbi.draw(new Rectangle2D.Double(1, 1, width - 2, height - 2));
 			}
@@ -434,7 +455,8 @@ public class FrameArea extends JComponent implements ComponentListener {
 		Graphics2D gbiHeader = null;
 
 		if (showHeader)
-			if (event == null || !event.isBackground()) {
+//			if (event == null || !event.isBackground()) {
+			if (event != null) {
 			/* ------------------------------------------------------- */
 			// create darker header
 			BufferedImage buffImgHeader = new BufferedImage(width, HEADER_HEIGHT,
@@ -445,8 +467,15 @@ public class FrameArea extends JComponent implements ComponentListener {
 					RenderingHints.VALUE_ANTIALIAS_ON);
 			gbiHeader.setStroke(new BasicStroke(1.0f));
 			/* ------------------------------------------------------- */
-			gbiHeader.setPaint(this.getBackground());
-			gbiHeader.fill(new RoundRectangle2D.Double(0, 0, width, 20, 20, 20));
+//			if (event.isBackground())
+//				gbiHeader.setPaint(Color.LIGHT_GRAY);
+//			else
+				gbiHeader.setPaint(headerColor);
+			/* ------------------------------------------------------- */
+			if (isRoundedRectangle())
+				gbiHeader.fill(new RoundRectangle2D.Double(0, 0, width, 20, 20, 20));
+			else
+				gbiHeader.fill(new Rectangle2D.Double(0, 0, width, 20));
 			/* ------------------------------------------------------- */
 			// paint
 			g2.drawImage(buffImgHeader, null, 0, 0);
@@ -505,28 +534,28 @@ public class FrameArea extends JComponent implements ComponentListener {
 		if (itsDescription != null) {
 			if (showHeader && itsHeadLine == null)
 				ypos = HEADER_HEIGHT + 15;
-			if (this.event != null && this.event.isBackground()) {
-				/* ------------------------------------------------------- */
-				// compute angle
-				// first the diagonale, normal Pythagoras
-				try {
-					double diagonale =
-						Math.sqrt(Math.pow(this.getBounds().width, 2)
-								+ Math.pow(this.getBounds().height-ypos-10, 2));
-					/* ------------------------------------------------------- */
-					Double temp = Math.asin(this.getBounds().height / diagonale);
-
-						if (!temp.equals(Double.NaN)) {
-						this.angle = temp;
-					}
-				} catch (Exception e) {}
-				/* ------------------------------------------------------- */
-				g2.rotate(angle-0.3, this.xPosition, this.yPosition);
-				g2.drawString(itsDescription, xpos, ypos+10);
-				// back
-				g2.rotate(-angle+0.3, this.xPosition, this.yPosition);
-				/* ------------------------------------------------------- */
-			} else {
+//			if (this.event != null && this.event.isBackground()) {
+//				/* ------------------------------------------------------- */
+//				// compute angle
+//				// first the diagonale, normal Pythagoras
+//				try {
+//					double diagonale =
+//						Math.sqrt(Math.pow(this.getBounds().width, 2)
+//								+ Math.pow(this.getBounds().height-ypos-10, 2));
+//					/* ------------------------------------------------------- */
+//					Double temp = Math.asin(this.getBounds().height / diagonale);
+//
+//						if (!temp.equals(Double.NaN)) {
+//						this.angle = temp;
+//					}
+//				} catch (Exception e) {}
+//				/* ------------------------------------------------------- */
+//				g2.rotate(angle-0.3, this.xPosition, this.yPosition);
+//				g2.drawString(itsDescription, xpos, ypos+10);
+//				// back
+//				g2.rotate(-angle+0.3, this.xPosition, this.yPosition);
+//				/* ------------------------------------------------------- */
+//			} else {
 				/* ------------------------------------------------------- */
 				int fontHeight =	(int) this.getFont().getSize2D();
 				// get the optimal width
@@ -582,7 +611,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 					/* ------------------------------------------------------- */
 				}
 				/* ------------------------------------------------------- */
-			}
+//			}
 		}
 		/* ------------------------------------------------------- */
 		// draw end time at the bottom
@@ -741,6 +770,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.12  2008/10/21 15:08:31  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.11  2008/08/12 12:47:28  heine_
 	 * <br>fixed some bugs and made code improvements
 	 * <br>

@@ -60,17 +60,18 @@ public class Event
 	private String description;
 	private Date start;
 	private Date end;
-	private int level = 0;
-	private Color color = Color.LIGHT_GRAY;
-	private boolean frame = true;
-	private boolean roundedCorner = true;
-	private boolean editable = true;
-	private boolean showTime = true;
-	private String toolTip = null;
-	private Map props = new HashMap();
-	private boolean background = false;
-	private boolean selectable = true;
-	private ImageIcon icon = null;
+	private int level 			  	= 0;
+	private Color color 			= Color.LIGHT_GRAY;
+	private boolean frame 			= true;
+	private boolean roundedCorner 	= true;
+	private boolean editable 		= true;
+	private boolean showTime 		= true;
+	private boolean showHeader 		= true;
+	private String toolTip 			= null;
+	private Map props 				= new HashMap();
+	private boolean background 		= false;
+	private boolean selectable 		= true;
+	private ImageIcon icon 			= null;
 	private Object orgEvent;
 
 	private ImageIcon upperRightIcon;
@@ -178,7 +179,20 @@ public class Event
 	public void setShowTime(boolean showTime) {
 		this.showTime = showTime;
 	}
-
+	
+	public boolean showHeader() {
+		/* ================================================== */
+		return this.showHeader;
+		/* ================================================== */
+	}
+	
+	public void setShowHeader(boolean b) {
+		/* ================================================== */
+		this.showHeader = b;
+		/* ================================================== */
+	}
+	
+	
 	public String getToolTip()
 	{
 		if (toolTip != null)
