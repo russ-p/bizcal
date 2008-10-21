@@ -67,7 +67,7 @@ public class CheckBoxPanel extends JPanel implements ActionListener {
 		group.add(this.button);
 
 		this.button.addActionListener(this);
-		this.button.setForeground(c);
+//		this.button.setForeground(c);
 
 		this.icon = new ColorBoxIcon(c);
 		this.button.setIcon(this.icon);
@@ -113,7 +113,7 @@ public class CheckBoxPanel extends JPanel implements ActionListener {
 
 	public void setColor(Color c) {
 		this.bgColor = c;
-		this.button.setForeground(bgColor);
+//		this.button.setForeground(bgColor);
 		this.icon.setColor(bgColor);
 		this.button.updateUI();
 	}
@@ -177,6 +177,9 @@ public class CheckBoxPanel extends JPanel implements ActionListener {
 	 *
 	 * @version
 	 * <br>$Log: CheckBoxPanel.java,v $
+	 * <br>Revision 1.5  2008/10/21 16:05:06  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.4  2008/10/21 15:08:31  heine_
 	 * <br>*** empty log message ***
 	 * <br>
