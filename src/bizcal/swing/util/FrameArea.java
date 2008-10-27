@@ -328,6 +328,8 @@ public class FrameArea extends JComponent implements ComponentListener {
 			headerColor     = event.getColor();
 			/* ------------------------------------------------------- */
 		}
+		
+//		System.out.println(event);
 		/* ------------------------------------------------------- */
 		// increase the alpha value if the event is a background event
 		/* ------------------------------------------------------- */
@@ -590,7 +592,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 					int pos 		= 0;
 					int yposString  = ypos;
 					
-					while (pos < itsDescription.length()) {
+					while (pos < itsDescription.length() && lineWrap > 0) {
 						if (pos+lineWrap >= itsDescription.length())
 							g2.drawString(itsDescription.substring(pos, itsDescription.length()-1).trim(), xpos, yposString);
 						else
@@ -770,6 +772,10 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.13  2008/10/27 13:59:50  heine_
+	 * <br>fixed invite loop.
+	 * <br>happens when the paint width of a character is bigger than the width of the frame area
+	 * <br>
 	 * <br>Revision 1.12  2008/10/21 15:08:31  heine_
 	 * <br>*** empty log message ***
 	 * <br>
