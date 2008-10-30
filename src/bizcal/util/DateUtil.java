@@ -356,6 +356,24 @@ public class DateUtil
 	}
 	
 	/**
+	 * Moves the given date by the given years
+	 * 
+	 * @param date
+	 * @param offset years to add
+	 * @return
+	 */
+	public static Date moveByYear(Date date, int offset) {
+		/* ================================================== */
+		Calendar cal = newCalendar();
+        cal.setTime(date);
+        cal.add(Calendar.YEAR, offset);
+        
+        return cal.getTime();
+		/* ================================================== */
+	}
+	
+	
+	/**
 	 * Sets the date to 23:59:59
 	 * 
 	 * @param date

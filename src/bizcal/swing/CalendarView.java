@@ -70,6 +70,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.37  2008/10/30 10:42:52  heine_
+ *          *** empty log message ***
+ *
  *          Revision 1.36  2008/10/21 15:08:31  heine_
  *          *** empty log message ***
  *
@@ -1547,6 +1550,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.37  2008/10/30 10:42:52  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.36  2008/10/21 15:08:31  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1652,6 +1658,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.37  2008/10/30 10:42:52  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.36  2008/10/21 15:08:31  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1766,6 +1775,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.37  2008/10/30 10:42:52  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.36  2008/10/21 15:08:31  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -2745,6 +2757,8 @@ public abstract class CalendarView {
 	}
 
 	private boolean isSelected(Event event) {
+		if (event == null)
+			return false;
 		Iterator i = _selectedEvents.iterator();
 		while (i.hasNext()) {
 			Event tmpEvent = (Event) i.next();
@@ -2825,6 +2839,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.37  2008/10/30 10:42:52  heine_
+//	 * <br>*** empty log message ***
+//	 * <br>
 //	 * <br>Revision 1.36  2008/10/21 15:08:31  heine_
 //	 * <br>*** empty log message ***
 //	 * <br>
