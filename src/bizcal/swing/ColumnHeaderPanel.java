@@ -283,7 +283,11 @@ public class ColumnHeaderPanel
 			try {
 				int height = refLabel.getPreferredSize().height;
 				height = rowCount * height;
-				int width = dayCount * model.getSelectedCalendars().size() * DayView.PREFERRED_DAY_WIDTH;
+				int calenderSize = 1;
+				if (model.getSelectedCalendars() != null)
+					calenderSize = model.getSelectedCalendars().size();
+				/* ---------------------------------------------------- */
+				int width = dayCount * calenderSize * DayView.PREFERRED_DAY_WIDTH;
 				return new Dimension(width, height);
 			} catch (Exception e) {
 				throw BizcalException.create(e);
