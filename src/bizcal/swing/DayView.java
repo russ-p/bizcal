@@ -696,6 +696,9 @@ public class DayView extends CalendarView {
 	 *
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.38  2008/12/12 16:20:11  heine_
+	 *          *** empty log message ***
+	 *
 	 *          Revision 1.37  2008/08/12 12:47:27  heine_
 	 *          fixed some bugs and made code improvements
 	 *
@@ -912,7 +915,7 @@ public class DayView extends CalendarView {
 										/* ------------------------------------------------------- */
 										// This events ends after the previous
 										/* ------------------------------------------------------- */
-										previousArea = area;
+										previousArea = area; 
 										/* ------------------------------------------------------- */
 									}
 								} else {
@@ -1040,8 +1043,8 @@ public class DayView extends CalendarView {
 // }
 				/* ================================================== */
 				// set up the line to minute mapping hashmap.
-				// we create a hashmap of puxel to minute mapping to
-				// have a fixed resource for resolving the expoicit time 
+				// we create a hashmap of pixel to minute mapping to
+				// have a fixed resource for resolving the explicit time 
 				// for a position on the calendar panel
 				/* ================================================== */
 				if (dayCount > 1)
@@ -1153,6 +1156,27 @@ public class DayView extends CalendarView {
 		/* ================================================== */
 	}
 
+	
+	
+	private void layoutNew(List<Event> eventList, List<FrameArea> areaList) {
+		/* ================================================== */
+		//		currCol
+		//		colsInRow
+		//		currWidth=width/colsInRow
+		/* ------------------------------------------------------- */
+		// Map to store the column position for each event
+		HashMap<Event, Integer> colPositionMap = new HashMap<Event, Integer>();
+		// Map to store the amount of events, that are painted in a row
+		// neccessary to get the right width of each event
+		HashMap<Event, Integer> colsInRowMap   = new HashMap<Event, Integer>();
+		/* ------------------------------------------------------- */
+		
+		
+		/* ================================================== */	
+	}
+	
+	
+	
 	/**
 	 * Finds the smallest width of a framearea and its children
 	 *
