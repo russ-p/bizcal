@@ -284,7 +284,7 @@ public class ColumnHeaderPanel
 				int height = refLabel.getPreferredSize().height;
 				height = rowCount * height;
 				int calenderSize = 1;
-				if (model.getSelectedCalendars() != null)
+				if (model != null && model.getSelectedCalendars() != null)
 					calenderSize = model.getSelectedCalendars().size();
 				/* ---------------------------------------------------- */
 				int width = dayCount * calenderSize * DayView.PREFERRED_DAY_WIDTH;
