@@ -287,6 +287,7 @@ public class DateUtil
     }
 	
 	/**
+	 * Returns the day of the year
 	 * @param date
 	 * @return
 	 */
@@ -710,7 +711,7 @@ public class DateUtil
 	
 	
 	/**
-	 * Returns the number of dates that are between the two given dates
+	 * Returns the number of days that are between the two given dates
 	 * 
 	 * @param date2
 	 * @param date1
@@ -851,7 +852,12 @@ public class DateUtil
 		Calendar c2 = new GregorianCalendar();
 		c2.setTime(dayOfBirth);
 
-		return c1.get(Calendar.YEAR) - c2.get(Calendar.YEAR);
+		long year =  c1.get(Calendar.YEAR) - c2.get(Calendar.YEAR);
+		
+		if (getDayOfYear(c1.getTime()) < getDayOfYear(dayOfBirth))
+			year--;
+		
+		return year;
 		/* ================================================== */
 	}
 	
