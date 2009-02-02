@@ -43,7 +43,6 @@ import javax.swing.JPanel;
 
 import bizcal.common.CalendarViewConfig;
 import bizcal.swing.util.GradientArea;
-import bizcal.util.BizcalException;
 import bizcal.util.TimeOfDay;
 
 /**
@@ -57,6 +56,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version
  * <br>$Log: TimeLabelPanel.java,v $
+ * <br>Revision 1.8  2009/02/02 12:38:21  heine_
+ * <br>changed time ruler. The hour lables are now placed in the right position of the hour.
+ * <br>
  * <br>Revision 1.7  2008/06/12 13:04:18  heine_
  * <br>*** empty log message ***
  * <br>
@@ -122,48 +124,75 @@ public class TimeLabelPanel
 			/* ------------------------------------------------------- */
 			long pos = start.getValue();
 	 		while (pos < end.getValue()) {
-				Date date = new Date(pos);
+	 			/* ------------------------------------------------------- */
+	 			// new try, hour label and 30.
+	 			/* ------------------------------------------------------- */
+	 			Date date = new Date(pos);
 				String timeTxt = hourFormat.format(date);
+				/* ------------------------------------------------------- */
+				// make the hour label nicer
+				/* ------------------------------------------------------- */
 				JLabel timeLabel = new JLabel(timeTxt);
 				timeLabel.setVerticalTextPosition(JLabel.CENTER);
 				timeLabel.setFont(hourFont);
+				/* ------------------------------------------------------- */
 				panel.add(timeLabel);
 				hourLabels.add(timeLabel);
+				/* ------------------------------------------------------- */
+				// a label for the line of the hour
+				/* ------------------------------------------------------- */
 				JLabel line = new JLabel();
 				line.setBackground(this.config.getLineColor());
 				line.setOpaque(true);
-				hourLines.add(line);
+				/* ------------------------------------------------------- */
 				panel.add(line);
+				hourLines.add(line);
 				
-
-				timeTxt = "15";
+				
+				timeTxt = "30";
 				timeLabel = new JLabel(timeTxt);
 				timeLabel.setFont(font);
 				panel.add(timeLabel);
 				minuteLabels.add(timeLabel);
-//				line = new JLabel();
+				createMinuteLine();
+				createMinuteLine();
+				createMinuteLine();
+				createMinuteLine();
+				
+				pos += 3600 * 1000;
+	 			
+	 			/* ------------------------------------------------------- */
+//				Date date = new Date(pos);
+//				String timeTxt = hourFormat.format(date);
+//				JLabel timeLabel = new JLabel(timeTxt);
+//				timeLabel.setVerticalTextPosition(JLabel.CENTER);
+//				timeLabel.setFont(hourFont);
+//				panel.add(timeLabel);
+//				hourLabels.add(timeLabel);
+//				JLabel line = new JLabel();
 //				line.setBackground(this.config.getLineColor());
 //				line.setOpaque(true);
-//				minuteLines.add(line);
+//				hourLines.add(line);
 //				panel.add(line);
-				createMinuteLine();
-				createMinuteLine();
-
-				timeTxt = "45";
-				timeLabel = new JLabel(timeTxt);
-				timeLabel.setFont(font);
-				panel.add(timeLabel);
-				minuteLabels.add(timeLabel);
-//				line = new JLabel();
-////				line.setBackground(this.config.getLineColor());
-//				line.setBackground(Color.RED);
-//				line.setOpaque(true);
-//				minuteLines.add(line);
-//				panel.add(line);
-				createMinuteLine();
-				createMinuteLine();
-
-				pos += 3600 * 1000;
+//				
+//
+//				timeTxt = "15";
+//				timeLabel = new JLabel(timeTxt);
+//				timeLabel.setFont(font);
+//				panel.add(timeLabel);
+//				minuteLabels.add(timeLabel);
+//				createMinuteLine();
+//				createMinuteLine();
+//
+//				timeTxt = "45";
+//				timeLabel = new JLabel(timeTxt);
+//				timeLabel.setFont(font);
+//				panel.add(timeLabel);
+//				minuteLabels.add(timeLabel);
+//				createMinuteLine();
+//				createMinuteLine();
+//
+//				pos += 3600 * 1000;
 			}
 	        gradientArea = new GradientArea(GradientArea.LEFT_RIGHT, Color.WHITE,
 	        		ColumnHeaderPanel.GRADIENT_COLOR);
@@ -232,87 +261,165 @@ public class TimeLabelPanel
 		}
 
 		public void layoutContainer(Container parent) {
+			/* ================================================== */
 			try {
-				double totHeight = parent.getHeight() - footerHeight;
-				double rowHeight = totHeight / hourCount;
-				double minuteRowHeight = rowHeight / 2;
-				int colWidth = width / 2;
-				int iMinute = 0;
-				int iLine  = 0;
-				for (int i=0; i < hourLabels.size(); i++) {
-					/* ------------------------------------------------------- */
-					// layout the hour labels
-					/* ------------------------------------------------------- */
-					JLabel hourLabel = (JLabel) hourLabels.get(i);
-					hourLabel.setBounds(0,
-							(int) (i*rowHeight),
-							colWidth,
-							(int) rowHeight);
-					/* ------------------------------------------------------- */
-					// layout the hour lines
-					/* ------------------------------------------------------- */
-					JLabel hourLine = (JLabel) hourLines.get(i);
-					hourLine.setBounds(0,
-							(int) ((i+1)*rowHeight),
-							width,
-							1);
-					/* ------------------------------------------------------- */
-					// layout the first minute label
-					/* ------------------------------------------------------- */
-					JLabel minuteLabel = (JLabel) minuteLabels.get(iMinute);
-					minuteLabel.setBounds(colWidth,
-							(int) (i*rowHeight),
-							colWidth,
-							(int) (minuteRowHeight));
-					iMinute++;
-					/* ------------------------------------------------------- */
-					// the minute line for the 30 min
-					/* ------------------------------------------------------- */
-					JLabel minuteLine = (JLabel) minuteLines.get(iLine);
-//					
-					minuteLine.setBounds(colWidth,
-							(int) (i*rowHeight + minuteRowHeight),
-							colWidth,
-							1);
-					iLine++;
-					/* ------------------------------------------------------- */
-					// line for 15
-					/* ------------------------------------------------------- */
-					JLabel minuteLine2 = (JLabel) minuteLines.get(iLine);
-					
-					minuteLine2.setBounds(colWidth*2-4,
-							(int) (i*rowHeight + minuteRowHeight/2),
-							colWidth,
-							1);
-					
-					iLine++;
-					/* ------------------------------------------------------- */
-					// the minute label for 45 min
-					/* ------------------------------------------------------- */
-					minuteLabel = (JLabel) minuteLabels.get(iMinute);
-					minuteLabel.setBounds(colWidth,
-							(int) (i*rowHeight + minuteRowHeight),
-							colWidth,
-							(int) minuteRowHeight);
-					iMinute++;
-					/* ------------------------------------------------------- */
-					// line for 45
-					/* ------------------------------------------------------- */
-					JLabel minuteLine3 = (JLabel) minuteLines.get(iLine);
-					
-					minuteLine3.setBounds(colWidth*2-4,
-							(int) (i*rowHeight + minuteRowHeight + minuteRowHeight/2),
-							colWidth,
-							1);
-					
-					iLine++;
-					/* ------------------------------------------------------- */
-				}
-				gradientArea.setBounds(0, 0, parent.getWidth(), parent.getHeight());
-			} catch (Exception e) {
-				e.printStackTrace();
-//				throw BizcalException.create(e);
+			double totHeight = parent.getHeight() - footerHeight;
+			double rowHeight = totHeight / hourCount;
+			double minuteRowHeight = rowHeight / 2;
+			int colWidth = width / 2;
+			int iMinute = 0;
+			int iLine  = 0;
+			for (int i=0; i < hourLabels.size(); i++) {
+				/* ------------------------------------------------------- */
+				// layout the hour labels
+				/* ------------------------------------------------------- */
+				JLabel hourLabel = (JLabel) hourLabels.get(i);
+				hourLabel.setBounds(0,
+//						(int) (i*rowHeight),
+						(int) ((i)*rowHeight) -7,
+						colWidth,
+						(int) 15);
+				/* ------------------------------------------------------- */
+				// layout the hour lines
+				/* ------------------------------------------------------- */
+				JLabel hourLine = (JLabel) hourLines.get(i);
+				hourLine.setBounds(colWidth,
+						(int) ((i+1)*rowHeight),
+						width,
+						1);
+				/* ------------------------------------------------------- */
+				// layout the 30 minute label
+				/* ------------------------------------------------------- */
+				JLabel minuteLabel = (JLabel) minuteLabels.get(iMinute);
+				minuteLabel.setBounds(colWidth - 15,
+						(int) (i*rowHeight),
+						colWidth,
+						(int) rowHeight);
+				iMinute++;
+				/* ------------------------------------------------------- */
+				// the minute line for the 30 min
+				/* ------------------------------------------------------- */
+				JLabel minuteLine = (JLabel) minuteLines.get(iLine);
+//				
+				minuteLine.setBounds(colWidth + 5,
+						(int) ((i*rowHeight) + (rowHeight / 2)),
+						colWidth,
+						1);
+				iLine++;
+				/* ------------------------------------------------------- */
+				// line for 15
+				/* ------------------------------------------------------- */
+				JLabel minuteLine2 = (JLabel) minuteLines.get(iLine);
+				
+				minuteLine2.setBounds(colWidth*2-8,
+						(int) (i*rowHeight + minuteRowHeight/2),
+						colWidth,
+						1);
+				
+				iLine++;
+				/* ------------------------------------------------------- */
+				// line for 45
+				/* ------------------------------------------------------- */
+				JLabel minuteLine3 = (JLabel) minuteLines.get(iLine);
+				
+				minuteLine3.setBounds(colWidth*2-8,
+						(int) (i*rowHeight + minuteRowHeight + minuteRowHeight/2),
+						colWidth,
+						1);
+				
+				iLine++;
+				/* ------------------------------------------------------- */
 			}
+			gradientArea.setBounds(0, 0, parent.getWidth(), parent.getHeight());
+		} catch (Exception e) {
+			e.printStackTrace();
+//			throw BizcalException.create(e);
+		}
+			
+			
+			
+//			try {
+//				double totHeight = parent.getHeight() - footerHeight;
+//				double rowHeight = totHeight / hourCount;
+//				double minuteRowHeight = rowHeight / 2;
+//				int colWidth = width / 2;
+//				int iMinute = 0;
+//				int iLine  = 0;
+//				for (int i=0; i < hourLabels.size(); i++) {
+//					/* ------------------------------------------------------- */
+//					// layout the hour labels
+//					/* ------------------------------------------------------- */
+//					JLabel hourLabel = (JLabel) hourLabels.get(i);
+//					hourLabel.setBounds(0,
+//							(int) (i*rowHeight),
+//							colWidth,
+//							(int) rowHeight);
+//					/* ------------------------------------------------------- */
+//					// layout the hour lines
+//					/* ------------------------------------------------------- */
+//					JLabel hourLine = (JLabel) hourLines.get(i);
+//					hourLine.setBounds(0,
+//							(int) ((i+1)*rowHeight),
+//							width,
+//							1);
+//					/* ------------------------------------------------------- */
+//					// layout the first minute label
+//					/* ------------------------------------------------------- */
+//					JLabel minuteLabel = (JLabel) minuteLabels.get(iMinute);
+//					minuteLabel.setBounds(colWidth,
+//							(int) (i*rowHeight),
+//							colWidth,
+//							(int) (minuteRowHeight));
+//					iMinute++;
+//					/* ------------------------------------------------------- */
+//					// the minute line for the 30 min
+//					/* ------------------------------------------------------- */
+//					JLabel minuteLine = (JLabel) minuteLines.get(iLine);
+////					
+//					minuteLine.setBounds(colWidth,
+//							(int) (i*rowHeight + minuteRowHeight),
+//							colWidth,
+//							1);
+//					iLine++;
+//					/* ------------------------------------------------------- */
+//					// line for 15
+//					/* ------------------------------------------------------- */
+//					JLabel minuteLine2 = (JLabel) minuteLines.get(iLine);
+//					
+//					minuteLine2.setBounds(colWidth*2-4,
+//							(int) (i*rowHeight + minuteRowHeight/2),
+//							colWidth,
+//							1);
+//					
+//					iLine++;
+//					/* ------------------------------------------------------- */
+//					// the minute label for 45 min
+//					/* ------------------------------------------------------- */
+//					minuteLabel = (JLabel) minuteLabels.get(iMinute);
+//					minuteLabel.setBounds(colWidth,
+//							(int) (i*rowHeight + minuteRowHeight),
+//							colWidth,
+//							(int) minuteRowHeight);
+//					iMinute++;
+//					/* ------------------------------------------------------- */
+//					// line for 45
+//					/* ------------------------------------------------------- */
+//					JLabel minuteLine3 = (JLabel) minuteLines.get(iLine);
+//					
+//					minuteLine3.setBounds(colWidth*2-4,
+//							(int) (i*rowHeight + minuteRowHeight + minuteRowHeight/2),
+//							colWidth,
+//							1);
+//					
+//					iLine++;
+//					/* ------------------------------------------------------- */
+//				}
+//				gradientArea.setBounds(0, 0, parent.getWidth(), parent.getHeight());
+//			} catch (Exception e) {
+//				e.printStackTrace();
+////				throw BizcalException.create(e);
+//			}
+			/* ================================================== */
 		}
 	}
 
