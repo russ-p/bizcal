@@ -31,6 +31,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.LayoutManager;
 import java.awt.event.MouseAdapter;
@@ -42,6 +43,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -69,7 +71,13 @@ public class ColumnHeaderPanel
 	private List dateList = new ArrayList();
 	private List dateLines = new ArrayList();
 	private GradientArea gradientArea;
-	private JLabel refLabel = new JLabel("AAA");
+	/**
+	 * A label as reference to compute the minum width of a header column
+	 * It should at least show the first three characters of the day of week.
+	 * This is to avoid the behaviour of JLabel if there is to less space to display the text
+	 * 
+	 */
+	private JLabel referenceLabel = new JLabel("AAA");
 	private int rowCount;
 	private int dayCount;
 	private CalendarModel model;
@@ -79,6 +87,13 @@ public class ColumnHeaderPanel
 	private boolean showExtraDateHeaders = false;
 	private CalendarViewConfig config;
 	private boolean isMonthView = false;
+	
+	private static Font headerFont = new Font("Arial", Font.PLAIN, 12);
+	/**
+	 * Color for today, a nice green
+	 */
+	private static Color todayColor = new Color(111, 236, 82);
+	private static Color sundayColor = new Color(255, 106, 106);
 
 //	// formater for month view
 //	DateFormat monthDateFormat = new SimpleDateFormat("EEEE",
@@ -192,9 +207,15 @@ public class ColumnHeaderPanel
 					header.setAlignmentY(2);
 					//header.setFont(font);
 					header.setToolTipText(toolTipFormat.format(date));
-
-					if (model.isRedDay(date))
-						header.setForeground(Color.RED);
+					/* ------------------------------------------------------- */
+					// font non-bold
+					header.setFont(headerFont);
+					/* ------------------------------------------------------- */
+					if (model.isRedDay(date)) {
+						header.setBackground(sundayColor);
+						header.setBorder(BorderFactory.createLineBorder(sundayColor.darker()));
+						header.setOpaque(true);
+					}
 					dateHeaders.add(header);
 					panel.add(header);
 					if (showExtraDateHeaders) {
@@ -281,7 +302,7 @@ public class ColumnHeaderPanel
 
 		public Dimension preferredLayoutSize(Container parent) {
 			try {
-				int height = refLabel.getPreferredSize().height;
+				int height = referenceLabel.getPreferredSize().height;
 				height = rowCount * height;
 				int calenderSize = 1;
 				if (model != null && model.getSelectedCalendars() != null)
@@ -361,16 +382,23 @@ public class ColumnHeaderPanel
 		}
 	}
 
-	private void resizeDates(int width)
-		throws Exception
-	{
-		if (dayCount != 5 && dayCount != 7)
-			return;
+	/**
+	 * 
+	 * 
+	 * @param width
+	 * @throws Exception
+	 */
+	private void resizeDates(int width)	throws Exception {
+		/* ================================================== */
+//		if (dayCount != 5 && dayCount != 7)
+//			return;
 
 		Date today = DateUtil.round2Day(new Date());
-
-		FontMetrics metrics = refLabel.getFontMetrics(refLabel.getFont());
-		int charCount = 10;
+		/* ------------------------------------------------------- */
+		// 
+		/* ------------------------------------------------------- */
+		FontMetrics metrics = referenceLabel.getFontMetrics(referenceLabel.getFont());
+		int charCount = 12;
 		if (maxWidth(charCount, metrics) > width) {
 			charCount = 3;
 			if (maxWidth(charCount, metrics) > width) {
@@ -397,22 +425,35 @@ public class ColumnHeaderPanel
 			/* ------------------------------------------------------- */
 			str = TextUtil.formatCase(str);
 			/* ------------------------------------------------------- */
-			if (today.equals(DateUtil.round2Day(date)))
+			if (today.equals(DateUtil.round2Day(date))) {
 				str = "<html><b>" + str + "</b> </html>";
+				label.setBackground(todayColor);
+				label.setBorder(BorderFactory.createLineBorder(todayColor.darker()));
+				label.setOpaque(true);
+			}
 			/* ------------------------------------------------------- */
 			label.setText(str);
 			/* ------------------------------------------------------- */
 		}
+		/* ================================================== */
 	}
-
-	private int maxWidth(int charCount, FontMetrics metrics)
-		throws Exception
-	{
+	/**
+	 * returns the maximum width in pixel of a date string, according to the
+	 * maximum amount of characters 
+	 * 
+	 * @param charCount maximum amount of charcters to measure the width of
+	 * @param metrics font context in which the width should be computed
+	 * @return width in pixel, according to the amount of characters ant the font metrics context
+	 */
+	private int maxWidth(int charCount, FontMetrics metrics)  {
+		/* ================================================== */
 		DateFormat format = new SimpleDateFormat("EEEEE", LocaleBroker.getLocale());
 		Calendar cal = DateUtil.newCalendar();
 		cal.set(Calendar.DAY_OF_WEEK, 1);
 		int maxWidth = 0;
+		
 		for (int i=0; i < 7; i++) {
+			/* ------------------------------------------------------- */
 			String str = format.format(cal.getTime());
 			if (str.length() > charCount)
 				str = str.substring(0, charCount);
@@ -420,8 +461,10 @@ public class ColumnHeaderPanel
 			if (width > maxWidth)
 				maxWidth = width;
 			cal.add(Calendar.DAY_OF_WEEK, +1);
+			/* ------------------------------------------------------- */
 		}
 		return maxWidth;
+		/* ================================================== */
 	}
 
 	public void setModel(CalendarModel model) {
