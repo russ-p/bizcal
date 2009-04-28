@@ -132,7 +132,11 @@ public class DateInterval extends Interval
 		if (end == null)
 		    return;
 		long diff = end.getTime() - getStartDate().getTime();
-		_duration = (int) diff;
+		
+		long dstOffset = Math.abs(DateUtil.getDaylightSavingOffset(end)) 
+							- Math.abs(DateUtil.getDaylightSavingOffset(getStartDate()));
+		
+		_duration = (int) diff + dstOffset;
 	}
 
 	public void setDuration(long duration)

@@ -187,14 +187,13 @@ public class DayView extends CalendarView {
 
 	public void refresh0() throws Exception {
 		/* ================================================== */
-//		System.out.println("DayView::refresh0");
-//		System.out.println("----");
 		if (calPanel == null || this.getModel() == null)
 			return;
 		/* ------------------------------------------------------- */
 		// remove nealry everything from the panel
 		/* ------------------------------------------------------- */
 		dayCount = (int) (getModel().getInterval().getDuration() / (24 * 3600 * 1000));
+		
 		calPanel.removeAll();
 		calPanel.setBackground(Color.WHITE);
 		rowHeader.setStartEnd(new TimeOfDay(this.config.getDayStartHour(), 0),
@@ -509,8 +508,21 @@ public class DayView extends CalendarView {
 	private int getYPos(long time, int dayNo) throws Exception {
 		/* ================================================== */
 		DateInterval interval = getInterval(dayNo);
-		time -= interval.getStartDate().getTime();
-
+		
+		
+		if (DateUtil.isDaylightSavingDay(interval.getStartDate())) {
+			/* ------------------------------------------------------- */
+			Date currDay = new Date(time);
+			
+			if (DateUtil.isAfterDSTChange(currDay)) {
+				currDay = DateUtil.moveByMinute(currDay, 60);
+				time = currDay.getTime(); 
+				time -= interval.getStartDate().getTime();
+			}
+			/* ------------------------------------------------------- */
+		} else
+			time -= interval.getStartDate().getTime();
+		
 		double viewPortHeight = getHeight() - getCaptionRowHeight()
 				- getFooterHeight();
 		// double timeSpan = (double) getTimeSpan();
@@ -553,28 +565,12 @@ public class DayView extends CalendarView {
 		/* ------------------------------------------------------- */
 		yPos -= getCaptionRowHeight();
 		
-//		BigDecimal bg_Pos = new BigDecimal (yPos);
-//		BigDecimal bg_timeHeight = new BigDecimal (getTimeHeight());
-//		BigDecimal bg_ratio = bg_Pos.divide (bg_timeHeight,5,RoundingMode.DOWN);
-//		BigDecimal bg_time = new BigDecimal (interval.getDuration()).multiply(bg_ratio);
-//		long time = bg_time.longValue();
-		
-//		Date duration = DateUtil.round2Minute(new Date(interval.getDuration()));
-		
-//		double ratio = ((double) yPos) / ((double) getTimeHeight());
-		
-//		long time = (long) Math.round((double)(interval.getDuration()/60000  * yPos) / (double)getTimeHeight());
-//		
-//		BigDecimal b = new BigDecimal(interval.getDuration());
-//		
-//		b.round(new MathContext(60000));
-//		time *= 60000;
-//		time += interval.getStartDate().getTime();
 		/* ------------------------------------------------------- */
 		Date foundDate = null;
 		while (foundDate == null) {
 			/* ------------------------------------------------------- */
 			foundDate = minuteMapping.get(yPos);
+			System.out.println("Found Date " + foundDate);
 			yPos++;
 			if (yPos < 0 )
 				break;
@@ -696,6 +692,9 @@ public class DayView extends CalendarView {
 	 *
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.39  2009/04/28 14:11:19  heine_
+	 *          some dst fixes. Not yet finished but better than before...
+	 *
 	 *          Revision 1.38  2008/12/12 16:20:11  heine_
 	 *          *** empty log message ***
 	 *
@@ -1126,9 +1125,36 @@ public class DayView extends CalendarView {
 					minuteMapping.put(currPos, currDate);
 					int startMinute = DateUtil.getMinuteOfHour(currDate);
 					
+					// check if the current time is in the shift hour of dst
+					boolean isDSTDay = DateUtil.isDaylightSavingDay(currDate);
+					
 					for (int k = 1; k < numberOfMinutesPerSlot; k++) {
+						/* ------------------------------------------------------- */
+						Date pixelDate = DateUtil.round2Minute(currDate, startMinute + k);
 						
-						minuteMapping.put(currPos + k*pixelsPerMinute, DateUtil.round2Minute(currDate, startMinute + k));
+						if (isDSTDay) {
+							/* ------------------------------------------------------- */
+							if (DateUtil.isAfterDSTChange(pixelDate)) {
+								// add one hour if after the dst shift
+//								pixelDate = DateUtil.moveByMinute(pixelDate, 60);
+							}
+							/* ------------------------------------------------------- */
+						}
+//						long dstOffset = DateUtil.getDSTShiftHourOffset(d);
+//						System.out.println(d + " => " + dstOffset);
+//						if (dstOffset > 0) {
+//							System.out.println("skipping " + d + " -- " + (currPos + k*pixelsPerMinute));
+//							continue;
+//						}
+						// if date is dst day
+						// dann betrachte ob  Zeitwechsel schon stattgefunden hat
+						// wenn ja, dann passe die eigene uhrzeit an
+						// 3 Uhr muss 3 Uhr bleiben
+						// ab 3 Uhr muss alles wieder stimmen
+//						Date dstDate = new Date(pixelDate.getTime()+dstOffset);
+						// shift the dst offset
+						minuteMapping.put(currPos + k*pixelsPerMinute, pixelDate);
+						/* ------------------------------------------------------- */
 					}
 					/* ------------------------------------------------------- */
 				}
@@ -1157,23 +1183,23 @@ public class DayView extends CalendarView {
 	}
 
 	
-	
-	private void layoutNew(List<Event> eventList, List<FrameArea> areaList) {
-		/* ================================================== */
-		//		currCol
-		//		colsInRow
-		//		currWidth=width/colsInRow
-		/* ------------------------------------------------------- */
-		// Map to store the column position for each event
-		HashMap<Event, Integer> colPositionMap = new HashMap<Event, Integer>();
-		// Map to store the amount of events, that are painted in a row
-		// neccessary to get the right width of each event
-		HashMap<Event, Integer> colsInRowMap   = new HashMap<Event, Integer>();
-		/* ------------------------------------------------------- */
-		
-		
-		/* ================================================== */	
-	}
+//	
+//	private void layoutNew(List<Event> eventList, List<FrameArea> areaList) {
+//		/* ================================================== */
+//		//		currCol
+//		//		colsInRow
+//		//		currWidth=width/colsInRow
+//		/* ------------------------------------------------------- */
+//		// Map to store the column position for each event
+//		HashMap<Event, Integer> colPositionMap = new HashMap<Event, Integer>();
+//		// Map to store the amount of events, that are painted in a row
+//		// neccessary to get the right width of each event
+//		HashMap<Event, Integer> colsInRowMap   = new HashMap<Event, Integer>();
+//		/* ------------------------------------------------------- */
+//		
+//		
+//		/* ================================================== */	
+//	}
 	
 	
 	

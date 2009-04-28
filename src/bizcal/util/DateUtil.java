@@ -25,6 +25,8 @@
  *******************************************************************************/
 package bizcal.util;
 
+import static org.junit.Assert.assertTrue;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +36,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import org.junit.Test;
 
 /**
  * @author Fredrik Bertilsson
@@ -720,7 +724,11 @@ public class DateUtil
 	 */
 	public static int getDateDiff(Date date2, Date date1)  {
 		/* ================================================== */
-		return (int) ((date2.getTime() - date1.getTime()) / 24 / 3600 / 1000);
+		long dstOffset = Math.abs(DateUtil.getDaylightSavingOffset(date2)) 
+						- Math.abs(DateUtil.getDaylightSavingOffset(date1));
+		
+		
+		return (int) (((date2.getTime() - date1.getTime()) + dstOffset) / 24 / 3600 / 1000);
 		/* ================================================== */
 	}
 
@@ -846,13 +854,13 @@ public class DateUtil
 	 * @param dayOfBirth
 	 * @return
 	 */
-	public static long extractAge(Date dayOfBirth) {
+	public static int extractAge(Date dayOfBirth) {
 		/* ================================================== */
 		Calendar c1 = new GregorianCalendar();
 		Calendar c2 = new GregorianCalendar();
 		c2.setTime(dayOfBirth);
 
-		long year =  c1.get(Calendar.YEAR) - c2.get(Calendar.YEAR);
+		int year =  c1.get(Calendar.YEAR) - c2.get(Calendar.YEAR);
 		
 		if (getDayOfYear(c1.getTime()) < getDayOfYear(dayOfBirth))
 			year--;
@@ -860,6 +868,109 @@ public class DateUtil
 		return year;
 		/* ================================================== */
 	}
+	
+	/**
+	 * Checks if the date is a day on which the daylight saving time is
+	 * changing.
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static boolean isDaylightSavingDay(Date date) {
+		/* ================================================== */
+		Date start = move2Morning(date);
+		Date end   = move2Midnight(date);
+		/* ------------------------------------------------------- */
+		// now compare the dst offsets of both, if unequal, we have
+		// a dst day
+		return (getDaylightSavingOffset(start) != getDaylightSavingOffset(end));
+		/* ================================================== */
+	}
+	
+	/**
+	 * Checks if the date is after the dst changing hour.
+	 * If it is in the hour, it will return false. Will return false, if the
+	 * day of the date is unequal to a dst changing day.
+	 * @param date
+	 * @return false if before, in the change hour, or on a different day
+	 */
+	public static boolean isAfterDSTChange(Date date) {
+		/* ================================================== */
+		if (!isDaylightSavingDay(date))
+			return false;
+		/* ------------------------------------------------------- */
+		Calendar cal = newCalendar();
+		cal.setTime(date);
+		
+		int hour = cal.get(Calendar.HOUR_OF_DAY);
+//		int min  = cal.get(Calendar.MINUTE);
+		return (hour >= 3);
+		/* ================================================== */
+	}
+	
+	/**
+	 * Checks if the date is before the dst changing hour.
+	 * If it is in the hour, it will return false. Will return false, if the
+	 * day of the date is unequal to a dst changing day.
+	 * @param date
+	 * @return false if after, in the change hour, or on a different day
+	 */
+	public static boolean isBeforeDSTChange(Date date) {
+		/* ================================================== */
+		if (!isDaylightSavingDay(date))
+			return false;
+		/* ------------------------------------------------------- */
+		Calendar cal = newCalendar();
+		cal.setTime(date);
+		
+		int hour = cal.get(Calendar.HOUR_OF_DAY);
+		return (hour <= 2);
+		/* ================================================== */
+	}
+	
+	/**
+	 * Returns the daylight saving offset of the date and the
+	 * current timezone in millis
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static long getDaylightSavingOffset(Date date) {
+		/* ================================================== */
+		Calendar cal = newCalendar();
+		cal.setTime(date);
+		return cal.get(Calendar.DST_OFFSET) ;
+		/* ================================================== */
+	}
+	
+	/**
+	 * Checks if the date/time is in the shifthour of daylight saving time
+	 * Returns the shift in millis
+	 * @param date
+	 * @return
+	 */
+	public static long getDSTShiftHourOffset(Date date) {
+		/* ================================================== */
+		// we will have a look at a date one hour earlier and later than 
+		// the given date.
+		/* ------------------------------------------------------- */
+		Date earlier = DateUtil.moveByMinute(date, -60);
+
+		/* ------------------------------------------------------- */
+		// if the offset is < 0 then
+		long dstOffsetEarlier = Math.abs(DateUtil.getDaylightSavingOffset(date)) 
+								- Math.abs(DateUtil.getDaylightSavingOffset(earlier));
+		if (dstOffsetEarlier != 0) {
+			return dstOffsetEarlier;
+		} 
+		/* ------------------------------------------------------- */
+		Date later   = DateUtil.moveByMinute(date, 60);
+		long dstOffsetLater = Math.abs(DateUtil.getDaylightSavingOffset(later)) 
+								- Math.abs(DateUtil.getDaylightSavingOffset(date));
+		return dstOffsetLater;
+		/* ================================================== */
+	}
+	
 	
 	
 	
@@ -883,6 +994,28 @@ public class DateUtil
 			return cal;
 		}
 	}
+	
+	@Test
+	public void testDaylightSavingTime() {
+		/* ================================================== */
+		// test for 29.03.2009 2:13
+		// should be moved to 3:13
+		Calendar cal = newCalendar();
+		cal.set(2009, 2, 29, 2, 13);
+		
+		/* ------------------------------------------------------- */
+		assertTrue("DST Offset was not unequal to 0 ", 0 != getDSTShiftHourOffset(cal.getTime()));
+		
+		/* ------------------------------------------------------- */
+		cal.set(2009, 3, 29, 2, 13);
+		assertTrue("DST offset was not 0 but " + getDSTShiftHourOffset(cal.getTime()), 0 == getDSTShiftHourOffset(cal.getTime()));
+		
+		/* ------------------------------------------------------- */
+		cal.set(2009, 9, 25, 2, 13);
+		assertTrue("DST offset was not unequal to 0 ", 0 != getDSTShiftHourOffset(cal.getTime()));
+		/* ================================================== */
+	}
+	
 
 	
 }

@@ -70,6 +70,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.38  2009/04/28 14:11:19  heine_
+ *          some dst fixes. Not yet finished but better than before...
+ *
  *          Revision 1.37  2008/10/30 10:42:52  heine_
  *          *** empty log message ***
  *
@@ -277,9 +280,14 @@ public abstract class CalendarView {
 	 */
 	protected DateInterval incDay(DateInterval day) throws Exception {
 		/* ================================================== */
-		return new DateInterval(new Date(
-				day.getStartDate().getTime() + 24 * 3600 * 1000), new Date(day
-				.getEndDate().getTime() + 24 * 3600 * 1000));
+//		DateInterval di = new DateInterval(new Date(
+//				day.getStartDate().getTime() + 24 * 3600 * 1000), new Date(day
+//				.getEndDate().getTime() + 24 * 3600 * 1000));
+		DateInterval di = new DateInterval(
+				DateUtil.move(day.getStartDate(), 1), DateUtil.move(day
+				.getEndDate(), 1));
+		
+		return di; 
 		/* ================================================== */
 	}
 
@@ -1550,6 +1558,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.38  2009/04/28 14:11:19  heine_
+	 * <br>some dst fixes. Not yet finished but better than before...
+	 * <br>
 	 * <br>Revision 1.37  2008/10/30 10:42:52  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1658,6 +1669,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.38  2009/04/28 14:11:19  heine_
+	 * <br>some dst fixes. Not yet finished but better than before...
+	 * <br>
 	 * <br>Revision 1.37  2008/10/30 10:42:52  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -1775,6 +1789,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.38  2009/04/28 14:11:19  heine_
+	 * <br>some dst fixes. Not yet finished but better than before...
+	 * <br>
 	 * <br>Revision 1.37  2008/10/30 10:42:52  heine_
 	 * <br>*** empty log message ***
 	 * <br>
@@ -2839,6 +2856,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.38  2009/04/28 14:11:19  heine_
+//	 * <br>some dst fixes. Not yet finished but better than before...
+//	 * <br>
 //	 * <br>Revision 1.37  2008/10/30 10:42:52  heine_
 //	 * <br>*** empty log message ***
 //	 * <br>
