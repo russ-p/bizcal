@@ -40,6 +40,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -47,7 +49,6 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -131,9 +132,12 @@ public class CalendarPanel extends JPanel implements MouseListener {
 	 *
 	 */
 	public CalendarPanel() {
-
+		
+		
+		TimeZone.setDefault(TimeZone.getTimeZone("Europe/Brussels"));
+		
 		// load translations
-//		Translatrix.loadSupportedLocales("lu.tudor.santec.bizcal.resources.supportedLocales");
+		Translatrix.loadSupportedLocales("lu.tudor.santec.bizcal.resources.supportedLocales");
 //		Translatrix.setLocale(Locale.US);
 //		Locale.setDefault(Translatrix.getLocale());
 		Translatrix.addBundle("lu.tudor.santec.bizcal.resources.Translatrix");
@@ -238,8 +242,7 @@ public class CalendarPanel extends JPanel implements MouseListener {
 				if ("calendar".equals(evt.getPropertyName())
 						|| "date".equals(evt.getPropertyName())) {
 					date = dayChooser.getDate();
-					for (Iterator iter = dateListeners.iterator(); iter
-							.hasNext();) {
+					for (Iterator iter = dateListeners.iterator(); iter.hasNext();) {
 						DateListener listener = (DateListener) iter.next();
 						listener.dateChanged(date);
 					}

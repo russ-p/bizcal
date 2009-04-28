@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.JFrame;
 
@@ -36,6 +37,7 @@ import lu.tudor.santec.bizcal.util.ObservableEventList;
 import lu.tudor.santec.bizcal.views.DayViewPanel;
 import lu.tudor.santec.bizcal.views.ListViewPanel;
 import lu.tudor.santec.bizcal.views.MonthViewPanel;
+import lu.tudor.santec.i18n.Translatrix;
 import bizcal.common.Event;
 import bizcal.swing.CalendarListener;
 import bizcal.swing.util.FrameArea;
@@ -49,6 +51,9 @@ import bizcal.util.DateInterval;
  *
  * @version
  * <br>$Log: CalendarDemo.java,v $
+ * <br>Revision 1.9  2009/04/28 14:11:26  heine_
+ * <br>*** empty log message ***
+ * <br>
  * <br>Revision 1.8  2008/06/19 12:20:00  heine_
  * <br>*** empty log message ***
  * <br>
@@ -86,8 +91,9 @@ public class CalendarDemo extends JFrame{
 	public CalendarDemo() {
 		/* ================================================== */
 		super("Calendar Demo");
-
+		
 		this.calendarPanel = new CalendarPanel();
+		
 		/* ------------------------------------------------------- */
 		// this is the "data base" for all events. All created events 
 		// will be stored in this list
@@ -225,6 +231,7 @@ public class CalendarDemo extends JFrame{
 //		SwingTracing.enableEventDispatcherThreadViolationTracing(false);
 //		SwingTracing.enableRepaintTracing("bizcal");
 		
+//		Translatrix.setLocale(new Locale("en_US"));
 		new CalendarDemo();
 	}
 	
@@ -389,6 +396,9 @@ public class CalendarDemo extends JFrame{
 	 *
 	 * @version
 	 * <br>$Log: CalendarDemo.java,v $
+	 * <br>Revision 1.9  2009/04/28 14:11:26  heine_
+	 * <br>*** empty log message ***
+	 * <br>
 	 * <br>Revision 1.8  2008/06/19 12:20:00  heine_
 	 * <br>*** empty log message ***
 	 * <br>

@@ -43,6 +43,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version
  * <br>$Log: DayViewConfig.java,v $
+ * <br>Revision 1.12  2009/04/28 14:10:47  heine_
+ * <br>*** empty log message ***
+ * <br>
  * <br>Revision 1.11  2008/06/12 13:04:18  heine_
  * <br>*** empty log message ***
  * <br>
@@ -91,7 +94,7 @@ public class DayViewConfig
 	/**
 	 * The default start time of the day view
 	 */
-	public  int DAY_START_DEFAULT = 7;
+	public  int DAY_START_DEFAULT = 0;
 	
 	/**
 	 * The default end time of the day view

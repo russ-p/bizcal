@@ -26,6 +26,9 @@
  *
  * @version
  * <br>$Log: EventModel.java,v $
+ * <br>Revision 1.5  2009/04/28 14:11:26  heine_
+ * <br>*** empty log message ***
+ * <br>
  * <br>Revision 1.4  2008/04/08 13:17:53  heine_
  * <br>*** empty log message ***
  * <br>
@@ -97,6 +100,9 @@ import bizcal.util.Tuple;
  *
  * @version <br>
  *          $Log: EventModel.java,v $
+ *          Revision 1.5  2009/04/28 14:11:26  heine_
+ *          *** empty log message ***
+ *
  *          Revision 1.4  2008/04/08 13:17:53  heine_
  *          *** empty log message ***
  *
@@ -149,7 +155,7 @@ public class EventModel extends CalendarModel.BaseImpl implements Observer {
 	public static final int TYPE_MONTH = 3;
 
 //	private DateFormat weekNumberFormat = new SimpleDateFormat("W. '" + Translatrix.getTranslationString("calendar.week")  + "'", Translatrix.getLocale());
-	private DateFormat weekNumberFormat = new SimpleDateFormat("'"+Translatrix.getTranslationString("calendar.week")  + "'", Translatrix.getLocale());
+	private DateFormat weekNumberFormat = new SimpleDateFormat("'"+Translatrix.getTranslationString("calendar.week")  + "' w", Translatrix.getLocale());
 	private DateFormat monthFormatter = new SimpleDateFormat("MMMMMM yyyy", Translatrix.getLocale());
 
 	private ObservableEventList events = null;
