@@ -43,6 +43,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version
  * <br>$Log: DayViewConfig.java,v $
+ * <br>Revision 1.13  2009/05/11 16:11:18  heine_
+ * <br>nicer time row labeling for different hour fragmentations.
+ * <br>
  * <br>Revision 1.12  2009/04/28 14:10:47  heine_
  * <br>*** empty log message ***
  * <br>
@@ -66,9 +69,19 @@ import bizcal.util.TimeOfDay;
  * <br>
  *   
  */
-public class DayViewConfig
-	extends CalendarViewConfig
-{
+public class DayViewConfig extends CalendarViewConfig {
+	
+	
+	
+	/**
+	 * Hour fregmentation. 60, 30, 20, 15, 10 minutes 
+	 */
+	public static final int FRAG_HOUR    = 1;
+	public static final int FRAG_HALF    = 2;
+	public static final int FRAG_THIRD   = 3;
+	public static final int FRAG_QUARTER = 4;
+	public static final int FRAG_SIXTHT  = 6;
+	
 //	private int dayCount = 1;
 	/**
 	 * Switched off -> nothing will be printed on top of a column!!!
@@ -89,7 +102,7 @@ public class DayViewConfig
 	/**
 	 * Timeslots per hour
 	 */
-	private int numberOfTimeSlots = 3;
+	private int numberOfTimeSlots = FRAG_SIXTHT;
 
 	/**
 	 * The default start time of the day view

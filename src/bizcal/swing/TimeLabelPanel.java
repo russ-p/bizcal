@@ -42,6 +42,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import bizcal.common.CalendarViewConfig;
+import bizcal.common.DayViewConfig;
 import bizcal.swing.util.GradientArea;
 import bizcal.util.TimeOfDay;
 
@@ -56,6 +57,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version
  * <br>$Log: TimeLabelPanel.java,v $
+ * <br>Revision 1.9  2009/05/11 16:11:18  heine_
+ * <br>nicer time row labeling for different hour fragmentations.
+ * <br>
  * <br>Revision 1.8  2009/02/02 12:38:21  heine_
  * <br>changed time ruler. The hour lables are now placed in the right position of the hour.
  * <br>
@@ -84,12 +88,14 @@ public class TimeLabelPanel
 	private TimeOfDay end;
 	private SimpleDateFormat hourFormat;
 	private Font hourFont;
+	private int timeslots;
 
-	public TimeLabelPanel(CalendarViewConfig config, TimeOfDay start, TimeOfDay end) throws Exception {
+	public TimeLabelPanel(CalendarViewConfig config, TimeOfDay start, TimeOfDay end, int timeslots) throws Exception {
 		/* ================================================== */
 		this.config = config;
 		this.start = start;
 		this.end = end;
+		this.timeslots = timeslots;
 		/* ------------------------------------------------------- */
 		panel = new JPanel();
 		panel.setLayout(new Layout());
@@ -147,17 +153,75 @@ public class TimeLabelPanel
 				/* ------------------------------------------------------- */
 				panel.add(line);
 				hourLines.add(line);
+				/* ------------------------------------------------------- */
+				// manages the display for different hour fragmentations
+				/* ------------------------------------------------------- */
+				switch (this.timeslots) {
+					case DayViewConfig.FRAG_HOUR: {
+									/* ------------------------------------------------------- */
+									// for hours, do nothing. we just need the hour labes
+									// that are already added to the panel above
+									/* ------------------------------------------------------- */
+									break;
+									/* ------------------------------------------------------- */
+
+					}
+					case DayViewConfig.FRAG_HALF: {
+						/* ------------------------------------------------------- */
+						// half hour fragmenation. we need one minute line and the "30"
+						// label
+						/* ------------------------------------------------------- */
+						createTimeLabel("30");
+						createMinuteLine();
+						break;
+						/* ------------------------------------------------------- */
+					}
+					case DayViewConfig.FRAG_THIRD: {
+						/* ------------------------------------------------------- */
+						// 20 min fragmentation. We need 2 lines and "20" + "40" labels
+						/* ------------------------------------------------------- */
+						createTimeLabel("20");
+						createTimeLabel("40");
+						createMinuteLine();
+						createMinuteLine();
+						break;
+						/* ------------------------------------------------------- */
+					}
+					case DayViewConfig.FRAG_QUARTER: {
+						/* ------------------------------------------------------- */
+						// 15 min fragmentation. We need 3 lines and the "30" label
+						/* ------------------------------------------------------- */
+						createTimeLabel("30");
+						createMinuteLine();
+						createMinuteLine();
+						createMinuteLine();
+						break;
+						/* ------------------------------------------------------- */
+					}
+					case DayViewConfig.FRAG_SIXTHT: {
+						/* ------------------------------------------------------- */
+						// 10 min fragmentation. We need 5 lines and the "20" + "40" labels
+						/* ------------------------------------------------------- */
+						createTimeLabel("20");
+						createTimeLabel("40");
+						createMinuteLine();
+						createMinuteLine();
+						createMinuteLine();
+						createMinuteLine();
+						createMinuteLine();
+						break;
+						/* ------------------------------------------------------- */
+					}
+				default:
+					break;
+				}
 				
 				
-				timeTxt = "30";
-				timeLabel = new JLabel(timeTxt);
-				timeLabel.setFont(font);
-				panel.add(timeLabel);
-				minuteLabels.add(timeLabel);
-				createMinuteLine();
-				createMinuteLine();
-				createMinuteLine();
-				createMinuteLine();
+//				createTimeLabel("30");
+//				createMinuteLine();
+//				createMinuteLine();
+//				createMinuteLine();
+//				createMinuteLine();
 				
 				pos += 3600 * 1000;
 	 			
@@ -212,6 +276,24 @@ public class TimeLabelPanel
 
 	
 	/**
+	 * Creates a label with a time text and adds it to the panel and
+	 * the minuteLabels list
+	 * 
+	 * @param time
+	 * @return the created label
+	 */
+	private JLabel createTimeLabel(String time) {
+		/* ====================================================== */
+		JLabel timeLabel = new JLabel(time);
+		timeLabel.setFont(font);
+		panel.add(timeLabel);
+		minuteLabels.add(timeLabel);
+		return timeLabel;
+		/* ====================================================== */
+	}
+
+
+	/**
 	 * Creates a new JLabel for a line and adds it to the panel
 	 */
 	private void createMinuteLine() {
@@ -232,10 +314,11 @@ public class TimeLabelPanel
 	 * @param start
 	 * @param end
 	 */
-	public void setStartEnd(TimeOfDay start, TimeOfDay end) {
+	public void setStartEnd(TimeOfDay start, TimeOfDay end, int timeslots) {
 		/* ================================================== */
 		this.start = start;
 		this.end = end;
+		this.timeslots = timeslots;
 		refresh();
 		/* ================================================== */
 	}
@@ -246,6 +329,10 @@ public class TimeLabelPanel
 	}
 
 	private class Layout implements LayoutManager {
+		
+		private int colWidth = width /2;
+		private double rowHeight = 0;
+		
 		public void addLayoutComponent(String name, Component comp) {
 		}
 
@@ -264,10 +351,10 @@ public class TimeLabelPanel
 			/* ================================================== */
 			try {
 			double totHeight = parent.getHeight() - footerHeight;
-			double rowHeight = totHeight / hourCount;
+			this.rowHeight = totHeight / hourCount;
 			double minuteRowHeight = rowHeight / 2;
-			int colWidth = width / 2;
-			int iMinute = 0;
+			this.colWidth = width / 2;
+			Integer iMinute = 0;
 			int iLine  = 0;
 			for (int i=0; i < hourLabels.size(); i++) {
 				/* ------------------------------------------------------- */
@@ -288,141 +375,166 @@ public class TimeLabelPanel
 						width,
 						1);
 				/* ------------------------------------------------------- */
-				// layout the 30 minute label
+				// layout according the timeslots
 				/* ------------------------------------------------------- */
-				JLabel minuteLabel = (JLabel) minuteLabels.get(iMinute);
-				minuteLabel.setBounds(colWidth - 15,
-						(int) (i*rowHeight),
-						colWidth,
-						(int) rowHeight);
-				iMinute++;
-				/* ------------------------------------------------------- */
-				// the minute line for the 30 min
-				/* ------------------------------------------------------- */
-				JLabel minuteLine = (JLabel) minuteLines.get(iLine);
-//				
-				minuteLine.setBounds(colWidth + 5,
-						(int) ((i*rowHeight) + (rowHeight / 2)),
-						colWidth,
-						1);
-				iLine++;
-				/* ------------------------------------------------------- */
-				// line for 15
-				/* ------------------------------------------------------- */
-				JLabel minuteLine2 = (JLabel) minuteLines.get(iLine);
-				
-				minuteLine2.setBounds(colWidth*2-8,
-						(int) (i*rowHeight + minuteRowHeight/2),
-						colWidth,
-						1);
-				
-				iLine++;
-				/* ------------------------------------------------------- */
-				// line for 45
-				/* ------------------------------------------------------- */
-				JLabel minuteLine3 = (JLabel) minuteLines.get(iLine);
-				
-				minuteLine3.setBounds(colWidth*2-8,
-						(int) (i*rowHeight + minuteRowHeight + minuteRowHeight/2),
-						colWidth,
-						1);
-				
-				iLine++;
+				switch (timeslots) {
+					case DayViewConfig.FRAG_HOUR:  {
+						/* ------------------------------------------------------- */
+						// hour, no line, no label
+						/* ------------------------------------------------------- */
+						break;
+						/* ------------------------------------------------------- */
+					}
+					case DayViewConfig.FRAG_HALF:  {
+						/* ------------------------------------------------------- */
+						// one line, 30 label
+						/* ------------------------------------------------------- */
+						// layout the 30 minute label
+						/* ------------------------------------------------------- */
+						iMinute = layoutMinuteLabel(i, iMinute);
+						/* ------------------------------------------------------- */
+						// the minute line for the 30 min
+						/* ------------------------------------------------------- */
+						iLine = layoutMinuteLine(i, iLine);
+						break;
+						/* ------------------------------------------------------- */
+					}
+					case DayViewConfig.FRAG_THIRD:  {
+						/* ------------------------------------------------------- */
+						// 2 lines, 20 and 40 label
+						/* ------------------------------------------------------- */
+						// layout the 20 minute label
+						/* ------------------------------------------------------- */
+						iMinute = layoutMinuteLabel(i, iMinute, (int) ((rowHeight/6)),(int) ((rowHeight/6) * 2));
+						// 40 minute label
+						iMinute = layoutMinuteLabel(i, iMinute, (int) ((rowHeight/6)*3),(int) ((rowHeight/6) * 2));
+						/* ------------------------------------------------------- */
+						// line layout
+						/* ------------------------------------------------------- */
+						iLine = layoutMinuteLine(i, iLine, (int) ((rowHeight/3)),   10);
+						iLine = layoutMinuteLine(i, iLine, (int) ((rowHeight/3)*2), 10);
+						break;
+						/* ------------------------------------------------------- */
+					}
+					case DayViewConfig.FRAG_QUARTER:  {
+						/* ------------------------------------------------------- */
+						// 3 lines, and "30" label
+						/* ------------------------------------------------------- */
+						// layout the 30 minute label
+						/* ------------------------------------------------------- */
+						iMinute = layoutMinuteLabel(i, iMinute);
+						/* ------------------------------------------------------- */
+						// line layout
+						/* ------------------------------------------------------- */
+						iLine = layoutMinuteLine(i, iLine, (int) ((rowHeight/4)),   10);
+						iLine = layoutMinuteLine(i, iLine);
+						iLine = layoutMinuteLine(i, iLine, (int) ((rowHeight/4)*3),   10);
+						break;
+						/* ------------------------------------------------------- */
+					}
+					case DayViewConfig.FRAG_SIXTHT:  {
+						/* ------------------------------------------------------- */
+						// 5 lines, and "20" + "40" label
+						/* ------------------------------------------------------- */
+						// layout the 20 minute label
+						/* ------------------------------------------------------- */
+						iMinute = layoutMinuteLabel(i, iMinute, (int) ((rowHeight/6)),(int) ((rowHeight/6) * 2));
+						// 40 minute label
+						iMinute = layoutMinuteLabel(i, iMinute, (int) ((rowHeight/6)*3),(int) ((rowHeight/6) * 2));
+						/* ------------------------------------------------------- */
+						// line layout
+						/* ------------------------------------------------------- */
+						iLine = layoutMinuteLine(i, iLine, (int) ((rowHeight/6)),       10);
+						iLine = layoutMinuteLine(i, iLine, (int) ((rowHeight/6) * 2),    5);
+						iLine = layoutMinuteLine(i, iLine, (int) ((rowHeight/6) * 3),   10);
+						iLine = layoutMinuteLine(i, iLine, (int) ((rowHeight/6) * 4),    5);
+						iLine = layoutMinuteLine(i, iLine, (int) ((rowHeight/6) * 5),   10);
+						break;
+						/* ------------------------------------------------------- */
+					}
+				default:
+					break;
+				}
 				/* ------------------------------------------------------- */
 			}
 			gradientArea.setBounds(0, 0, parent.getWidth(), parent.getHeight());
 		} catch (Exception e) {
 			e.printStackTrace();
-//			throw BizcalException.create(e);
 		}
-			
-			
-			
-//			try {
-//				double totHeight = parent.getHeight() - footerHeight;
-//				double rowHeight = totHeight / hourCount;
-//				double minuteRowHeight = rowHeight / 2;
-//				int colWidth = width / 2;
-//				int iMinute = 0;
-//				int iLine  = 0;
-//				for (int i=0; i < hourLabels.size(); i++) {
-//					/* ------------------------------------------------------- */
-//					// layout the hour labels
-//					/* ------------------------------------------------------- */
-//					JLabel hourLabel = (JLabel) hourLabels.get(i);
-//					hourLabel.setBounds(0,
-//							(int) (i*rowHeight),
-//							colWidth,
-//							(int) rowHeight);
-//					/* ------------------------------------------------------- */
-//					// layout the hour lines
-//					/* ------------------------------------------------------- */
-//					JLabel hourLine = (JLabel) hourLines.get(i);
-//					hourLine.setBounds(0,
-//							(int) ((i+1)*rowHeight),
-//							width,
-//							1);
-//					/* ------------------------------------------------------- */
-//					// layout the first minute label
-//					/* ------------------------------------------------------- */
-//					JLabel minuteLabel = (JLabel) minuteLabels.get(iMinute);
-//					minuteLabel.setBounds(colWidth,
-//							(int) (i*rowHeight),
-//							colWidth,
-//							(int) (minuteRowHeight));
-//					iMinute++;
-//					/* ------------------------------------------------------- */
-//					// the minute line for the 30 min
-//					/* ------------------------------------------------------- */
-//					JLabel minuteLine = (JLabel) minuteLines.get(iLine);
-////					
-//					minuteLine.setBounds(colWidth,
-//							(int) (i*rowHeight + minuteRowHeight),
-//							colWidth,
-//							1);
-//					iLine++;
-//					/* ------------------------------------------------------- */
-//					// line for 15
-//					/* ------------------------------------------------------- */
-//					JLabel minuteLine2 = (JLabel) minuteLines.get(iLine);
-//					
-//					minuteLine2.setBounds(colWidth*2-4,
-//							(int) (i*rowHeight + minuteRowHeight/2),
-//							colWidth,
-//							1);
-//					
-//					iLine++;
-//					/* ------------------------------------------------------- */
-//					// the minute label for 45 min
-//					/* ------------------------------------------------------- */
-//					minuteLabel = (JLabel) minuteLabels.get(iMinute);
-//					minuteLabel.setBounds(colWidth,
-//							(int) (i*rowHeight + minuteRowHeight),
-//							colWidth,
-//							(int) minuteRowHeight);
-//					iMinute++;
-//					/* ------------------------------------------------------- */
-//					// line for 45
-//					/* ------------------------------------------------------- */
-//					JLabel minuteLine3 = (JLabel) minuteLines.get(iLine);
-//					
-//					minuteLine3.setBounds(colWidth*2-4,
-//							(int) (i*rowHeight + minuteRowHeight + minuteRowHeight/2),
-//							colWidth,
-//							1);
-//					
-//					iLine++;
-//					/* ------------------------------------------------------- */
-//				}
-//				gradientArea.setBounds(0, 0, parent.getWidth(), parent.getHeight());
-//			} catch (Exception e) {
-//				e.printStackTrace();
-////				throw BizcalException.create(e);
-//			}
 			/* ================================================== */
 		}
+		
+		
+		/**
+		 * Layouts a minute label
+		 * 
+		 * @param hourPosition
+		 * @param minutePosition
+		 */
+		private int layoutMinuteLabel(int hourPosition, int minutePosition) {
+			/* ================================================== */
+			return layoutMinuteLabel(hourPosition, minutePosition, 0, (int) rowHeight);
+			/* ================================================== */
+		}
+		
+		/**
+		 * Layouts a minute label. yOffset defines the distance inside an hour for 
+		 * the position of the label. Start at the hour label.
+		 * 
+		 * @param hourPosition
+		 * @param minutePosition
+		 * @param yInside  startposition inside an hour
+		 */
+		private int layoutMinuteLabel(int hourPosition, int minutePosition, int yInside, int height) {
+			/* ================================================== */
+			JLabel minuteLabel = (JLabel) minuteLabels.get(minutePosition);
+			minuteLabel.setBounds(colWidth - 15,
+					(int) (hourPosition*rowHeight) + yInside,
+					colWidth,
+					(int) height);
+			minutePosition++;
+			return minutePosition;
+			/* ================================================== */
+		}
+		
+		/**
+		 * Layouts a minute line in the middle of an hour
+		 * 
+		 * @param hourPosition
+		 * @param linePostion
+		 */
+		private int layoutMinuteLine(int hourPosition, int linePostion) {
+			/* ================================================== */
+			return layoutMinuteLine(hourPosition, linePostion, (int) (rowHeight / 2), 5);
+			/* ================================================== */
+		}
+		
+		/**
+		 * Layouts a minute line
+		 * 
+		 * @param hourPosition
+		 * @param linePostion
+		 * @param yInside position inside an hour
+		 * @param length x ofset of the length of the line. The larger the value, the shorter the line
+		 * @return
+		 */
+		private int layoutMinuteLine(int hourPosition, int linePostion, int yInside, int length) {
+			/* ================================================== */
+			JLabel minuteLine = (JLabel) minuteLines.get(linePostion);
+			minuteLine.setBounds(colWidth + length,
+					(int) ((hourPosition*rowHeight) + yInside),
+					colWidth,
+					1);
+			linePostion++;
+			return linePostion;
+			/* ================================================== */
+		}
+		
 	}
-
+	
+	
+	
+	
 	public JComponent getComponent()
 	{
 		return panel;

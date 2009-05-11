@@ -161,7 +161,7 @@ public class DayView extends CalendarView {
 		/* ------------------------------------------------------- */
 		// set the time label at the left side
 		rowHeader = new TimeLabelPanel(desc, new TimeOfDay(this.config.getDayStartHour(), 0),
-				new TimeOfDay(this.config.getDayEndHour(), 0));
+				new TimeOfDay(this.config.getDayEndHour(), 0), this.config.getNumberOfTimeSlots());
 		/* ------------------------------------------------------- */
 		rowHeader.setFooterHeight(getFooterHeight());
 		scrollPane.setRowHeaderView(rowHeader.getComponent());
@@ -197,7 +197,7 @@ public class DayView extends CalendarView {
 		calPanel.removeAll();
 		calPanel.setBackground(Color.WHITE);
 		rowHeader.setStartEnd(new TimeOfDay(this.config.getDayStartHour(), 0),
-				new TimeOfDay(this.config.getDayEndHour(), 0));
+				new TimeOfDay(this.config.getDayEndHour(), 0), this.config.getNumberOfTimeSlots());
 		rowHeader.setFooterHeight(getFooterHeight());
 		rowHeader.getComponent().revalidate();
 
@@ -692,6 +692,9 @@ public class DayView extends CalendarView {
 	 *
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.40  2009/05/11 16:11:18  heine_
+	 *          nicer time row labeling for different hour fragmentations.
+	 *
 	 *          Revision 1.39  2009/04/28 14:11:19  heine_
 	 *          some dst fixes. Not yet finished but better than before...
 	 *
