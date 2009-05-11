@@ -54,6 +54,9 @@ import bizcal.util.Interval;
  *
  * @version
  * <br>$Log: DayViewPanel.java,v $
+ * <br>Revision 1.5  2009/05/11 16:45:44  heine_
+ * <br>added a listener for the zoom slider
+ * <br>
  * <br>Revision 1.4  2008/08/12 12:47:28  heine_
  * <br>fixed some bugs and made code improvements
  * <br>
@@ -357,7 +360,7 @@ public class DayViewPanel extends AbstractCalendarView {
 		/* ================================================== */
 	}
 
-	public void setZoomFactor(int zoom) {
+	public synchronized void setZoomFactor(int zoom) {
 		/* ================================================== */
 		DayView.PIXELS_PER_HOUR = zoom;
 		refresh();

@@ -40,7 +40,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -55,11 +54,13 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import lu.tudor.santec.bizcal.listeners.CalendarManagementListener;
 import lu.tudor.santec.bizcal.listeners.DateListener;
+import lu.tudor.santec.bizcal.listeners.IZoomSliderListener;
 import lu.tudor.santec.bizcal.listeners.NamedCalendarListener;
 import lu.tudor.santec.bizcal.views.DayViewPanel;
 import lu.tudor.santec.bizcal.views.ListViewPanel;
@@ -76,7 +77,7 @@ import bizcal.util.DateUtil;
 
 import com.toedter.calendar.JCalendar;
 
-public class CalendarPanel extends JPanel implements MouseListener {
+public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -126,6 +127,8 @@ public class CalendarPanel extends JPanel implements MouseListener {
 	private static Color headerColor = new Color(153,204,255);
 	
 	private ButtonGroup calendarButtonGroup = new ButtonGroup();
+
+	private Vector<IZoomSliderListener> zoomSliderListeners  = new Vector<IZoomSliderListener>();
 	
 
 	/**
@@ -288,18 +291,28 @@ public class CalendarPanel extends JPanel implements MouseListener {
 			public void stateChanged(ChangeEvent e) {
 				/* ====================================================== */
 				int pos = (((JSlider) (e.getSource())).getValue());
-				for (AbstractCalendarView acv : calendarViews.values()) {
-					/* ------------------------------------------------------- */
-					if (acv instanceof DayViewPanel) {
-						DayViewPanel dvp = (DayViewPanel) acv;
-						dvp.setZoomFactor(pos);
-					}
-					/* ------------------------------------------------------- */
-				}
+				
+//				SwingUtilities.invokeLater(new Runnable() {
+//					public void run() {
+						for (AbstractCalendarView acv : calendarViews.values()) {
+							/* ------------------------------------------------------- */
+							if (acv instanceof DayViewPanel) {
+								DayViewPanel dvp = (DayViewPanel) acv;
+								dvp.setZoomFactor(pos);
+							}
+							/* ------------------------------------------------------- */
+						}
+//					}
+//				});
+				
+				informZoomSliderListener(pos);
+				
 				/* ====================================================== */
 			}
 		});
-
+		
+		this.addZoomSliderListener(this);
+		
 		slider.addMouseWheelListener(new MouseWheelListener() {
 
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -438,6 +451,19 @@ public class CalendarPanel extends JPanel implements MouseListener {
 		this.calendarManagementListeners.remove(listener);
 		/* ================================================== */
 	}
+	
+	private synchronized void informZoomSliderListener(final int value) {
+		/* ================================================== */
+		Thread t = new Thread() {
+			public void run() {
+				for (IZoomSliderListener l : zoomSliderListeners)
+					l.zoomPositionchanged(value);
+			}
+		};
+		t.start();
+		/* ================================================== */
+	}
+	
 
 	/**
 	 * Remove a NamedCalendar.
@@ -463,7 +489,23 @@ public class CalendarPanel extends JPanel implements MouseListener {
 		}
 		/* ================================================== */
 	}
-
+	
+	
+	/**
+	 * @param listener
+	 */
+	public void addZoomSliderListener(IZoomSliderListener listener) {
+		/* ================================================== */
+		this.zoomSliderListeners.add(listener);
+		/* ================================================== */
+	}
+	
+	public void removeZoomSliderListener(IZoomSliderListener listener) {
+		/* ================================================== */
+		this.zoomSliderListeners.remove(listener);
+		/* ================================================== */
+	}
+	
 	/**
 	 * Add a calendar.
 	 *
@@ -1111,6 +1153,26 @@ public class CalendarPanel extends JPanel implements MouseListener {
 			/* ====================================================== */
 		}
 
+	}
+
+	public void zoomPositionchanged(int value) {
+		/* ====================================================== */
+//		for (AbstractCalendarView acv : calendarViews.values()) {
+//			/* ------------------------------------------------------- */
+//			if (acv instanceof DayViewPanel) {
+//				DayViewPanel dvp = (DayViewPanel) acv;
+//				dvp.setZoomFactor(value);
+//			}
+//			/* ------------------------------------------------------- */
+//		}
+		/* ====================================================== */
+	}
+
+	public void setZoomPosition(Integer value) {
+		/* ====================================================== */
+		if (value != null)
+			this.slider.setValue(value);
+		/* ====================================================== */
 	}
 
 
