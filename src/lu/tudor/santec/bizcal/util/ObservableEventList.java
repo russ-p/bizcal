@@ -26,6 +26,9 @@
  *
  * @version
  * <br>$Log: ObservableEventList.java,v $
+ * <br>Revision 1.4  2009/05/12 11:45:29  heine_
+ * <br>*** empty log message ***
+ * <br>
  * <br>Revision 1.3  2008/08/12 12:47:28  heine_
  * <br>fixed some bugs and made code improvements
  * <br>
@@ -67,6 +70,9 @@ import bizcal.common.Event;
  *
  * @version
  * <br>$Log: ObservableEventList.java,v $
+ * <br>Revision 1.4  2009/05/12 11:45:29  heine_
+ * <br>*** empty log message ***
+ * <br>
  * <br>Revision 1.3  2008/08/12 12:47:28  heine_
  * <br>fixed some bugs and made code improvements
  * <br>
@@ -123,8 +129,10 @@ public class ObservableEventList extends Observable implements List<Event> {
 	public synchronized boolean addAll(Collection<? extends Event> c) {
 		/* ====================================================== */
 		boolean b =  list.addAll(c);
-		setChanged();
-		notifyObservers();
+		if (notifyEnabled) {
+			setChanged();
+			notifyObservers();
+		}
 
 		return b;
 		/* ====================================================== */
@@ -142,9 +150,11 @@ public class ObservableEventList extends Observable implements List<Event> {
 
 	public synchronized void clear() {
 		/* ====================================================== */
-		setChanged();
 		list.clear();
-		notifyObservers();
+		if (notifyEnabled) {
+			setChanged();
+			notifyObservers();
+		}
 		/* ====================================================== */
 	}
 

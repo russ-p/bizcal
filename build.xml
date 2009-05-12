@@ -1,10 +1,10 @@
-<project name="bizcal" basedir=".">
+ <project name="bizcal" basedir=".">
 
 
 
   <property environment="env" />
 
-  <property name="version" value="0.0.5"/>
+  <property name="version" value="0.0.6"/>
 
 
 
