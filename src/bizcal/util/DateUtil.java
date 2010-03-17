@@ -25,8 +25,6 @@
  *******************************************************************************/
 package bizcal.util;
 
-import static org.junit.Assert.assertTrue;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,8 +34,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import org.junit.Test;
 
 /**
  * @author Fredrik Bertilsson
@@ -995,26 +991,26 @@ public class DateUtil
 		}
 	}
 	
-	@Test
-	public void testDaylightSavingTime() {
-		/* ================================================== */
-		// test for 29.03.2009 2:13
-		// should be moved to 3:13
-		Calendar cal = newCalendar();
-		cal.set(2009, 2, 29, 2, 13);
-		
-		/* ------------------------------------------------------- */
-		assertTrue("DST Offset was not unequal to 0 ", 0 != getDSTShiftHourOffset(cal.getTime()));
-		
-		/* ------------------------------------------------------- */
-		cal.set(2009, 3, 29, 2, 13);
-		assertTrue("DST offset was not 0 but " + getDSTShiftHourOffset(cal.getTime()), 0 == getDSTShiftHourOffset(cal.getTime()));
-		
-		/* ------------------------------------------------------- */
-		cal.set(2009, 9, 25, 2, 13);
-		assertTrue("DST offset was not unequal to 0 ", 0 != getDSTShiftHourOffset(cal.getTime()));
-		/* ================================================== */
-	}
+//	@Test
+//	public void testDaylightSavingTime() {
+//		/* ================================================== */
+//		// test for 29.03.2009 2:13
+//		// should be moved to 3:13
+//		Calendar cal = newCalendar();
+//		cal.set(2009, 2, 29, 2, 13);
+//		
+//		/* ------------------------------------------------------- */
+//		assertTrue("DST Offset was not unequal to 0 ", 0 != getDSTShiftHourOffset(cal.getTime()));
+//		
+//		/* ------------------------------------------------------- */
+//		cal.set(2009, 3, 29, 2, 13);
+//		assertTrue("DST offset was not 0 but " + getDSTShiftHourOffset(cal.getTime()), 0 == getDSTShiftHourOffset(cal.getTime()));
+//		
+//		/* ------------------------------------------------------- */
+//		cal.set(2009, 9, 25, 2, 13);
+//		assertTrue("DST offset was not unequal to 0 ", 0 != getDSTShiftHourOffset(cal.getTime()));
+//		/* ================================================== */
+//	}
 	
 
 	
