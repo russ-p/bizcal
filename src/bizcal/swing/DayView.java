@@ -570,7 +570,7 @@ public class DayView extends CalendarView {
 		while (foundDate == null) {
 			/* ------------------------------------------------------- */
 			foundDate = minuteMapping.get(yPos);
-			System.out.println("Found Date " + foundDate);
+//			System.out.println("Found Date " + foundDate);
 			yPos++;
 			if (yPos < 0 )
 				break;
@@ -692,6 +692,9 @@ public class DayView extends CalendarView {
 	 *
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.41  2010/03/17 15:12:30  hermenj
+	 *          removed sysout
+	 *
 	 *          Revision 1.40  2009/05/11 16:11:18  heine_
 	 *          nicer time row labeling for different hour fragmentations.
 	 *
