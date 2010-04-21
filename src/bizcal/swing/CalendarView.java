@@ -70,6 +70,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.39  2010/04/21 08:28:28  hermenj
+ *          fixed annoying bug when trying to show popup in some cases
+ *
  *          Revision 1.38  2009/04/28 14:11:19  heine_
  *          some dst fixes. Not yet finished but better than before...
  *
@@ -381,8 +384,12 @@ public abstract class CalendarView {
 			throws Exception {
 		if (popupMenuCallback == null)
 			return;
-		JPopupMenu popup = popupMenuCallback.getEventPopupMenu(calId, event);
-		popup.show(e.getComponent(), e.getX(), e.getY());
+		try {
+		    JPopupMenu popup = popupMenuCallback.getEventPopupMenu(calId, event);
+		    popup.show(e.getComponent(), e.getX(), e.getY());		    
+		} catch (Exception e2) {
+		    e2.printStackTrace();
+		}
 	}
 
 	protected void showEmptyPopup(MouseEvent e, Object calId) throws Exception {
@@ -1558,6 +1565,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.39  2010/04/21 08:28:28  hermenj
+	 * <br>fixed annoying bug when trying to show popup in some cases
+	 * <br>
 	 * <br>Revision 1.38  2009/04/28 14:11:19  heine_
 	 * <br>some dst fixes. Not yet finished but better than before...
 	 * <br>
@@ -1669,6 +1679,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.39  2010/04/21 08:28:28  hermenj
+	 * <br>fixed annoying bug when trying to show popup in some cases
+	 * <br>
 	 * <br>Revision 1.38  2009/04/28 14:11:19  heine_
 	 * <br>some dst fixes. Not yet finished but better than before...
 	 * <br>
@@ -1789,6 +1802,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.39  2010/04/21 08:28:28  hermenj
+	 * <br>fixed annoying bug when trying to show popup in some cases
+	 * <br>
 	 * <br>Revision 1.38  2009/04/28 14:11:19  heine_
 	 * <br>some dst fixes. Not yet finished but better than before...
 	 * <br>
@@ -2856,6 +2872,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.39  2010/04/21 08:28:28  hermenj
+//	 * <br>fixed annoying bug when trying to show popup in some cases
+//	 * <br>
 //	 * <br>Revision 1.38  2009/04/28 14:11:19  heine_
 //	 * <br>some dst fixes. Not yet finished but better than before...
 //	 * <br>
