@@ -4,7 +4,8 @@
  *  
  * Contributor(s):
  * Johannes Hermen  johannes.hermen(at)tudor.lu                            
- * Martin Heinemann martin.heinemann(at)tudor.lu  
+ * Martin Heinemann martin.heinemann(at)tudor.lu
+ * Thorsten Roth thorsten.roth(at)tudor.lu  
  *  
  * This library is free software; you can redistribute it and/or modify it  
  * under the terms of the GNU Lesser General Public License (version 2.1)
@@ -42,7 +43,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.Vector;
-
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -54,7 +54,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -77,6 +76,15 @@ import bizcal.util.DateUtil;
 
 import com.toedter.calendar.JCalendar;
 
+/**
+ * @author martin.heinemann@tudor.lu
+ *
+ * @version
+ * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.11  2011/02/11 07:22:07  thorstenroth
+ * <br>Add a new view to the calendar the 'Three Day View' which shows three days per interval.
+ * <br>
+ */
 public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderListener {
 
 	private static final long serialVersionUID = 1L;
@@ -124,7 +132,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 
 	private NamedCalendar lastShowingCalendarBeforeShowAll = null;
 
-	private static Color headerColor = new Color(153,204,255);
+	private static Color headerColor =  new Color(153,204,255);
 	
 	private ButtonGroup calendarButtonGroup = new ButtonGroup();
 
@@ -176,7 +184,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 		
 		// create the view buttons
 		this.viewsButtonPanel = new ButtonPanel(Translatrix
-				.getTranslationString("bizcal.views"), headerColor, 4,
+				.getTranslationString("bizcal.views"), headerColor, 5,
 				new Vector<AbstractButton>());
 		this.naviBar.addButtonPanel(this.viewsButtonPanel, NaviBar.TOP);
 		/* ------------------------------------------------------- */
@@ -635,7 +643,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 		stepDate(false);
 		/* ================================================== */
 	}
-
+	
 	/**
 	 * @param forward
 	 */
@@ -656,7 +664,11 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 				} else
 					if (DayViewPanel.VIEW_NAME_WEEK.equals(currentName)) {
 						step = 7;
-					} else if (ListViewPanel.VIEW_NAME.equals(currentName)) {
+					} else 
+						if (DayViewPanel.VIEW_NAME_THREE_DAY.equals(currentName)) {
+							step = 3;
+						}else
+						if (ListViewPanel.VIEW_NAME.equals(currentName)) {
 						try {
 							ListViewPanel listView = (ListViewPanel) calendarViews.get(ListViewPanel.VIEW_NAME);
 							step = listView.listView.getShowDays();

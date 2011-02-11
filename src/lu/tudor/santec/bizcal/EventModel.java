@@ -4,7 +4,8 @@
  *  
  * Contributor(s):
  * Johannes Hermen  johannes.hermen(at)tudor.lu                            
- * Martin Heinemann martin.heinemann(at)tudor.lu  
+ * Martin Heinemann martin.heinemann(at)tudor.lu
+ * Thorsten Roth thorsten.roth(at)tudor.lu  
  *  
  * This library is free software; you can redistribute it and/or modify it  
  * under the terms of the GNU Lesser General Public License (version 2.1)
@@ -26,6 +27,9 @@
  *
  * @version
  * <br>$Log: EventModel.java,v $
+ * <br>Revision 1.6  2011/02/11 07:22:07  thorstenroth
+ * <br>Add a new view to the calendar the 'Three Day View' which shows three days per interval.
+ * <br>
  * <br>Revision 1.5  2009/04/28 14:11:26  heine_
  * <br>*** empty log message ***
  * <br>
@@ -100,6 +104,9 @@ import bizcal.util.Tuple;
  *
  * @version <br>
  *          $Log: EventModel.java,v $
+ *          Revision 1.6  2011/02/11 07:22:07  thorstenroth
+ *          Add a new view to the calendar the 'Three Day View' which shows three days per interval.
+ *
  *          Revision 1.5  2009/04/28 14:11:26  heine_
  *          *** empty log message ***
  *
@@ -150,9 +157,10 @@ import bizcal.util.Tuple;
 public class EventModel extends CalendarModel.BaseImpl implements Observer {
 
 
-	public static final int TYPE_DAY   = 1;
-	public static final int TYPE_WEEK  = 2;
-	public static final int TYPE_MONTH = 3;
+	public static final int TYPE_DAY   		= 1;
+	public static final int TYPE_WEEK  		= 2;
+	public static final int TYPE_MONTH		= 3;
+	public static final int TYPE_THREE_DAY 	= 4;
 
 //	private DateFormat weekNumberFormat = new SimpleDateFormat("W. '" + Translatrix.getTranslationString("calendar.week")  + "'", Translatrix.getLocale());
 	private DateFormat weekNumberFormat = new SimpleDateFormat("'"+Translatrix.getTranslationString("calendar.week")  + "' w", Translatrix.getLocale());
@@ -258,11 +266,10 @@ public class EventModel extends CalendarModel.BaseImpl implements Observer {
 		
 		this.days = DateUtil.getDiffDay(weekStart, weekEnd);
 		
-		setDate(DateUtil.getStartOfWeek(new Date()));
+		setDate(new Date());
 		/* ================================================== */
 	}
 	
-
 	public void setDate(Date date) {
 		try {
 			// Date start = (Date)date.clone();
@@ -290,6 +297,12 @@ public class EventModel extends CalendarModel.BaseImpl implements Observer {
 					end = DateUtil.getDiffDay(start, 31);
 					cal.setSummary(Translatrix.getTranslationString("bizcal.MONTH_VIEW") + " - " + monthFormatter.format(start));
 					break;
+				// Three Day View
+				case TYPE_THREE_DAY:
+					start = DateUtil.round2Day(date);
+					end = DateUtil.getDiffDay(start, days);
+					cal.setSummary(Translatrix.getTranslationString("bizcal.THREE_DAY_VIEW") +" - " + weekNumberFormat.format(start));
+					break;	
 				default:
 					break;
 			}

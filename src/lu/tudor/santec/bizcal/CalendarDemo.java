@@ -4,7 +4,8 @@
  *  
  * Contributor(s):
  * Johannes Hermen  johannes.hermen(at)tudor.lu                            
- * Martin Heinemann martin.heinemann(at)tudor.lu  
+ * Martin Heinemann martin.heinemann(at)tudor.lu
+ * Thorsten Roth thorsten.roth(at)tudor.lu  
  *  
  * This library is free software; you can redistribute it and/or modify it  
  * under the terms of the GNU Lesser General Public License (version 2.1)
@@ -28,7 +29,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import javax.swing.JFrame;
 
@@ -37,7 +37,6 @@ import lu.tudor.santec.bizcal.util.ObservableEventList;
 import lu.tudor.santec.bizcal.views.DayViewPanel;
 import lu.tudor.santec.bizcal.views.ListViewPanel;
 import lu.tudor.santec.bizcal.views.MonthViewPanel;
-import lu.tudor.santec.i18n.Translatrix;
 import bizcal.common.Event;
 import bizcal.swing.CalendarListener;
 import bizcal.swing.util.FrameArea;
@@ -51,6 +50,9 @@ import bizcal.util.DateInterval;
  *
  * @version
  * <br>$Log: CalendarDemo.java,v $
+ * <br>Revision 1.10  2011/02/11 07:22:07  thorstenroth
+ * <br>Add a new view to the calendar the 'Three Day View' which shows three days per interval.
+ * <br>
  * <br>Revision 1.9  2009/04/28 14:11:26  heine_
  * <br>*** empty log message ***
  * <br>
@@ -88,6 +90,8 @@ public class CalendarDemo extends JFrame{
 
 	private CalendarPanel calendarPanel;
 
+	private DayViewPanel dayThreeViewPanel;
+
 	public CalendarDemo() {
 		/* ================================================== */
 		super("Calendar Demo");
@@ -107,11 +111,13 @@ public class CalendarDemo extends JFrame{
 		EventModel weekModel  = new EventModel(eventDataList, EventModel.TYPE_WEEK);
 		EventModel monthModel = new EventModel(eventDataList, EventModel.TYPE_MONTH);
 		EventModel listModel  = new EventModel(eventDataList, EventModel.TYPE_MONTH);
+		EventModel dayThreeModel  = new EventModel(eventDataList, EventModel.TYPE_THREE_DAY);
 		
 		/* ------------------------------------------------------- */
 		// create the panels for each kind of view
 		/* ------------------------------------------------------- */
 		this.dayViewPanel 	= new DayViewPanel(  dayModel);
+		this.dayThreeViewPanel 	= new DayViewPanel(  dayThreeModel);
 		this.weekViewPanel 	= new DayViewPanel(  weekModel);
 		this.monthViewPanel = new MonthViewPanel(monthModel);
 		this.listViewPanel 	= new ListViewPanel( listModel);
@@ -127,6 +133,7 @@ public class CalendarDemo extends JFrame{
 		// you can create different listeners for each view, if you like to.
 		/* ------------------------------------------------------- */
 		dayViewPanel.addCalendarListener(  calListener);
+		dayThreeViewPanel.addCalendarListener(  calListener);
 		weekViewPanel.addCalendarListener( calListener);
 		monthViewPanel.addCalendarListener(calListener);
 		listViewPanel.addCalendarListener( calListener);
@@ -135,6 +142,7 @@ public class CalendarDemo extends JFrame{
 		// now we add all views to the base panel
 		/* ------------------------------------------------------- */
 		calendarPanel.addCalendarView(dayViewPanel);
+		calendarPanel.addCalendarView(dayThreeViewPanel);
 		calendarPanel.addCalendarView(weekViewPanel);
 		calendarPanel.addCalendarView(monthViewPanel);
 		calendarPanel.addCalendarView(listViewPanel);
@@ -396,6 +404,9 @@ public class CalendarDemo extends JFrame{
 	 *
 	 * @version
 	 * <br>$Log: CalendarDemo.java,v $
+	 * <br>Revision 1.10  2011/02/11 07:22:07  thorstenroth
+	 * <br>Add a new view to the calendar the 'Three Day View' which shows three days per interval.
+	 * <br>
 	 * <br>Revision 1.9  2009/04/28 14:11:26  heine_
 	 * <br>*** empty log message ***
 	 * <br>

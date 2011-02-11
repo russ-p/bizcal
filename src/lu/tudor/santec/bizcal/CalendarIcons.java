@@ -4,7 +4,8 @@
  *  
  * Contributor(s):
  * Johannes Hermen  johannes.hermen(at)tudor.lu                            
- * Martin Heinemann martin.heinemann(at)tudor.lu  
+ * Martin Heinemann martin.heinemann(at)tudor.lu
+ * Thorsten Roth thorsten.roth(at)tudor.lu  
  *  
  * This library is free software; you can redistribute it and/or modify it  
  * under the terms of the GNU Lesser General Public License (version 2.1)
@@ -26,6 +27,15 @@ import java.net.URL;
 
 import javax.swing.ImageIcon;
 
+/**
+ * @author martin.heinemann@tudor.lu
+ *
+ * @version
+ * <br>$Log: CalendarIcons.java,v $
+ * <br>Revision 1.3  2011/02/11 07:22:07  thorstenroth
+ * <br>Add a new view to the calendar the 'Three Day View' which shows three days per interval.
+ * <br>
+ */
 public class CalendarIcons {
 
 //	***************************************************************************
@@ -41,12 +51,13 @@ public class CalendarIcons {
 		protected static final int MINIPIX = 12;
 
 		public static String AGENDA 				= "agendamodule.png";
-		public static final String DAYVIEW 				= "cal_day.png";
-		public static final String WEEKVIEW 				= "cal_week.png";
-		public static final String MONTHVIEW 				= "cal_month.png";
-		public static final String LISTVIEW 				= "cal_list.png";
+		public static final String DAYVIEW 			= "cal_day.png";
+		public static final String THREEDAYVIEW 	= "cal_three_day.png";
+		public static final String WEEKVIEW 		= "cal_week.png";
+		public static final String MONTHVIEW 		= "cal_month.png";
+		public static final String LISTVIEW 		= "cal_list.png";
 
-		public static final String TODAY 					= "today.png";
+		public static final String TODAY 			= "today.png";
 
 
 		// day views
@@ -59,8 +70,8 @@ public class CalendarIcons {
 		public static String EDIT 					= "edit.png";
 		public static String DELETE 				= "close.png";
 
-		public static String COPY 			= "copy.png";
-		public static String PASTE			= "paste.png";
+		public static String COPY 					= "copy.png";
+		public static String PASTE					= "paste.png";
 
 //	---------------------------------------------------------------------------
 

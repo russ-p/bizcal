@@ -4,7 +4,8 @@
  *  
  * Contributor(s):
  * Johannes Hermen  johannes.hermen(at)tudor.lu                            
- * Martin Heinemann martin.heinemann(at)tudor.lu  
+ * Martin Heinemann martin.heinemann(at)tudor.lu
+ * Thorsten Roth thorsten.roth(at)tudor.lu  
  *  
  * This library is free software; you can redistribute it and/or modify it  
  * under the terms of the GNU Lesser General Public License (version 2.1)
@@ -25,8 +26,10 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -54,6 +57,9 @@ import bizcal.util.Interval;
  *
  * @version
  * <br>$Log: DayViewPanel.java,v $
+ * <br>Revision 1.6  2011/02/11 07:22:07  thorstenroth
+ * <br>Add a new view to the calendar the 'Three Day View' which shows three days per interval.
+ * <br>
  * <br>Revision 1.5  2009/05/11 16:45:44  heine_
  * <br>added a listener for the zoom slider
  * <br>
@@ -81,6 +87,7 @@ public class DayViewPanel extends AbstractCalendarView {
 	private DayView dayView;
 	public static final String VIEW_NAME_DAY = "DAY_VIEW";
 	public static final String VIEW_NAME_WEEK = "WEEK_VIEW";
+	public static final String VIEW_NAME_THREE_DAY = "DAY_THREE_VIEW";
 	public String VIEW_NAME;
 	private JButton switcherButton;
 
@@ -125,8 +132,9 @@ public class DayViewPanel extends AbstractCalendarView {
 			this.button = new JToggleButton(
 					CalendarIcons.getMediumIcon(CalendarIcons.DAYVIEW));
 			this.button.setToolTipText(Translatrix.getTranslationString("bizcal.DAY_VIEW"));
+			model.setDate(new Date());
 			/* ------------------------------------------------------- */
-		} else {
+		}else if (dayModel.getType() == EventModel.TYPE_WEEK){
 			/* ------------------------------------------------------- */
 			VIEW_NAME = VIEW_NAME_WEEK;
 			this.button = new JToggleButton(
@@ -136,9 +144,21 @@ public class DayViewPanel extends AbstractCalendarView {
 			// set the weekday start/stop to the model
 			this.dayModel.setWeekdayStartEnd(dayViewConfig.getWeekStart(), dayViewConfig.getWeekEnd());
 			/* ------------------------------------------------------- */
+		}else if (dayModel.getType() == EventModel.TYPE_THREE_DAY){
+			/* ------------------------------------------------------- */
+			VIEW_NAME = VIEW_NAME_THREE_DAY;
+			this.button = new JToggleButton(
+				CalendarIcons.getMediumIcon(CalendarIcons.THREEDAYVIEW));
+			this.button.setToolTipText(Translatrix.getTranslationString("bizcal.THREE_DAY_VIEW"));
+		
+			// set the weekday start/stop to the model
+			Calendar c = new GregorianCalendar();
+			int start = c.get(Calendar.DAY_OF_WEEK);
+			c.add(Calendar.DAY_OF_WEEK, 2);
+			int end = c.get(Calendar.DAY_OF_WEEK);
+			this.dayModel.setWeekdayStartEnd(start, end);
+			/* ------------------------------------------------------- */
 		}
-
-
 		try {
 			/* ------------------------------------------------------- */
 			
