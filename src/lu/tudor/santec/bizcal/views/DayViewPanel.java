@@ -42,11 +42,13 @@ import lu.tudor.santec.bizcal.EventModel;
 import lu.tudor.santec.bizcal.NamedCalendar;
 import lu.tudor.santec.bizcal.print.PrintUtilities;
 import lu.tudor.santec.i18n.Translatrix;
+
 import bizcal.common.DayViewConfig;
 import bizcal.common.Event;
 import bizcal.swing.CalendarListener;
 import bizcal.swing.CalendarView;
 import bizcal.swing.DayView;
+import bizcal.swing.DayView.Layout;
 import bizcal.util.Interval;
 
 /**
@@ -57,6 +59,11 @@ import bizcal.util.Interval;
  *
  * @version
  * <br>$Log: DayViewPanel.java,v $
+ * <br>Revision 1.7  2011/02/22 14:59:32  thorstenroth
+ * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
+ * <br>
+ * <br>2. Add a new horizontal line to the day view to represent the current time.
+ * <br>
  * <br>Revision 1.6  2011/02/11 07:22:07  thorstenroth
  * <br>Add a new view to the calendar the 'Three Day View' which shows three days per interval.
  * <br>
@@ -75,7 +82,6 @@ public class DayViewPanel extends AbstractCalendarView {
 
 	private static final long serialVersionUID = 1L;
 
-
 	private final static int STATE_FULL 		= 1;
 	private final static int STATE_MORNING 		= 2;
 	private final static int STATE_AFTERNOON 	= 3;
@@ -83,41 +89,53 @@ public class DayViewPanel extends AbstractCalendarView {
 	private int state = STATE_FULL;
 
 	private JToggleButton button;
+	
 	private EventModel dayModel;
+	
 	private DayView dayView;
-	public static final String VIEW_NAME_DAY = "DAY_VIEW";
-	public static final String VIEW_NAME_WEEK = "WEEK_VIEW";
-	public static final String VIEW_NAME_THREE_DAY = "DAY_THREE_VIEW";
+	
+	public static final String VIEW_NAME_DAY 		= "DAY_VIEW";
+	public static final String VIEW_NAME_WEEK 		= "WEEK_VIEW";
+	public static final String VIEW_NAME_THREE_DAY	= "DAY_THREE_VIEW";
+	
 	public String VIEW_NAME;
+	
 	private JButton switcherButton;
-
 
 	private ImageIcon fullDayIcon;
 
-
 	private ImageIcon morningDayIcon;
-
 
 	private ImageIcon afternoonDayIcon;
 
-
 	private DayViewConfig dayViewConfig;
+
 
 	/**
 	 * @param model
 	 */
 	public DayViewPanel(EventModel model) {
 		/* ================================================== */
-		this(model, new DayViewConfig());
+		this(model, new DayViewConfig(), Layout.DAY_COLUMN_NORMAL);
 		/* ================================================== */
 	}
-
-
+	
 	/**
 	 * @param model
 	 * @param config
 	 */
-	public DayViewPanel(EventModel model, DayViewConfig config) {
+	public DayViewPanel(EventModel model, DayViewConfig config)
+	{
+		this(model, config, Layout.DAY_COLUMN_NORMAL);
+	}
+	
+	public DayViewPanel(EventModel model, Integer layoutMode) {
+		/* ================================================== */
+		this(model, new DayViewConfig(), layoutMode);
+		/* ================================================== */
+	}
+
+	public DayViewPanel(EventModel model, DayViewConfig config, Integer layoutMode) {
 		/* ================================================== */
 
 		this.dayModel = model;
@@ -154,7 +172,7 @@ public class DayViewPanel extends AbstractCalendarView {
 			// set the weekday start/stop to the model
 			Calendar c = new GregorianCalendar();
 			int start = c.get(Calendar.DAY_OF_WEEK);
-			c.add(Calendar.DAY_OF_WEEK, 2);
+			c.add(Calendar.DAY_OF_WEEK, 2); // set the week + 2 day
 			int end = c.get(Calendar.DAY_OF_WEEK);
 			this.dayModel.setWeekdayStartEnd(start, end);
 			/* ------------------------------------------------------- */
@@ -164,7 +182,7 @@ public class DayViewPanel extends AbstractCalendarView {
 			
 			initDayViewSwitcherButton();
 
-			dayView = new DayView(this.dayViewConfig, this.switcherButton);
+			dayView = new DayView(this.dayViewConfig, this.switcherButton, layoutMode);
 			dayView.setModel(dayModel);
 			dayModel.addCalendarView(dayView);
 
@@ -191,6 +209,7 @@ public class DayViewPanel extends AbstractCalendarView {
 			// set the weekday start/stop to the model
 			this.dayModel.setWeekdayStartEnd(dayViewConfig.getWeekStart(), dayViewConfig.getWeekEnd());
 			/* ------------------------------------------------------- */
+			//TODO damit in der drei tages ansicht die wochenende aus geblendet werden oder ???
 		}
 		
 		try {
@@ -213,7 +232,6 @@ public class DayViewPanel extends AbstractCalendarView {
 			this.dayView.resetHorizontalLines();
 			this.dayView.refresh();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		/* ================================================== */
@@ -343,18 +361,22 @@ public class DayViewPanel extends AbstractCalendarView {
 
 	public void activeCalendarsChanged(Collection<NamedCalendar> calendars) {
 		/* ====================================================== */
-		// TODO Auto-generated method stub
+		// TODO activeCalendars
+		dayView.setActiveCalendars(calendars);
+		//System.out.println("*** aktive Calendars change");
 		/* ====================================================== */
 	}
 
 	public void selectedCalendarChanged(NamedCalendar selectedCalendar) {
 		/* ====================================================== */
-		// TODO Auto-generated method stub
+		// TODO selectedCalendars
+		//dayView.setSelectedCalendar(selectedCalendar);
+		//System.out.println("*** selected Calendar change");
 		/* ====================================================== */
 	}
 
 	@Override
-	public List getEvents() {
+	public List<Event> getEvents() {
 		/* ================================================== */
 		try {
 			Interval interval = this.dayModel.getInterval();
@@ -428,7 +450,4 @@ public class DayViewPanel extends AbstractCalendarView {
 		return this.dayView;
 		/* ====================================================== */
 	}
-
-
-
 }

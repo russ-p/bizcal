@@ -70,6 +70,11 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.40  2011/02/22 14:59:32  thorstenroth
+ *          1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
+ *
+ *          2. Add a new horizontal line to the day view to represent the current time.
+ *
  *          Revision 1.39  2010/04/21 08:28:28  hermenj
  *          fixed annoying bug when trying to show popup in some cases
  *
@@ -372,9 +377,10 @@ public abstract class CalendarView {
 		try {
 			area.setLineDistance((Integer) event.get(Event.LINE_DISTANCE));
 		} catch (Exception e) {
-//			e.printStackTrace();
+			e.printStackTrace();
 		}
 		/* ------------------------------------------------------- */
+		//System.out.println("area select ?: "+ isSelected(event));
 		area.setSelected(isSelected(event));
 		register(calId, event, area);
 		return area;
@@ -710,7 +716,7 @@ public abstract class CalendarView {
 			}
 			/* ================================================== */
 		}
-
+		//TODO FIX ME in this mouse action there are sometimes null pointer exceptions
 		public void mouseEntered(MouseEvent e) {
 			/* ================================================== */
 			FrameArea baseFrameArea = getBaseArea();
@@ -962,6 +968,8 @@ public abstract class CalendarView {
 		/**
 		 * 
 		 */
+		//TODO new Dragging ???
+		//das größer ziehen eines Termins ist nur deshalb so hackelig weil der Mousezeiger zum größer ziehen schon dargestellt wird obwohl nicht mehr größer gezogen werden kann.
 		private void moveDrag(FrameArea baseFrameArea, MouseEvent e) {
 			/* ================================================== */
 //			 **************************************************************************
@@ -1565,6 +1573,11 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.40  2011/02/22 14:59:32  thorstenroth
+	 * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
+	 * <br>
+	 * <br>2. Add a new horizontal line to the day view to represent the current time.
+	 * <br>
 	 * <br>Revision 1.39  2010/04/21 08:28:28  hermenj
 	 * <br>fixed annoying bug when trying to show popup in some cases
 	 * <br>
@@ -1679,6 +1692,11 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.40  2011/02/22 14:59:32  thorstenroth
+	 * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
+	 * <br>
+	 * <br>2. Add a new horizontal line to the day view to represent the current time.
+	 * <br>
 	 * <br>Revision 1.39  2010/04/21 08:28:28  hermenj
 	 * <br>fixed annoying bug when trying to show popup in some cases
 	 * <br>
@@ -1802,6 +1820,11 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.40  2011/02/22 14:59:32  thorstenroth
+	 * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
+	 * <br>
+	 * <br>2. Add a new horizontal line to the day view to represent the current time.
+	 * <br>
 	 * <br>Revision 1.39  2010/04/21 08:28:28  hermenj
 	 * <br>fixed annoying bug when trying to show popup in some cases
 	 * <br>
@@ -2872,6 +2895,11 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.40  2011/02/22 14:59:32  thorstenroth
+//	 * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
+//	 * <br>
+//	 * <br>2. Add a new horizontal line to the day view to represent the current time.
+//	 * <br>
 //	 * <br>Revision 1.39  2010/04/21 08:28:28  hermenj
 //	 * <br>fixed annoying bug when trying to show popup in some cases
 //	 * <br>

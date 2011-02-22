@@ -77,8 +77,10 @@ public class FrameArea extends JComponent implements ComponentListener {
 	private ImageIcon upperRightIcon;
 
 	// private Color selectionColor = new Color(196, 0, 0);
-	private Color selectionColor = Color.BLACK;
-
+	// TODO Schwarz durch grün ersetzt
+	//private Color selectionColor = Color.BLACK;
+	private Color selectionColor = Color.LIGHT_GRAY;
+	
 	private Date endTime = null;
 
 	private Date startTime = null;
@@ -109,10 +111,8 @@ public class FrameArea extends JComponent implements ComponentListener {
 
 	private float SELECT_OFFSET = 0.2f;
 
-
 	private float alphaValue = ALPHA_DEFAULT;
 
-	
 	private int lineDistance = 4;
 	
 	private static int HEADER_HEIGHT = 20;
@@ -772,6 +772,11 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.14  2011/02/22 14:59:32  thorstenroth
+	 * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
+	 * <br>
+	 * <br>2. Add a new horizontal line to the day view to represent the current time.
+	 * <br>
 	 * <br>Revision 1.13  2008/10/27 13:59:50  heine_
 	 * <br>fixed invite loop.
 	 * <br>happens when the paint width of a character is bigger than the width of the frame area

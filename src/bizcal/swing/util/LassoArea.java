@@ -88,6 +88,8 @@ extends JComponent
 			AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.DST_OVER, 1.0f);
 			gbi.setComposite(ac);
 			gbi.setPaint(this.lineColor);
+			//TODO Raus
+			//gbi.setPaint(Color.RED);
 			gbi.draw(new RoundRectangle2D.Double(1, 1, width-2, height-2, 17,17));
 		}
 		else
@@ -95,6 +97,8 @@ extends JComponent
 			AlphaComposite ac = AlphaComposite.getInstance(AlphaComposite.DST_OVER, 1.0f);
 			gbi.setComposite(ac);
 			gbi.setPaint(this.lineColor);
+			//TODO Raus
+			//gbi.setPaint(Color.RED);
 			gbi.draw(new Rectangle2D.Double(1, 1, width-2, height-2));
 		}
 

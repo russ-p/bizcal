@@ -81,6 +81,11 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.12  2011/02/22 14:59:32  thorstenroth
+ * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
+ * <br>
+ * <br>2. Add a new horizontal line to the day view to represent the current time.
+ * <br>
  * <br>Revision 1.11  2011/02/11 07:22:07  thorstenroth
  * <br>Add a new view to the calendar the 'Three Day View' which shows three days per interval.
  * <br>
@@ -94,6 +99,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 	LinkedHashMap<String, AbstractCalendarView> calendarViews = new LinkedHashMap<String, AbstractCalendarView>();
 
 	private NaviBar naviBar;
+	
 	private JCalendar dayChooser;
 
 	private ButtonPanel viewsButtonPanel;
@@ -163,7 +169,6 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 		this.add(this.naviBar, BorderLayout.EAST);
 
 		initPopup();
-
 	}
 
 	/**
@@ -197,9 +202,10 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 
 		// create the functions buttons
 		functionsButtonPanel = new ButtonPanel(Translatrix
-				.getTranslationString("bizcal.functions"), headerColor, 1,
+				.getTranslationString("bizcal.functions"), headerColor, 5,
 				functionsActionsVector, false, true);
-		functionsButtonPanel.setContentLayout(new BorderLayout());
+		//functionsButtonPanel.setContentLayout(new BorderLayout());
+		
 		this.naviBar.addButtonPanel(functionsButtonPanel, NaviBar.FILL);
 
 		// create the calendar buttons
@@ -253,7 +259,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 				if ("calendar".equals(evt.getPropertyName())
 						|| "date".equals(evt.getPropertyName())) {
 					date = dayChooser.getDate();
-					for (Iterator iter = dateListeners.iterator(); iter.hasNext();) {
+					for (Iterator<DateListener> iter = dateListeners.iterator(); iter.hasNext();) {
 						DateListener listener = (DateListener) iter.next();
 						listener.dateChanged(date);
 					}
@@ -341,7 +347,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 	public void showView(String panelName) {
 		if (panelName == null)
 			return;
-		for (Iterator iter = calendarViews.values().iterator(); iter.hasNext();) {
+		for (Iterator<AbstractCalendarView> iter = calendarViews.values().iterator(); iter.hasNext();) {
 			AbstractCalendarView panel = (AbstractCalendarView) iter.next();
 			if (panelName.equals(panel.getButton().getActionCommand())) {
 				panel.getButton().doClick();
@@ -545,7 +551,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 						namedCalendar.setActive(calendarToggler.isActiv());
 						/* ------------------------------------------------------- */
 						// inform the listeners
-						for (Iterator iter = calendarListeners.iterator(); iter.hasNext();) {
+						for (Iterator<NamedCalendarListener> iter = calendarListeners.iterator(); iter.hasNext();) {
 							NamedCalendarListener listener = (NamedCalendarListener) iter.next();
 							listener.activeCalendarsChanged(namedCalendars.keySet());
 						}
@@ -580,7 +586,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 						// =========================================================
 						// send the current selected calendar to the listeners
 						// =========================================================
-						for (Iterator iter = calendarListeners.iterator(); iter
+						for (Iterator<NamedCalendarListener> iter = calendarListeners.iterator(); iter
 								.hasNext();) {
 							NamedCalendarListener listener = (NamedCalendarListener) iter
 									.next();
@@ -606,6 +612,9 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 		// /* ------------------------------------------------------- */
 		// }
 		/* ================================================== */
+		
+		// say all views that there was a new calendar added
+		callAllCalenderListeners();
 	}
 
 	/**
@@ -613,7 +622,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 	 */
 	public void triggerUpdate() {
 		/* ================================================== */
-		for (Iterator iter = calendarListeners.iterator(); iter.hasNext();) {
+		for (Iterator<NamedCalendarListener> iter = calendarListeners.iterator(); iter.hasNext();) {
 			/* ------------------------------------------------------- */
 			NamedCalendarListener listener = (NamedCalendarListener) iter
 					.next();
@@ -673,7 +682,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 							ListViewPanel listView = (ListViewPanel) calendarViews.get(ListViewPanel.VIEW_NAME);
 							step = listView.listView.getShowDays();
 						} catch (Exception e) {
-							// TODO: handle exception
+							e.printStackTrace();
 						}
 					}
 			if (!forward)
@@ -683,7 +692,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 					step));
 			this.date = dayChooser.getDate();
 
-			for (Iterator iter = dateListeners.iterator(); iter.hasNext();) {
+			for (Iterator<DateListener> iter = dateListeners.iterator(); iter.hasNext();) {
 				DateListener listener = (DateListener) iter.next();
 				listener.dateChanged(date);
 			}
@@ -953,7 +962,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 	private void informListeners() {
 		/* ================================================== */
 //		System.out.println("called update");
-		for (Iterator iter = calendarListeners.iterator(); iter.hasNext();) {
+		for (Iterator<NamedCalendarListener> iter = calendarListeners.iterator(); iter.hasNext();) {
 			NamedCalendarListener listener = (NamedCalendarListener) iter
 					.next();
 			listener.activeCalendarsChanged(namedCalendars.keySet());
@@ -1134,39 +1143,48 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 	// }
 	// }
 
-
-
 	class PopupCallBack implements PopupMenuCallback {
 
+		/* (non-Javadoc)
+		 * @see bizcal.swing.PopupMenuCallback#getCalendarPopupMenu(java.lang.Object)
+		 */
 		public JPopupMenu getCalendarPopupMenu(Object calId) throws Exception {
 			/* ====================================================== */
-			// TODO Auto-generated method stub
 			return null;
 			/* ====================================================== */
 		}
 
+		/* (non-Javadoc)
+		 * @see bizcal.swing.PopupMenuCallback#getEmptyPopupMenu(java.lang.Object, java.util.Date)
+		 */
 		public JPopupMenu getEmptyPopupMenu(Object calId, Date date) throws Exception {
 			/* ====================================================== */
-			// TODO Auto-generated method stub
 			return null;
 			/* ====================================================== */
 		}
 
+		/* (non-Javadoc)
+		 * @see bizcal.swing.PopupMenuCallback#getEventPopupMenu(java.lang.Object, bizcal.common.Event)
+		 */
 		public JPopupMenu getEventPopupMenu(Object calId, Event event) throws Exception {
 			/* ====================================================== */
 			return popup;
 			/* ====================================================== */
 		}
 
+		/* (non-Javadoc)
+		 * @see bizcal.swing.PopupMenuCallback#getProjectPopupMenu(java.lang.Object)
+		 */
 		public JPopupMenu getProjectPopupMenu(Object calId) throws Exception {
 			/* ====================================================== */
-			// TODO Auto-generated method stub
 			return null;
 			/* ====================================================== */
 		}
-
 	}
 
+	/* (non-Javadoc)
+	 * @see lu.tudor.santec.bizcal.listeners.IZoomSliderListener#zoomPositionchanged(int)
+	 */
 	public void zoomPositionchanged(int value) {
 		/* ====================================================== */
 //		for (AbstractCalendarView acv : calendarViews.values()) {
@@ -1186,7 +1204,25 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 			this.slider.setValue(value);
 		/* ====================================================== */
 	}
-
-
+	
+	
+	public void callAllCalenderListeners()
+	{
+		for(Iterator<NamedCalendarListener> iter = calendarListeners.iterator(); iter.hasNext();)
+		{
+			NamedCalendarListener listener = (NamedCalendarListener) iter.next();
+			listener.selectedCalendarChanged(getSelectedCalendar());
+		}
+		
+		for (Iterator<NamedCalendarListener> iter = calendarListeners.iterator(); iter.hasNext();) {
+			NamedCalendarListener listener = (NamedCalendarListener) iter.next();
+			listener.activeCalendarsChanged(namedCalendars.keySet());
+		}
+	}
+//	public static List<NamedCalendar> getCalendarss() {
+//		/* ================================================== */
+//		return new ArrayList<NamedCalendar>(namedCalendars.keySet());
+//		/* ================================================== */
+//	}
 
 }

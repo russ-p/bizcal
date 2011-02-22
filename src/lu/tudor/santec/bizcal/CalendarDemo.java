@@ -23,6 +23,7 @@
 package lu.tudor.santec.bizcal;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +31,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JFrame;
 
 import lu.tudor.santec.bizcal.listeners.NamedCalendarListener;
@@ -39,6 +42,8 @@ import lu.tudor.santec.bizcal.views.ListViewPanel;
 import lu.tudor.santec.bizcal.views.MonthViewPanel;
 import bizcal.common.Event;
 import bizcal.swing.CalendarListener;
+import bizcal.swing.DayView;
+import bizcal.swing.DayView.Layout;
 import bizcal.swing.util.FrameArea;
 import bizcal.util.DateInterval;
 
@@ -50,6 +55,11 @@ import bizcal.util.DateInterval;
  *
  * @version
  * <br>$Log: CalendarDemo.java,v $
+ * <br>Revision 1.11  2011/02/22 14:59:32  thorstenroth
+ * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
+ * <br>
+ * <br>2. Add a new horizontal line to the day view to represent the current time.
+ * <br>
  * <br>Revision 1.10  2011/02/11 07:22:07  thorstenroth
  * <br>Add a new view to the calendar the 'Three Day View' which shows three days per interval.
  * <br>
@@ -75,9 +85,7 @@ public class CalendarDemo extends JFrame{
 	private static final long serialVersionUID = 1L;
 	
 	
-	public static final String CALENDAR_ID = "calendarId";
-	
-	
+		
 	private ObservableEventList eventDataList;
 
 	private DayViewPanel dayViewPanel;
@@ -107,20 +115,20 @@ public class CalendarDemo extends JFrame{
 		// create a model for each view day, week, month, list
 		// they all gain the same data list to operate on
 		/* ------------------------------------------------------- */
-		EventModel dayModel   = new EventModel(eventDataList, EventModel.TYPE_DAY);
-		EventModel weekModel  = new EventModel(eventDataList, EventModel.TYPE_WEEK);
-		EventModel monthModel = new EventModel(eventDataList, EventModel.TYPE_MONTH);
-		EventModel listModel  = new EventModel(eventDataList, EventModel.TYPE_MONTH);
-		EventModel dayThreeModel  = new EventModel(eventDataList, EventModel.TYPE_THREE_DAY);
+		EventModel dayModel   		= new EventModel(eventDataList, EventModel.TYPE_DAY);
+		EventModel weekModel  		= new EventModel(eventDataList, EventModel.TYPE_WEEK);
+		EventModel monthModel 		= new EventModel(eventDataList, EventModel.TYPE_MONTH);
+		EventModel listModel  		= new EventModel(eventDataList, EventModel.TYPE_MONTH);
+		EventModel dayThreeModel 	= new EventModel(eventDataList, EventModel.TYPE_THREE_DAY);
 		
 		/* ------------------------------------------------------- */
 		// create the panels for each kind of view
 		/* ------------------------------------------------------- */
-		this.dayViewPanel 	= new DayViewPanel(  dayModel);
-		this.dayThreeViewPanel 	= new DayViewPanel(  dayThreeModel);
-		this.weekViewPanel 	= new DayViewPanel(  weekModel);
-		this.monthViewPanel = new MonthViewPanel(monthModel);
-		this.listViewPanel 	= new ListViewPanel( listModel);
+		this.dayViewPanel 		= new DayViewPanel(dayModel, 		Layout.DAY_COLUMN_SEPARATED_BY_CALENDAR);
+		this.dayThreeViewPanel 	= new DayViewPanel(dayThreeModel, 	Layout.DAY_COLUMN_SEPARATED_BY_CALENDAR);
+		this.weekViewPanel 		= new DayViewPanel(weekModel, 		Layout.DAY_COLUMN_SEPARATED_BY_CALENDAR);
+		this.monthViewPanel 	= new MonthViewPanel(monthModel);
+		this.listViewPanel 		= new ListViewPanel(listModel);
 		/* ------------------------------------------------------- */
 		// create a new calendar listener.
 		// It will be informed of many interactions on the calendar like, event selected
@@ -132,29 +140,29 @@ public class CalendarDemo extends JFrame{
 		// add the same listener to all views
 		// you can create different listeners for each view, if you like to.
 		/* ------------------------------------------------------- */
-		dayViewPanel.addCalendarListener(  calListener);
-		dayThreeViewPanel.addCalendarListener(  calListener);
-		weekViewPanel.addCalendarListener( calListener);
-		monthViewPanel.addCalendarListener(calListener);
-		listViewPanel.addCalendarListener( calListener);
+		this.dayViewPanel.addCalendarListener(		calListener);
+		this.dayThreeViewPanel.addCalendarListener(	calListener);
+		this.weekViewPanel.addCalendarListener(		calListener);
+		this.monthViewPanel.addCalendarListener(	calListener);
+		this.listViewPanel.addCalendarListener(		calListener);
 
 		/* ------------------------------------------------------- */
 		// now we add all views to the base panel
 		/* ------------------------------------------------------- */
-		calendarPanel.addCalendarView(dayViewPanel);
-		calendarPanel.addCalendarView(dayThreeViewPanel);
-		calendarPanel.addCalendarView(weekViewPanel);
-		calendarPanel.addCalendarView(monthViewPanel);
-		calendarPanel.addCalendarView(listViewPanel);
+		this.calendarPanel.addCalendarView(dayViewPanel);
+		this.calendarPanel.addCalendarView(dayThreeViewPanel);
+		this.calendarPanel.addCalendarView(weekViewPanel);
+		this.calendarPanel.addCalendarView(monthViewPanel);
+		this.calendarPanel.addCalendarView(listViewPanel);
 		/* ------------------------------------------------------- */
 		
 		/* ------------------------------------------------------- */
 		// now we create some sample calendars.
 		// they will appear in the right bar.
 		/* ------------------------------------------------------- */
-		calendarPanel.addNamedCalendar(new TestNamedCalendar("Peter", "dem Peter seiner", Color.RED));
-		calendarPanel.addNamedCalendar(new TestNamedCalendar("Max", "dem Max seiner", Color.BLUE));
-		calendarPanel.addNamedCalendar(new TestNamedCalendar("Office", "allen ihrer", Color.GRAY));
+		this.calendarPanel.addNamedCalendar(new TestNamedCalendar("Peter", 	"dem Peter seiner", Color.RED));
+		this.calendarPanel.addNamedCalendar(new TestNamedCalendar("Max", 	"dem Max seiner", 	Color.BLUE));
+		this.calendarPanel.addNamedCalendar(new TestNamedCalendar("Office", "allen ihrer", 		Color.GRAY));
 		/* ------------------------------------------------------- */
 		// next step is to create a listener that is responsible for selecting and deselecting of
 		// the calendars created above.
@@ -164,7 +172,7 @@ public class CalendarDemo extends JFrame{
 		// A selected calendar is the calendar which will recieve the actions on the view, 
 		// like creating a new event, moving, deleting etc.
 		/* ------------------------------------------------------- */
-		calendarPanel.addNamedCalendarListener(new NamedCalendarListener() {
+		this.calendarPanel.addNamedCalendarListener(new NamedCalendarListener() {
 
 			public void activeCalendarsChanged(Collection<NamedCalendar> calendars) {
 				/* ====================================================== */
@@ -190,8 +198,71 @@ public class CalendarDemo extends JFrame{
 
 		});
 
-		this.add(calendarPanel);
+		///////////////////////////////////////////////////////////////////////////
+		// TODO add some Buttons to test different view layouts of the day views //
+		Action layout0Action;
+		Action layout1Action;
+		Action layout2Action;
 		
+		layout0Action = new AbstractAction("0", CalendarIcons
+				.getMediumIcon(CalendarIcons.CHANGE_LAYOUT_MODE)) {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("### layout mode 0 ###");
+				DayView currentDayView = (DayView) calendarPanel.getCurrentView().getView();
+				currentDayView.setLayoutMode(Layout.DAY_COLUMN_NORMAL);
+				try {
+					currentDayView.refresh0();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}	
+			}
+		};
+
+		calendarPanel.getFunctionsButtonPanel().addAction(layout0Action);
+		
+		layout1Action = new AbstractAction("1", CalendarIcons
+				.getMediumIcon(CalendarIcons.CHANGE_LAYOUT_MODE)) {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("### layout mode 1 ###");
+				DayView currentDayView = (DayView) calendarPanel.getCurrentView().getView();
+				currentDayView.setLayoutMode(Layout.DAY_COLUMN_SEPARATED_BY_CALENDAR);
+				try {
+					currentDayView.refresh0();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		};
+
+		calendarPanel.getFunctionsButtonPanel().addAction(layout1Action);
+		
+		layout2Action = new AbstractAction("2", CalendarIcons
+				.getMediumIcon(CalendarIcons.CHANGE_LAYOUT_MODE)) {
+
+			private static final long serialVersionUID = 1L;
+
+			public void actionPerformed(ActionEvent e) {
+				DayView currentDayView = (DayView) calendarPanel.getCurrentView().getView();
+				System.out.println("### layout mode 2 ###");
+				currentDayView.setLayoutMode(Layout.DAY_COLUMN_SEPARATED_BY_MAX_NUMBER_OF_CALENDAR);
+				try {
+					currentDayView.refresh0();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		};
+
+		calendarPanel.getFunctionsButtonPanel().addAction(layout2Action);
+		///////////////////////////////////////////////////////////////////////////
+		
+		this.add(calendarPanel);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //		this.pack();
 		this.setSize(1000, 700);
@@ -201,7 +272,6 @@ public class CalendarDemo extends JFrame{
 //			try {
 //				Thread.sleep(200);
 //			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
 //				e.printStackTrace();
 //			}
 //		}
@@ -301,7 +371,7 @@ public class CalendarDemo extends JFrame{
 				return;
 			/* ------------------------------------------------------- */
 			for (NamedCalendar nc : calendarPanel.getCalendars()) {
-				if (nc.getId().equals(event.get(CALENDAR_ID))) {
+				if (nc.getId().equals(event.get(Event.CALENDAR_ID))) {
 					/* ------------------------------------------------------- */
 					calendarPanel.setSelectedCalendar(nc);
 					return;
@@ -404,6 +474,11 @@ public class CalendarDemo extends JFrame{
 	 *
 	 * @version
 	 * <br>$Log: CalendarDemo.java,v $
+	 * <br>Revision 1.11  2011/02/22 14:59:32  thorstenroth
+	 * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
+	 * <br>
+	 * <br>2. Add a new horizontal line to the day view to represent the current time.
+	 * <br>
 	 * <br>Revision 1.10  2011/02/11 07:22:07  thorstenroth
 	 * <br>Add a new view to the calendar the 'Three Day View' which shows three days per interval.
 	 * <br>
@@ -438,14 +513,12 @@ public class CalendarDemo extends JFrame{
 	 */
 	class TestNamedCalendar extends NamedCalendar {
 		
-		
 		private List<Event> calendarEvents = new ArrayList<Event>();
 		
 		public TestNamedCalendar(String name, String description, Color color) {
 			super(name, description, color);
 			
 			this.setId(this.hashCode());
-			
 		}
 
 		@Override
@@ -464,7 +537,7 @@ public class CalendarDemo extends JFrame{
 		@Override
 		public List<Event> addEvent(String clientId, Event event) {
 			/* ====================================================== */
-			event.set(CALENDAR_ID, this.getId());
+			event.set(Event.CALENDAR_ID, this.getId());
 			event.setColor(this.getColor());
 			
 			eventDataList.add(event);
@@ -476,14 +549,8 @@ public class CalendarDemo extends JFrame{
 		@Override
 		public List<Event> saveEvent(String clientId, Event event, boolean userInteraction) {
 			/* ====================================================== */
-			// TODO Auto-generated method stub
 			return null;
 			/* ====================================================== */
 		}
-
-	
-
 	}
-
-
 }

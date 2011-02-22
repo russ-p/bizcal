@@ -55,6 +55,8 @@ public class Event
 	 */
 	public static final String LINE_DISTANCE = "linedistance";
 	
+	public static final String CALENDAR_ID = "calendarId";
+	
 	private Object id;
 	private String summary;
 	private String description;
@@ -161,7 +163,7 @@ public class Event
 		return l_Code;
 	}
 	
-	
+	//
 	@SuppressWarnings("unchecked")
 	public void set(String property, Object value)
 	{

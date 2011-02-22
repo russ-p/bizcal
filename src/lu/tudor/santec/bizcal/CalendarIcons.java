@@ -32,6 +32,11 @@ import javax.swing.ImageIcon;
  *
  * @version
  * <br>$Log: CalendarIcons.java,v $
+ * <br>Revision 1.4  2011/02/22 14:59:32  thorstenroth
+ * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
+ * <br>
+ * <br>2. Add a new horizontal line to the day view to represent the current time.
+ * <br>
  * <br>Revision 1.3  2011/02/11 07:22:07  thorstenroth
  * <br>Add a new view to the calendar the 'Three Day View' which shows three days per interval.
  * <br>
@@ -72,6 +77,8 @@ public class CalendarIcons {
 
 		public static String COPY 					= "copy.png";
 		public static String PASTE					= "paste.png";
+		
+		public static String CHANGE_LAYOUT_MODE		= "newrecurevent.png"; //TODO Test the layoutbuttons
 
 //	---------------------------------------------------------------------------
 
