@@ -70,6 +70,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.41  2011/02/22 15:10:26  thorstenroth
+ *          Comment one bug in code
+ *
  *          Revision 1.40  2011/02/22 14:59:32  thorstenroth
  *          1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
  *
@@ -375,9 +378,10 @@ public abstract class CalendarView {
 		// set the line distance
 //		if (event.get(Event.LINE_DISTANCE) != null)
 		try {
+			//TODO this call always throws null pointer exception why ? print stack trace you will see.
 			area.setLineDistance((Integer) event.get(Event.LINE_DISTANCE));
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		/* ------------------------------------------------------- */
 		//System.out.println("area select ?: "+ isSelected(event));
@@ -1573,6 +1577,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.41  2011/02/22 15:10:26  thorstenroth
+	 * <br>Comment one bug in code
+	 * <br>
 	 * <br>Revision 1.40  2011/02/22 14:59:32  thorstenroth
 	 * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
 	 * <br>
@@ -1692,6 +1699,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.41  2011/02/22 15:10:26  thorstenroth
+	 * <br>Comment one bug in code
+	 * <br>
 	 * <br>Revision 1.40  2011/02/22 14:59:32  thorstenroth
 	 * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
 	 * <br>
@@ -1820,6 +1830,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.41  2011/02/22 15:10:26  thorstenroth
+	 * <br>Comment one bug in code
+	 * <br>
 	 * <br>Revision 1.40  2011/02/22 14:59:32  thorstenroth
 	 * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
 	 * <br>
@@ -2895,6 +2908,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.41  2011/02/22 15:10:26  thorstenroth
+//	 * <br>Comment one bug in code
+//	 * <br>
 //	 * <br>Revision 1.40  2011/02/22 14:59:32  thorstenroth
 //	 * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
 //	 * <br>
