@@ -663,11 +663,8 @@ public class FrameArea extends JComponent implements ComponentListener {
 			g2.setFont(timeFont);
 //			g2.drawString(movingString, xpos + this.getBounds().width - 85,
 //					ypos + this.getBounds().height - 35);
-			Paint paintSave = g2.getPaint();
-			g2.setPaint(selectionColor);
 			g2.drawString(getMovingTimeString(), xpos + this.getBounds().width - 85,
 					ypos + this.getBounds().height - 35);
-			g2.setPaint(paintSave);
 		}else{
 			// ============================================================
 			// paint time in the footer
@@ -785,6 +782,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.17  2011/03/04 15:35:27  thorstenroth
+	 * <br>Little redesign of the frame area show now the start and end time of a event in the footer too.
+	 * <br>
 	 * <br>Revision 1.16  2011/03/04 15:32:07  thorstenroth
 	 * <br>Little redesign of the frame area show now the start and end time of a event in the footer too.
 	 * <br>

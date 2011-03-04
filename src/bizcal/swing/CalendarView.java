@@ -73,6 +73,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.43  2011/03/04 15:32:07  thorstenroth
+ *          Little redesign of the frame area show now the start and end time of a event in the footer too.
+ *
  *          Revision 1.42  2011/03/04 12:45:35  thorstenroth
  *          1. Improvement of the mouse controls when event gets resize and move in the calendar.
  *          2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
@@ -349,6 +352,8 @@ public abstract class CalendarView {
 			headLineBuff.append(event.getSummary());
 		/* ------------------------------------------------------- */
 		area.setHeadLine(headLineBuff.toString());
+		area.setStartTime(event.getStart());
+		area.setEndTime(event.getEnd());
 		/* ------------------------------------------------------- */
 		// add the description to the description of the framearea
 		/* ------------------------------------------------------- */
@@ -1608,6 +1613,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.43  2011/03/04 15:32:07  thorstenroth
+	 * <br>Little redesign of the frame area show now the start and end time of a event in the footer too.
+	 * <br>
 	 * <br>Revision 1.42  2011/03/04 12:45:35  thorstenroth
 	 * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
 	 * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
@@ -1735,6 +1743,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.43  2011/03/04 15:32:07  thorstenroth
+	 * <br>Little redesign of the frame area show now the start and end time of a event in the footer too.
+	 * <br>
 	 * <br>Revision 1.42  2011/03/04 12:45:35  thorstenroth
 	 * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
 	 * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
@@ -1871,6 +1882,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.43  2011/03/04 15:32:07  thorstenroth
+	 * <br>Little redesign of the frame area show now the start and end time of a event in the footer too.
+	 * <br>
 	 * <br>Revision 1.42  2011/03/04 12:45:35  thorstenroth
 	 * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
 	 * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
@@ -2103,7 +2117,7 @@ public abstract class CalendarView {
 						// try to get a better calendar id with selectedCalendar.getId()
 						// take the selected calendar if possible
 						if(selectedCalendar.getId() != null)
-							listener.newEvent(selectedCalendar.getId(), new DateInterval(date1,date2));
+							listener.newEvent(selectedCalendar.getId(), new DateInterval(date1,date2)); // TODO vielleicht passiert hier ein fehler wenn ja raus
 						// use the old method getCalendarId(e.getPoint().x, e.getPoint().y) how try to get the selected calendar over the day columns
 						// TODO And i don't now how this will work
 						else
@@ -2963,6 +2977,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.43  2011/03/04 15:32:07  thorstenroth
+//	 * <br>Little redesign of the frame area show now the start and end time of a event in the footer too.
+//	 * <br>
 //	 * <br>Revision 1.42  2011/03/04 12:45:35  thorstenroth
 //	 * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
 //	 * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
