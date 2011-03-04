@@ -34,6 +34,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.ComponentEvent;
@@ -421,7 +422,6 @@ public class FrameArea extends JComponent implements ComponentListener {
 				gbi.fill(new RoundRectangle2D.Double(0, height-18, width, 18, 20 ,20));
 			/* ------------------------------------------------------- */
 			if (this.border && (this.event == null || !this.event.isBackground())) {
-				// TODO border are not nice
 				gbi.setPaint(Color.black);
 				g2.draw(new RoundRectangle2D.Double(1, 1, width - 3,height - 3, 18, 18));
 			}
@@ -441,8 +441,8 @@ public class FrameArea extends JComponent implements ComponentListener {
 //				drawHatchedRect(gbi, 0, 0, width, height, false);
 //			else
 				gbi.fill(new Rectangle2D.Double(0, 0, width, height));
-				gbi.setPaint(headerColor); //TODO only for testing
-				gbi.fill(new Rectangle2D.Double(0, height-18, width, 18)); //TODO only for testing
+				gbi.setPaint(headerColor);
+				gbi.fill(new Rectangle2D.Double(0, height-18, width, 18));
 			/* ------------------------------------------------------- */
 //			if (this.border && (this.event == null || !this.event.isBackground())) {
 			if (this.border && (this.event != null)) {
@@ -529,10 +529,11 @@ public class FrameArea extends JComponent implements ComponentListener {
 			ypos += 15;
 			xpos = 5;
 		}
+		
 		Font descriptionFont = this.getFont();
 		g2.setFont(descriptionFont);
-
-
+		
+		
 		// ============================================================
 		// paint the summary
 		//
@@ -599,9 +600,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 					int yposString  = ypos;
 					
 					while (pos < itsDescription.length() && lineWrap > 0) {
-						if (pos+lineWrap >= itsDescription.length())
+						if (pos+lineWrap >= itsDescription.length()){
 							g2.drawString(itsDescription.substring(pos, itsDescription.length()-1).trim(), xpos, yposString);
-						else
+						}else
 							try {
 							g2.drawString(itsDescription.substring(pos, pos+lineWrap).trim(), xpos, yposString);
 							} catch (Exception e) {
@@ -648,24 +649,32 @@ public class FrameArea extends JComponent implements ComponentListener {
 		// ===============================================================
 		// draw start time at the top
 		// ===============================================================
-		if (this.startTime != null) {
-			g2.setFont(timeFont);
-			g2.drawString(timeFormat.format(startTime) + " ",
-					xpos,
-					ypos);
-		}
+//		if (this.startTime != null) {
+//			g2.setFont(timeFont);
+//			g2.drawString(timeFormat.format(startTime) + " ",
+//					xpos,
+//					ypos);
+//		}
 		// ===============================================================
 		// if an event is moving, draw the new time period at the bottom
 		// ===============================================================
-		if (this.isMoving) { // zum testen raus genommen //TODO
+		if (this.isMoving) {
 			//g2.setPaint(selectionColor);	
 			g2.setFont(timeFont);
 //			g2.drawString(movingString, xpos + this.getBounds().width - 85,
 //					ypos + this.getBounds().height - 35);
+			Paint paintSave = g2.getPaint();
+			g2.setPaint(selectionColor);
 			g2.drawString(getMovingTimeString(), xpos + this.getBounds().width - 85,
 					ypos + this.getBounds().height - 35);
+			g2.setPaint(paintSave);
+		}else{
+			// ============================================================
+			// paint time in the footer
+			// ============================================================
+			String s = timeFormat.format(this.startTime) + " - " + timeFormat.format(this.endTime); 
+			g2.drawString(s, xpos + this.getBounds().width - 85, ypos + this.getBounds().height - 35);
 		}
-
 		// ===============================================================
 		// draw selection border on this frame area
 		//
@@ -776,6 +785,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.16  2011/03/04 15:32:07  thorstenroth
+	 * <br>Little redesign of the frame area show now the start and end time of a event in the footer too.
+	 * <br>
 	 * <br>Revision 1.15  2011/03/04 12:45:35  thorstenroth
 	 * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
 	 * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
