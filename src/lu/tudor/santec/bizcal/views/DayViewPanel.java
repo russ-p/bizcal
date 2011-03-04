@@ -59,6 +59,11 @@ import bizcal.util.Interval;
  *
  * @version
  * <br>$Log: DayViewPanel.java,v $
+ * <br>Revision 1.8  2011/03/04 12:45:35  thorstenroth
+ * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
+ * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
+ * <br>3. Bug Fix: Because of the bug the view can not difference between Events form different calendars which have the same start and end time so sometimes by resize or move a event there are side effects when drawing the events.
+ * <br>
  * <br>Revision 1.7  2011/02/22 14:59:32  thorstenroth
  * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
  * <br>
@@ -363,15 +368,14 @@ public class DayViewPanel extends AbstractCalendarView {
 		/* ====================================================== */
 		// TODO activeCalendars
 		dayView.setActiveCalendars(calendars);
-		//System.out.println("*** aktive Calendars change");
 		/* ====================================================== */
 	}
 
 	public void selectedCalendarChanged(NamedCalendar selectedCalendar) {
 		/* ====================================================== */
 		// TODO selectedCalendars
+		dayView.setSelectedCalendar(selectedCalendar);
 		//dayView.setSelectedCalendar(selectedCalendar);
-		//System.out.println("*** selected Calendar change");
 		/* ====================================================== */
 	}
 

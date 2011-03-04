@@ -162,4 +162,17 @@ public class DateInterval extends Interval
 		return new DateInterval((Date) result.getStart(), (Date) result.getEnd());
 	}
 
+	/**
+	 * Check if the date is in an date interval
+	 * @param date to check
+	 * @return if yes return true otherwise false 
+	 */
+	public boolean isDayIn(Date date) {
+		try {
+			return getStartDate().before(date) && getEndDate().after(date);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
 }

@@ -31,6 +31,7 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.LayoutManager;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -52,6 +53,8 @@ import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+import lu.tudor.santec.bizcal.NamedCalendar;
+
 import bizcal.common.CalendarModel;
 import bizcal.common.CalendarViewConfig;
 import bizcal.common.Event;
@@ -70,6 +73,11 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.42  2011/03/04 12:45:35  thorstenroth
+ *          1. Improvement of the mouse controls when event gets resize and move in the calendar.
+ *          2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
+ *          3. Bug Fix: Because of the bug the view can not difference between Events form different calendars which have the same start and end time so sometimes by resize or move a event there are side effects when drawing the events.
+ *
  *          Revision 1.41  2011/02/22 15:10:26  thorstenroth
  *          Comment one bug in code
  *
@@ -208,6 +216,8 @@ public abstract class CalendarView {
 	private JComponent calPanel;
 
 	private Date selectionDate;
+
+	private NamedCalendar selectedCalendar;
 
 	/**
 	 * @param desc
@@ -378,7 +388,8 @@ public abstract class CalendarView {
 		// set the line distance
 //		if (event.get(Event.LINE_DISTANCE) != null)
 		try {
-			//TODO this call always throws null pointer exception why ? print stack trace you will see.
+			// TODO this call always throws null pointer exception why ?
+			// print stack trace you will see.
 			area.setLineDistance((Integer) event.get(Event.LINE_DISTANCE));
 		} catch (Exception e) {
 			//e.printStackTrace();
@@ -515,9 +526,12 @@ public abstract class CalendarView {
 		private Object _calId;
 
 		private Event _event;
-
+		
+		// TODO test Cursors for test the resize and drag of a event
+		// private Cursor resizeCursor = Toolkit.getDefaultToolkit().createCustomCursor(CalendarIcons.getIcon(CalendarIcons.CURSOR_RESIZE).getImage(),new Point(0,0), "Cursor" );
+		
 		private Cursor resizeCursor = new Cursor(Cursor.S_RESIZE_CURSOR);
-
+		
 		private Cursor handCursor = new Cursor(Cursor.HAND_CURSOR);
 
 		private FrameArea lastCreatedFrameArea = null;
@@ -758,14 +772,23 @@ public abstract class CalendarView {
 
 		public void mouseExited(MouseEvent e) {
 			/* ================================================== */
+			
 			FrameArea baseFrameArea = getBaseArea();
+			
 			if (!baseFrameArea.equals(_frameArea)) {
 				baseFrameArea.getMouseListeners()[0].mouseExited(e);
 				return;
 			}
 			/* ------------------------------------------------------- */
+			
+			
 			if (CalendarView.isMousePressed)
 				return;
+			
+			if (CalendarView.isResizeable){
+			  CalendarView.isResizeable = false;
+			  baseFrameArea.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
 			try {
 				if (!_event.isSelectable() || _frameArea.isSelected())
 					return;
@@ -861,6 +884,7 @@ public abstract class CalendarView {
 		
 		
 		public void mouseDragged(MouseEvent e) {
+			//System.out.println("mouseDragged");
 			/* ================================================== */
 			// filter events by time
 			// to not let every drag position fire a new computation
@@ -927,6 +951,7 @@ public abstract class CalendarView {
 
 		public void mouseMoved(MouseEvent e) {
 			/* ================================================== */
+			
 			FrameArea baseFrameArea = frameAreaHash.get(_event);
 			// if (!baseFrameArea.equals(_frameArea)) {
 			// baseFrameArea.getMouseMotionListeners()[0].mouseMoved(e);
@@ -943,7 +968,8 @@ public abstract class CalendarView {
 			// if mouse is at the bottom, switch to resize mode
 
 			if (!areaToChange.getCursor().equals(this.resizeCursor)) {
-				if (e.getPoint().y > areaToChange.getHeight() - 15) {
+				
+				if (e.getPoint().y > areaToChange.getHeight() - 18) {
 					/* ------------------------------------------------------- */
 					// this is the latest frame area
 					if (e.getSource().equals(areaToChange)) {
@@ -956,7 +982,7 @@ public abstract class CalendarView {
 				}
 			} else {
 				if (!areaToChange.getCursor().equals(this.handCursor)) {
-					if (e.getPoint().y < areaToChange.getHeight() - 15) {
+					if (e.getPoint().y < areaToChange.getHeight() - 18) {
 						areaToChange.setCursor(this.handCursor);
 						CalendarView.isResizeable = false;
 						e.consume();
@@ -972,8 +998,7 @@ public abstract class CalendarView {
 		/**
 		 * 
 		 */
-		//TODO new Dragging ???
-		//das größer ziehen eines Termins ist nur deshalb so hackelig weil der Mousezeiger zum größer ziehen schon dargestellt wird obwohl nicht mehr größer gezogen werden kann.
+		
 		private void moveDrag(FrameArea baseFrameArea, MouseEvent e) {
 			/* ================================================== */
 //			 **************************************************************************
@@ -1069,13 +1094,19 @@ public abstract class CalendarView {
 					/* ------------------------------------------------------- */
 					int mov;
 					// move without the line steps
-					if (_shiftKey)
+					if (_shiftKey){
+						
 						mov = Math.abs(diffPoint);
-					else
+						//System.out.println("true mov: " + mov);
+					}else{
+						// TODO calculate mov better to get a better snap on time line effect when moving events
 						mov = getTimeSlotHeight();
+						//System.out.println("false mov: " + mov);
+					}
 					/* ------------------------------------------------------- */
 					if (_startDrag.y > e.getPoint().y) {
-						mov = mov * (-1) - 1;
+						mov = mov * (-1);// - 1;
+						//mov = mov * (-1) - 1;
 					}
 					/* ------------------------------------------------------- */
 					if (baseFrameArea.getY() + mov >= calPanel
@@ -1577,6 +1608,11 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.42  2011/03/04 12:45:35  thorstenroth
+	 * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
+	 * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
+	 * <br>3. Bug Fix: Because of the bug the view can not difference between Events form different calendars which have the same start and end time so sometimes by resize or move a event there are side effects when drawing the events.
+	 * <br>
 	 * <br>Revision 1.41  2011/02/22 15:10:26  thorstenroth
 	 * <br>Comment one bug in code
 	 * <br>
@@ -1699,6 +1735,11 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.42  2011/03/04 12:45:35  thorstenroth
+	 * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
+	 * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
+	 * <br>3. Bug Fix: Because of the bug the view can not difference between Events form different calendars which have the same start and end time so sometimes by resize or move a event there are side effects when drawing the events.
+	 * <br>
 	 * <br>Revision 1.41  2011/02/22 15:10:26  thorstenroth
 	 * <br>Comment one bug in code
 	 * <br>
@@ -1830,6 +1871,11 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.42  2011/03/04 12:45:35  thorstenroth
+	 * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
+	 * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
+	 * <br>3. Bug Fix: Because of the bug the view can not difference between Events form different calendars which have the same start and end time so sometimes by resize or move a event there are side effects when drawing the events.
+	 * <br>
 	 * <br>Revision 1.41  2011/02/22 15:10:26  thorstenroth
 	 * <br>Comment one bug in code
 	 * <br>
@@ -2053,8 +2099,17 @@ public abstract class CalendarView {
 				/* ------------------------------------------------------- */
 				if (!_lasso)// && (date1.before(date2)))
 					if (listener != null)
-						listener.newEvent(_dragCalId, new DateInterval(date1,
-								date2));
+					{
+						// try to get a better calendar id with selectedCalendar.getId()
+						// take the selected calendar if possible
+						if(selectedCalendar.getId() != null)
+							listener.newEvent(selectedCalendar.getId(), new DateInterval(date1,date2));
+						// use the old method getCalendarId(e.getPoint().x, e.getPoint().y) how try to get the selected calendar over the day columns
+						// TODO And i don't now how this will work
+						else
+							listener.newEvent(_dragCalId, new DateInterval(date1,date2));
+						
+					}
 				// }
 				_dragArea.setVisible(false);
 				/* ------------------------------------------------------- */
@@ -2908,6 +2963,11 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.42  2011/03/04 12:45:35  thorstenroth
+//	 * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
+//	 * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
+//	 * <br>3. Bug Fix: Because of the bug the view can not difference between Events form different calendars which have the same start and end time so sometimes by resize or move a event there are side effects when drawing the events.
+//	 * <br>
 //	 * <br>Revision 1.41  2011/02/22 15:10:26  thorstenroth
 //	 * <br>Comment one bug in code
 //	 * <br>
@@ -3126,4 +3186,8 @@ public abstract class CalendarView {
 		/* ================================================== */
 	}
 	
+	//TODO Test Calid
+	public void setSelectedCalendarInCV(NamedCalendar selectedCalendar) {
+		this.selectedCalendar = selectedCalendar;
+	}
 }

@@ -35,12 +35,15 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Vector;
 import javax.swing.AbstractAction;
@@ -81,6 +84,11 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.13  2011/03/04 12:45:35  thorstenroth
+ * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
+ * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
+ * <br>3. Bug Fix: Because of the bug the view can not difference between Events form different calendars which have the same start and end time so sometimes by resize or move a event there are side effects when drawing the events.
+ * <br>
  * <br>Revision 1.12  2011/02/22 14:59:32  thorstenroth
  * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
  * <br>
@@ -144,7 +152,10 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 
 	private Vector<IZoomSliderListener> zoomSliderListeners  = new Vector<IZoomSliderListener>();
 	
-
+	private Thread dayViewUpdateThread;
+	
+	public final DateFormat timeFormat = new SimpleDateFormat("ss",Locale.getDefault());
+	
 	/**
 	 *
 	 */
@@ -169,6 +180,52 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 		this.add(this.naviBar, BorderLayout.EAST);
 
 		initPopup();
+		
+		this.dayViewUpdateThread = new Thread(new Runnable() {
+			
+			private Date currentDate;
+			private final DateFormat timeFormat = new SimpleDateFormat("ss",Locale.getDefault());
+			
+			public void run()
+			{	
+				while (true)
+				{
+					try {
+						if(currentView != null)
+						{
+							currentDate = new Date();
+							if(timeFormat.format(currentDate).equals("00"))
+							{
+								DayView currentDayView = (DayView) currentView.getView();
+								currentDayView.setCurrentTimeLine();
+								repaint();
+							}
+						}
+						
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+//					try {
+//						Thread.sleep(1000 * 60);
+//					} catch (Exception ex) {
+//						ex.printStackTrace();
+//						
+//					}
+				}
+			}
+		});
+		dayViewUpdateThread.start();
+		/*
+		 Hi Olivier,
+
+i'm fine and you ?
+
+On next tuesday i and Andreas have holiday, i'm back at thursday 10.03 and still wand to work on ourer mini project .
+
+But we can meet us at 14.03 if it is possible for you
+
+		 */
 	}
 
 	/**

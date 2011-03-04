@@ -55,6 +55,11 @@ import bizcal.util.DateInterval;
  *
  * @version
  * <br>$Log: CalendarDemo.java,v $
+ * <br>Revision 1.12  2011/03/04 12:45:35  thorstenroth
+ * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
+ * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
+ * <br>3. Bug Fix: Because of the bug the view can not difference between Events form different calendars which have the same start and end time so sometimes by resize or move a event there are side effects when drawing the events.
+ * <br>
  * <br>Revision 1.11  2011/02/22 14:59:32  thorstenroth
  * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
  * <br>
@@ -194,6 +199,8 @@ public class CalendarDemo extends JFrame{
 				// we do nothing here.
 				// If you have any ideas of something that should be triggerd when a calendar was selected...
 				/* ====================================================== */
+				
+				updateEventsForActiveCalendars();
 			}
 
 		});
@@ -285,7 +292,7 @@ public class CalendarDemo extends JFrame{
 		List<Event> allActiveEvents = new ArrayList<Event>();
 
 		for (NamedCalendar nc : calendarPanel.getCalendars()) {
-			if (nc.isActive())
+			if (nc.isActive() || nc.isSelected())
 				// this is just for demonstration. You can define a time periode to 
 				// get events from the calendar
 				allActiveEvents.addAll(nc.getEvents(null, null));
@@ -474,6 +481,11 @@ public class CalendarDemo extends JFrame{
 	 *
 	 * @version
 	 * <br>$Log: CalendarDemo.java,v $
+	 * <br>Revision 1.12  2011/03/04 12:45:35  thorstenroth
+	 * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
+	 * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
+	 * <br>3. Bug Fix: Because of the bug the view can not difference between Events form different calendars which have the same start and end time so sometimes by resize or move a event there are side effects when drawing the events.
+	 * <br>
 	 * <br>Revision 1.11  2011/02/22 14:59:32  thorstenroth
 	 * <br>1. Add a new layout for the day view. This layout split the day column into a number of lines which is equal to the number of calendars which are active. The events of one calendar are now shown in one line, one below the other.
 	 * <br>

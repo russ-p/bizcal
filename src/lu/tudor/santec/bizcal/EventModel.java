@@ -27,6 +27,11 @@
  *
  * @version
  * <br>$Log: EventModel.java,v $
+ * <br>Revision 1.7  2011/03/04 12:45:35  thorstenroth
+ * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
+ * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
+ * <br>3. Bug Fix: Because of the bug the view can not difference between Events form different calendars which have the same start and end time so sometimes by resize or move a event there are side effects when drawing the events.
+ * <br>
  * <br>Revision 1.6  2011/02/11 07:22:07  thorstenroth
  * <br>Add a new view to the calendar the 'Three Day View' which shows three days per interval.
  * <br>
@@ -104,6 +109,11 @@ import bizcal.util.Tuple;
  *
  * @version <br>
  *          $Log: EventModel.java,v $
+ *          Revision 1.7  2011/03/04 12:45:35  thorstenroth
+ *          1. Improvement of the mouse controls when event gets resize and move in the calendar.
+ *          2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
+ *          3. Bug Fix: Because of the bug the view can not difference between Events form different calendars which have the same start and end time so sometimes by resize or move a event there are side effects when drawing the events.
+ *
  *          Revision 1.6  2011/02/11 07:22:07  thorstenroth
  *          Add a new view to the calendar the 'Three Day View' which shows three days per interval.
  *
@@ -366,4 +376,12 @@ public class EventModel extends CalendarModel.BaseImpl implements Observer {
 		return type;
 	}
 
+	/**
+	 * Get the numbers of days of the Model
+	 * 
+	 * @return the number of days
+	 */
+	public int getDays() {
+		return this.days;
+	}
 }
