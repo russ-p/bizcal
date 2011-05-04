@@ -84,6 +84,9 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.14  2011/05/04 15:50:56  thorstenroth
+ * <br>fixed a Thread bug that increased the CPU usage.
+ * <br>
  * <br>Revision 1.13  2011/03/04 12:45:35  thorstenroth
  * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
  * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
@@ -161,7 +164,6 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 	 */
 	public CalendarPanel() {
 		
-		
 		TimeZone.setDefault(TimeZone.getTimeZone("Europe/Brussels"));
 		
 		// load translations
@@ -188,17 +190,21 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 			
 			public void run()
 			{	
+				int i = 0;
 				while (true)
 				{
 					try {
 						if(currentView != null)
 						{
+							System.out.println("--- Current view not null num: " + i + "---");
 							currentDate = new Date();
 							if(timeFormat.format(currentDate).equals("00"))
 							{
 								DayView currentDayView = (DayView) currentView.getView();
 								currentDayView.setCurrentTimeLine();
 								repaint();
+								System.out.println("--- repaint day view num: " + i + "---");
+								i++;
 							}
 						}
 						
@@ -206,26 +212,16 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 						e.printStackTrace();
 					}
 					
-//					try {
-//						Thread.sleep(1000 * 60);
-//					} catch (Exception ex) {
-//						ex.printStackTrace();
-//						
-//					}
+					try {
+						Thread.sleep(1000 * 60);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+						
+					}
 				}
 			}
 		});
 		dayViewUpdateThread.start();
-		/*
-		 Hi Olivier,
-
-i'm fine and you ?
-
-On next tuesday i and Andreas have holiday, i'm back at thursday 10.03 and still wand to work on ourer mini project .
-
-But we can meet us at 14.03 if it is possible for you
-
-		 */
 	}
 
 	/**
