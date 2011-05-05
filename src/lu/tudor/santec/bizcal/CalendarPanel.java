@@ -84,6 +84,9 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.15  2011/05/05 16:04:55  thorstenroth
+ * <br>Fix Bug that comes up when the current time line should be paint in the agenda view and this view was not a instance of DayView.
+ * <br>
  * <br>Revision 1.14  2011/05/04 15:50:56  thorstenroth
  * <br>fixed a Thread bug that increased the CPU usage.
  * <br>
@@ -185,26 +188,19 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 		
 		this.dayViewUpdateThread = new Thread(new Runnable() {
 			
-			private Date currentDate;
-			private final DateFormat timeFormat = new SimpleDateFormat("ss",Locale.getDefault());
-			
 			public void run()
 			{	
-				int i = 0;
+				
 				while (true)
 				{
 					try {
 						if(currentView != null)
 						{
-							System.out.println("--- Current view not null num: " + i + "---");
-							currentDate = new Date();
-							if(timeFormat.format(currentDate).equals("00"))
+							if(currentView.getView() instanceof DayView)
 							{
 								DayView currentDayView = (DayView) currentView.getView();
 								currentDayView.setCurrentTimeLine();
-								repaint();
-								System.out.println("--- repaint day view num: " + i + "---");
-								i++;
+								repaint();							
 							}
 						}
 						
@@ -213,8 +209,8 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 					}
 					
 					try {
-						Thread.sleep(1000 * 60);
-					} catch (Exception ex) {
+						Thread.sleep(6000);
+					} catch (Exception ex) { 
 						ex.printStackTrace();
 						
 					}
