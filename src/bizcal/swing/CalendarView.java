@@ -31,6 +31,7 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.LayoutManager;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
@@ -73,6 +74,10 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.44  2011/05/17 15:22:46  thorstenroth
+ *          1. fix bugs that compute a wrong end time when resize the appointment. it only happens if appointment are recurrence.
+ *          2. New implementation of the FrameArea Paint method (it is not final).
+ *
  *          Revision 1.43  2011/03/04 15:32:07  thorstenroth
  *          Little redesign of the frame area show now the start and end time of a event in the footer too.
  *
@@ -412,7 +417,25 @@ public abstract class CalendarView {
 			return;
 		try {
 		    JPopupMenu popup = popupMenuCallback.getEventPopupMenu(calId, event);
-		    popup.show(e.getComponent(), e.getX(), e.getY());		    
+		    
+		    // TODO throws exception
+//		    System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++");
+//		    System.out.println("getComponent: " + e.getComponent());
+//		    System.out.println(e.getX());
+//		    System.out.println(e.getX());
+//		    System.out.println("Soucre: " + e.getSource());
+		    
+		    //Point componentLocation = e.getComponent().getLocationOnScreen();
+		    //e.getComponent().setVisible(true);
+		    
+		    
+		    //popup.show(this.getComponent(), e.getX(), e.getY());
+		    
+		    //popup.setLocation(componentLocation.x + e.getX(), componentLocation.y + e.getY());
+		    //popup.setLocation(e.getComponent().getX(), e.getComponent().getY());
+		    
+		    popup.show(e.getComponent(), e.getX(), e.getY());
+		    popup.setVisible(true);
 		} catch (Exception e2) {
 		    e2.printStackTrace();
 		}
@@ -566,7 +589,10 @@ public abstract class CalendarView {
 		}
 
 		public void mousePressed(MouseEvent e) {
+			System.out.println("mouse Pressed");
 			/* ================================================== */
+			if(SwingUtilities.isLeftMouseButton(e))
+			{
 			CalendarView.isMousePressed = true;
 			this.dragged = false;
 			_shiftKey = (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0;
@@ -629,7 +655,8 @@ public abstract class CalendarView {
 				}
 			lastCreatedFrameArea = findLastFrameArea(baseFrameArea);
 			/* ------------------------------------------------------- */
-			maybeShowPopup(e);
+			}else
+				maybeShowPopup(e);
 		}
 		
 		/**
@@ -655,7 +682,10 @@ public abstract class CalendarView {
 		 * @see java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
 		 */
 		public void mouseReleased(MouseEvent e) {
+			System.out.println("mouse released");
 			/* ================================================== */
+			if(SwingUtilities.isLeftMouseButton(e))
+			{
 			FrameArea baseFrameArea = getBaseArea();
 			if (!baseFrameArea.equals(_frameArea)) {
 				baseFrameArea.getMouseListeners()[0].mouseReleased(e);
@@ -671,11 +701,16 @@ public abstract class CalendarView {
 			}
 			deletedFrameAreas.clear();
 			getComponent().revalidate();
+			
+//			if (e.isPopupTrigger()) maybeShowPopup(e);
+//			else{
 			/* ------------------------------------------------------- */
 			try {
 				/* ------------------------------------------------------- */
 				if (listener != null) {
+					// only take it out to try something
 					if (isResizeable) {
+						System.out.println("resize area !!!");
 						/* ------------------------------------------------------- */
 						FrameArea fa = findLastFrameArea(baseFrameArea);
 						if (fa == null)
@@ -721,11 +756,12 @@ public abstract class CalendarView {
 						}
 					}
 				}
-				maybeShowPopup(e);
+			
 				/* ------------------------------------------------------- */
 			} catch (Exception exc) {
 				ErrorHandler.handleError(exc);
 			}
+			//}
 			_frameArea.setIsMoving(false);
 
 			// reset the original frameArea
@@ -737,6 +773,8 @@ public abstract class CalendarView {
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
+			}else
+				maybeShowPopup(e);
 			/* ================================================== */
 		}
 		//TODO FIX ME in this mouse action there are sometimes null pointer exceptions
@@ -860,6 +898,7 @@ public abstract class CalendarView {
 
 		private void maybeShowPopup(MouseEvent e) {
 			/* ================================================== */
+			System.out.println("Mause x y: " + e.getX() + " - " + e.getY());
 			try {
 				if (e.isPopupTrigger()) {
 					FrameArea area = getFrameArea(_calId, _event);
@@ -876,6 +915,7 @@ public abstract class CalendarView {
 			/* ================================================== */
 		}
 		
+		
 		/**
 		 * @return the base frame area, the area that is painted first for an event
 		 */
@@ -889,7 +929,11 @@ public abstract class CalendarView {
 		
 		
 		public void mouseDragged(MouseEvent e) {
-			//System.out.println("mouseDragged");
+			
+			if (SwingUtilities.isLeftMouseButton(e))
+			{ 
+				
+			
 			/* ================================================== */
 			// filter events by time
 			// to not let every drag position fire a new computation
@@ -948,7 +992,7 @@ public abstract class CalendarView {
 			} catch (Exception e2) {
 				e2.printStackTrace();
 			}
-
+			}
 //			this.mouseXold = e.getPoint().x;
 //			TimeTracker.finish(tracker);
 			/* ------------------------------------------------------- */
@@ -1613,6 +1657,10 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.44  2011/05/17 15:22:46  thorstenroth
+	 * <br>1. fix bugs that compute a wrong end time when resize the appointment. it only happens if appointment are recurrence.
+	 * <br>2. New implementation of the FrameArea Paint method (it is not final).
+	 * <br>
 	 * <br>Revision 1.43  2011/03/04 15:32:07  thorstenroth
 	 * <br>Little redesign of the frame area show now the start and end time of a event in the footer too.
 	 * <br>
@@ -1743,6 +1791,10 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.44  2011/05/17 15:22:46  thorstenroth
+	 * <br>1. fix bugs that compute a wrong end time when resize the appointment. it only happens if appointment are recurrence.
+	 * <br>2. New implementation of the FrameArea Paint method (it is not final).
+	 * <br>
 	 * <br>Revision 1.43  2011/03/04 15:32:07  thorstenroth
 	 * <br>Little redesign of the frame area show now the start and end time of a event in the footer too.
 	 * <br>
@@ -1882,6 +1934,10 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.44  2011/05/17 15:22:46  thorstenroth
+	 * <br>1. fix bugs that compute a wrong end time when resize the appointment. it only happens if appointment are recurrence.
+	 * <br>2. New implementation of the FrameArea Paint method (it is not final).
+	 * <br>
 	 * <br>Revision 1.43  2011/03/04 15:32:07  thorstenroth
 	 * <br>Little redesign of the frame area show now the start and end time of a event in the footer too.
 	 * <br>
@@ -2032,7 +2088,7 @@ public abstract class CalendarView {
 				_startDrag = e.getPoint();
 				_dragCalId = getCalendarId(e.getPoint().x, e.getPoint().y);
 				_lasso = (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0;
-				maybeShowPopup(e);
+				//maybeShowPopup(e);
 
 			} catch (Exception exc) {
 				throw BizcalException.create(exc);
@@ -2043,10 +2099,11 @@ public abstract class CalendarView {
 		}
 
 		public void mouseReleased(MouseEvent e) {
+			
 			/* ================================================== */
 			try {
 				/* ------------------------------------------------------- */
-				maybeShowPopup(e);
+				//maybeShowPopup(e);
 				_dragging = false;
 				/* ------------------------------------------------------- */
 				// if nothing had been dragged, do nothing
@@ -2977,6 +3034,10 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.44  2011/05/17 15:22:46  thorstenroth
+//	 * <br>1. fix bugs that compute a wrong end time when resize the appointment. it only happens if appointment are recurrence.
+//	 * <br>2. New implementation of the FrameArea Paint method (it is not final).
+//	 * <br>
 //	 * <br>Revision 1.43  2011/03/04 15:32:07  thorstenroth
 //	 * <br>Little redesign of the frame area show now the start and end time of a event in the footer too.
 //	 * <br>

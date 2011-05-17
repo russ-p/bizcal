@@ -316,67 +316,69 @@ public class FrameArea extends JComponent implements ComponentListener {
 		return this.movingString;
 		/* ================================================== */
 	}
+	//////////////////////////////////////////////////////////////
+	// TODO look for a perfect painting
+	//////////////////////////////////////////////////////////////
 	
-	
+	//////////////////////////////////////////////////////////////
 	// The toolkit will invoke this method when it's time to paint
-	public void paint(Graphics g) {
-		/* ================================================== */
+	public void paint(Graphics g) 
+	{ 
+		// -------------------------------------------------------------
+		// call the upper class to draw there content
+		//super.paint(g);
 		
+		// -------------------------------------------------------------
+		// set the default background and head color of the event
 		Color backGroundColor = this.getBackground();
 		Color headerColor     = this.getBackground();
-		/* ------------------------------------------------------- */
-		if (event != null) {
-			/* ------------------------------------------------------- */
-			backGroundColor = event.getColor();
-			headerColor     = event.getColor();
-			/* ------------------------------------------------------- */
-		}
 		
-//		System.out.println(event);
-		/* ------------------------------------------------------- */
-		// increase the alpha value if the event is a background event
-		/* ------------------------------------------------------- */
-		
-		/* ------------------------------------------------------- */
-		// background settings
-		/* ------------------------------------------------------- */
-		if (event != null && event.isBackground()) {
-			/* ------------------------------------------------------- */
-			headerColor = Color.LIGHT_GRAY;
-			
-			this.alphaValue = ALPHA_DEFAULT + SELECT_OFFSET - 0.55f;
-			/* ------------------------------------------------------- */
-		}
-		/* ------------------------------------------------------- */
-		if (!this.getBackground().equals(backGroundColor))
-			setBackground(backGroundColor);
-		/* ------------------------------------------------------- */
-		
-		
-		/* ------------------------------------------------------- */
-		Graphics2D g2 = (Graphics2D) g;
-		// makes the graphics smoother
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-		/* ------------------------------------------------------- */
+		// get the width and height of the FrameArea
 		int width  = getWidth();
 		int height = getHeight();
-		BufferedImage buffImg = null;
 		
-		/* ------------------------------------------------------- */
-		buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		// use the colors of the event if it's not null
+		if (event != null) {
+			backGroundColor = event.getColor();
+			headerColor     = event.getColor();
+		}
+				
+		// -------------------------------------------------------------
+		// do some settings if the event is a background event 
+		// set other head color
+		// increase the alpha value 
+		if (event != null && event.isBackground()) {
+			headerColor = Color.LIGHT_GRAY;
+			this.alphaValue = ALPHA_DEFAULT + SELECT_OFFSET - 0.55f;	
+		}
 		
-		/* ------------------------------------------------------- */
-		Graphics2D gbi = buffImg.createGraphics();
-		gbi.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+		// set the background color of the component
+		if (!this.getBackground().equals(backGroundColor))
+			setBackground(backGroundColor);
+		
+		
+		
+
+		Graphics2D g2 = (Graphics2D) g;
+		// makes the graphics smoother
+		//graphicHandle.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+			//	RenderingHints.VALUE_ANTIALIAS_ON);
+		// create a image buffer for the double buffering
+		BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		// create a 2D graphic handle of the image buffer
+		Graphics2D graphicBuffImgHandle = bufferedImage.createGraphics();
+		// init the rendering
+		graphicBuffImgHandle.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 									RenderingHints.VALUE_ANTIALIAS_ON);
-		gbi.setStroke(new BasicStroke(1.0f));
+		graphicBuffImgHandle.setStroke(new BasicStroke(1.0f));
 		
 		// ===========================================================
 		// draw backgorund marker event
 		//
 		// ===========================================================
-		if (isBackgroundMarker) {
+		//if(event.isBackground()){
+		if (isBackgroundMarker) { //TODO what is isBockgoundMarker? is it need for any other thing in the code ?
+			System.out.println("draw brackground marker");
 			/* ------------------------------------------------------- */
 			// do some modifications
 			event.setSelectable(false);
@@ -384,319 +386,709 @@ public class FrameArea extends JComponent implements ComponentListener {
 			/* ------------------------------------------------------- */
 			AlphaComposite ac = null;
 			ac = AlphaComposite.getInstance(AlphaComposite.DST_OVER, alphaValue);
-			gbi.setComposite(ac);
-			gbi.setPaint(this.getBackground());
+			graphicBuffImgHandle.setComposite(ac);
+			graphicBuffImgHandle.setPaint(this.getBackground());
 			/* ------------------------------------------------------- */
 			
-			gbi.fill(new Rectangle2D.Double(0, 0, width, height));
+			graphicBuffImgHandle.fill(new Rectangle2D.Double(0, 0, width, height));
 			/* ------------------------------------------------------- */
 //			if (this.border && (this.event == null || !this.event.isBackground())) {
 //				gbi.setPaint(Color.black);
 //				gbi.draw(new Rectangle2D.Double(1, 1, width - 2, height - 2));
 //			}
 			
-			
-			g2.drawImage(buffImg, null, 0, 0);
-			super.paint(g2);
-			super.paint(gbi);
+			g2.drawImage(bufferedImage, null, 0, 0);
 			return;
 			/* ------------------------------------------------------- */
 		}
+		g2.setColor(backGroundColor);
+		g2.drawRect(0, 0, width-1, height-1);
+		
 		
 		
 		// ===========================================================
 		// draw round rectangle
 		//
 		// ===========================================================
-		if (this.roundedRectangle) {
+		//if (this.roundedRectangle) {
+		if (true) {
 			AlphaComposite ac = AlphaComposite.getInstance(
 					AlphaComposite.DST_OVER, alphaValue);
-			gbi.setComposite(ac);
-			gbi.setPaint(this.getBackground());
+			graphicBuffImgHandle.setComposite(ac);
+			graphicBuffImgHandle.setPaint(this.getBackground());
 			/* ------------------------------------------------------- */
 //			if (this.event != null && this.event.isBackground())
 //				drawHatchedRect(gbi, 0, 0, width, height, false);
 //			else
-				gbi.fill(new RoundRectangle2D.Double(0, 0, width, height, 20, 20));
-				gbi.setPaint(headerColor);
-				gbi.fill(new RoundRectangle2D.Double(0, height-18, width, 18, 20 ,20));
+				graphicBuffImgHandle.fill(new RoundRectangle2D.Double(0, 0, width, height, 20, 20));
+				graphicBuffImgHandle.setPaint(headerColor);
+				graphicBuffImgHandle.fill(new RoundRectangle2D.Double(0, height-18, width, 18, 20 ,20));
 			/* ------------------------------------------------------- */
 			if (this.border && (this.event == null || !this.event.isBackground())) {
-				gbi.setPaint(Color.black);
-				g2.draw(new RoundRectangle2D.Double(1, 1, width - 3,height - 3, 18, 18));
+				graphicBuffImgHandle.setPaint(Color.black);
+				graphicBuffImgHandle.draw(new RoundRectangle2D.Double(1, 1, width - 3,height - 3, 18, 18));
 			}
 		}
-		// ============================================================
-		// draw non-round rectangle
-		// ============================================================
-		else {
-			/* ------------------------------------------------------- */
-			AlphaComposite ac = null;
-			ac = AlphaComposite.getInstance(AlphaComposite.DST_OVER, alphaValue);
-			gbi.setComposite(ac);
-			gbi.setPaint(this.getBackground());
-			/* ------------------------------------------------------- */
-//			if (this.event != null && this.event.isBackground())
-//				gbi.setPaint(Color.LIGHT_GRAY);
-//				drawHatchedRect(gbi, 0, 0, width, height, false);
-//			else
-				gbi.fill(new Rectangle2D.Double(0, 0, width, height));
-				gbi.setPaint(headerColor);
-				gbi.fill(new Rectangle2D.Double(0, height-18, width, 18));
-			/* ------------------------------------------------------- */
-//			if (this.border && (this.event == null || !this.event.isBackground())) {
-			if (this.border && (this.event != null)) {
-//				if (this.event.isBackground())
-				gbi.setPaint(Color.black);
-				gbi.draw(new Rectangle2D.Double(1, 1, width - 2, height - 2));
-			}
-			/* ------------------------------------------------------- */
-		}
-
-		g2.drawImage(buffImg, null, 0, 0);
-		/* ------------------------------------------------------- */
-		// ==============================================================
-		// creation of the darker header starts here
-		//
-		// background events do not have a darker header
-		// ==============================================================
-		Graphics2D gbiHeader = null;
-
-		if (showHeader)
-//			if (event == null || !event.isBackground()) {
-			if (event != null) {
-			/* ------------------------------------------------------- */
-			// create darker header
-			BufferedImage buffImgHeader = new BufferedImage(width, HEADER_HEIGHT,
-					BufferedImage.TYPE_INT_ARGB);
-			gbiHeader = buffImgHeader.createGraphics();
-			/* ------------------------------------------------------- */
-			gbiHeader.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-					RenderingHints.VALUE_ANTIALIAS_ON);
-			gbiHeader.setStroke(new BasicStroke(1.0f));
-			/* ------------------------------------------------------- */
-//			if (event.isBackground())
-//				gbiHeader.setPaint(Color.LIGHT_GRAY);
-//			else
-				gbiHeader.setPaint(headerColor);
-			/* ------------------------------------------------------- */
-			if (isRoundedRectangle())
-				gbiHeader.fill(new RoundRectangle2D.Double(0, 0, width, 20, 20, 20));
-			else
-				gbiHeader.fill(new Rectangle2D.Double(0, 0, width, 20));
-			/* ------------------------------------------------------- */
-			// paint
-			g2.drawImage(buffImgHeader, null, 0, 0);
-			/* ------------------------------------------------------- */
-		}
-
-		/* ------------------------------------------------------- */
-		int xpos = 5;
-		if (icon != null) {
-			g2.drawImage(icon.getImage(), xpos, 2, this);
-			xpos += icon.getIconWidth() + 3;
-		}
-		/* ------------------------------------------------------- */
-		// upper right icon
-		if (upperRightIcon != null) {
-			/* ------------------------------------------------------- */
-			g2.drawImage(upperRightIcon.getImage(), getWidth() - 20, 2, this);
-//			xpos += icon.getIconWidth() + 3;
-			/* ------------------------------------------------------- */
-		}
-		
-		
-		// =================================================================================
-		// actions below this point will be placed on top of the "colored glass"
-		//
-		// =================================================================================
-
-		// ============================================================
-		// paint the header, normally the time periode
-		// ============================================================
-		Font timeFont = this.getFont().deriveFont(Font.BOLD);
-		/* ------------------------------------------------------- */
-		// set alpha fontColor for background events
-		if (this.event == null || !this.event.isBackground())
-			g2.setPaint(fontColor);
-		else
-			g2.setPaint(alphaFontColor);
-		/* ------------------------------------------------------- */
-		g2.setFont(timeFont);
-		int ypos = 15;
-		if (itsHeadLine != null) {
-			g2.drawString(itsHeadLine, xpos, ypos);
-			ypos += 15;
-			xpos = 5;
-		}
-		
-		Font descriptionFont = this.getFont();
-		g2.setFont(descriptionFont);
-		
-		
-		// ============================================================
-		// paint the summary
-		//
-		// if the event is a background event, the summary is painted
-		// in a diagonale
-		// ============================================================
-		if (itsDescription != null) {
-			if (showHeader && itsHeadLine == null)
-				ypos = HEADER_HEIGHT + 15;
-//			if (this.event != null && this.event.isBackground()) {
-//				/* ------------------------------------------------------- */
-//				// compute angle
-//				// first the diagonale, normal Pythagoras
-//				try {
-//					double diagonale =
-//						Math.sqrt(Math.pow(this.getBounds().width, 2)
-//								+ Math.pow(this.getBounds().height-ypos-10, 2));
-//					/* ------------------------------------------------------- */
-//					Double temp = Math.asin(this.getBounds().height / diagonale);
-//
-//						if (!temp.equals(Double.NaN)) {
-//						this.angle = temp;
-//					}
-//				} catch (Exception e) {}
-//				/* ------------------------------------------------------- */
-//				g2.rotate(angle-0.3, this.xPosition, this.yPosition);
-//				g2.drawString(itsDescription, xpos, ypos+10);
-//				// back
-//				g2.rotate(-angle+0.3, this.xPosition, this.yPosition);
-//				/* ------------------------------------------------------- */
-//			} else {
-				/* ------------------------------------------------------- */
-				int fontHeight =	(int) this.getFont().getSize2D();
-				// get the optimal width
-				int itsW = g2.getFontMetrics().stringWidth(itsDescription);
-				FontMetrics fm = g2.getFontMetrics();
-				if (itsW > this.getWidth()) {
-					/* ------------------------------------------------------- */
-					// check if the width of the frame area has changed and we
-					// must find a new fitting length to split the string
-					int splitWidth = getWidth()-15;
-					if (lineWrap < 0 
-							|| fm.stringWidth(itsDescription.substring(0, lineWrap)) < splitWidth - 15 
-							|| fm.stringWidth(itsDescription.substring(0, lineWrap)) > splitWidth) {
-						/* ------------------------------------------------------- */
-						// wrap the lines
-						String s = itsDescription;
-						this.lineWrap = s.length()-1;
-						/* ------------------------------------------------------- */
-						// shorten the string as often as its painted length
-						// fits into the framearea
-						while (fm.stringWidth(s)> splitWidth && lineWrap > -1) {
-							s = itsDescription.substring(0, lineWrap);
-							lineWrap--;
-						}
-						if (lineWrap < 0) {
-							lineWrap = 0;
-						}
-						/* ------------------------------------------------------- */
-					}
-					/* ------------------------------------------------------- */
-					// paint the string
-					int pos 		= 0;
-					int yposString  = ypos;
-					
-					while (pos < itsDescription.length() && lineWrap > 0) {
-						if (pos+lineWrap >= itsDescription.length()){
-							g2.drawString(itsDescription.substring(pos, itsDescription.length()-1).trim(), xpos, yposString);
-						}else
-							try {
-							g2.drawString(itsDescription.substring(pos, pos+lineWrap).trim(), xpos, yposString);
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						pos = pos+lineWrap;
-						yposString = yposString + fontHeight + 5;
-					}
-					
-					/* ------------------------------------------------------- */
-				} else {
-					// just print
-					/* ------------------------------------------------------- */
-					g2.drawString(itsDescription, xpos, ypos);
-					/* ------------------------------------------------------- */
-				}
-				/* ------------------------------------------------------- */
+		g2.drawImage(bufferedImage, null, 0, 0);
+//		// ============================================================
+//		// draw non-round rectangle
+//		// ============================================================
+//		else {
+//			/* ------------------------------------------------------- */
+//			AlphaComposite ac = null;
+//			ac = AlphaComposite.getInstance(AlphaComposite.DST_OVER, alphaValue);
+//			graphicBuffImgHandle.setComposite(ac);
+//			graphicBuffImgHandle.setPaint(this.getBackground());
+//			/* ------------------------------------------------------- */
+////			if (this.event != null && this.event.isBackground())
+////				gbi.setPaint(Color.LIGHT_GRAY);
+////				drawHatchedRect(gbi, 0, 0, width, height, false);
+////			else
+//				graphicBuffImgHandle.fill(new Rectangle2D.Double(0, 0, width, height));
+//				graphicBuffImgHandle.setPaint(headerColor);
+//				graphicBuffImgHandle.fill(new Rectangle2D.Double(0, height-18, width, 18));
+//			/* ------------------------------------------------------- */
+////			if (this.border && (this.event == null || !this.event.isBackground())) {
+//			if (this.border && (this.event != null)) {
+////				if (this.event.isBackground())
+//				graphicBuffImgHandle.setPaint(Color.black);
+//				graphicBuffImgHandle.draw(new Rectangle2D.Double(1, 1, width - 2, height - 2));
 //			}
-		}
-		
-		// ===============================================================
-		// draw end time at the bottom
-		// ===============================================================
-		Date eTime = null;
-		if (this.endTime != null)
-			eTime = endTime;
-		else {
-			try {
-				eTime = this.event.getEnd();
-			} catch (Exception e) {
-			}
-
-		}
-		if (eTime != null) {
-			/* ------------------------------------------------------- */
-			g2.setFont(timeFont);
-			g2.drawString(timeFormat.format(eTime) + " ",
-					xpos
-					+ this.getBounds().width - 40, ypos
-					+ this.getBounds().height - 20);
-			/* ------------------------------------------------------- */
-		}
-
-		// ===============================================================
-		// draw start time at the top
-		// ===============================================================
-//		if (this.startTime != null) {
-//			g2.setFont(timeFont);
-//			g2.drawString(timeFormat.format(startTime) + " ",
-//					xpos,
-//					ypos);
+//			/* ------------------------------------------------------- */
 //		}
-		// ===============================================================
-		// if an event is moving, draw the new time period at the bottom
-		// ===============================================================
-		if (this.isMoving) {
-			//g2.setPaint(selectionColor);	
-			g2.setFont(timeFont);
-//			g2.drawString(movingString, xpos + this.getBounds().width - 85,
+//
+//		graphicHandle.drawImage(buffImg, null, 0, 0);
+//		/* ------------------------------------------------------- */
+//		// ==============================================================
+//		// creation of the darker header starts here
+//		//
+//		// background events do not have a darker header
+//		// ==============================================================
+//		
+//
+//		if (showHeader)
+//			
+////			if (event == null || !event.isBackground()) {
+//			if (event != null) {	
+//			Graphics2D gbiHeader = null;
+//				/* ------------------------------------------------------- */
+//			// create darker header
+//			BufferedImage buffImgHeader = new BufferedImage(width, HEADER_HEIGHT,
+//					BufferedImage.TYPE_INT_ARGB);
+//			gbiHeader = buffImgHeader.createGraphics();
+//			/* ------------------------------------------------------- */
+//			gbiHeader.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//					RenderingHints.VALUE_ANTIALIAS_ON);
+//			gbiHeader.setStroke(new BasicStroke(1.0f));
+//			/* ------------------------------------------------------- */
+////			if (event.isBackground())
+////				gbiHeader.setPaint(Color.LIGHT_GRAY);
+////			else
+//				gbiHeader.setPaint(headerColor);
+//			/* ------------------------------------------------------- */
+//			if (isRoundedRectangle())
+//				gbiHeader.fill(new RoundRectangle2D.Double(0, 0, width, 20, 20, 20));
+//			else
+//				gbiHeader.fill(new Rectangle2D.Double(0, 0, width, 20));
+//			/* ------------------------------------------------------- */
+//			// paint
+//			graphicHandle.drawImage(buffImgHeader, null, 0, 0);
+//			/* ------------------------------------------------------- */
+//		}
+//
+//		/* ------------------------------------------------------- */
+//		int xpos = 5;
+//		if (icon != null) {
+//			graphicBuffImgHandle.drawImage(icon.getImage(), xpos, 2, this);
+//			xpos += icon.getIconWidth() + 3;
+//		}
+//		/* ------------------------------------------------------- */
+//		// upper right icon
+//		if (upperRightIcon != null) {
+//			/* ------------------------------------------------------- */
+//			graphicBuffImgHandle.drawImage(upperRightIcon.getImage(), getWidth() - 20, 2, this);
+////			xpos += icon.getIconWidth() + 3;
+//			/* ------------------------------------------------------- */
+//		}
+//		
+//		
+//		// =================================================================================
+//		// actions below this point will be placed on top of the "colored glass"
+//		//
+//		// =================================================================================
+//
+//		// ============================================================
+//		// paint the header, normally the time periode
+//		// ============================================================
+//		Font timeFont = this.getFont().deriveFont(Font.BOLD);
+//		/* ------------------------------------------------------- */
+//		// set alpha fontColor for background events
+//		if (this.event == null || !this.event.isBackground())
+//			graphicBuffImgHandle.setPaint(fontColor);
+//		else
+//			graphicBuffImgHandle.setPaint(alphaFontColor);
+//		/* ------------------------------------------------------- */
+//		graphicBuffImgHandle.setFont(timeFont);
+//		int ypos = 15;
+//		if (itsHeadLine != null) {
+//			graphicBuffImgHandle.drawString(itsHeadLine, xpos, ypos);
+//			ypos += 15;
+//			xpos = 5;
+//		}
+//		
+//		Font descriptionFont = this.getFont();
+//		graphicBuffImgHandle.setFont(descriptionFont);
+//		
+//		
+//		// ============================================================
+//		// paint the summary
+//		//
+//		// if the event is a background event, the summary is painted
+//		// in a diagonale
+//		// ============================================================
+//		if (itsDescription != null) {
+//			if (showHeader && itsHeadLine == null)
+//				ypos = HEADER_HEIGHT + 15;
+////			if (this.event != null && this.event.isBackground()) {
+////				/* ------------------------------------------------------- */
+////				// compute angle
+////				// first the diagonale, normal Pythagoras
+////				try {
+////					double diagonale =
+////						Math.sqrt(Math.pow(this.getBounds().width, 2)
+////								+ Math.pow(this.getBounds().height-ypos-10, 2));
+////					/* ------------------------------------------------------- */
+////					Double temp = Math.asin(this.getBounds().height / diagonale);
+////
+////						if (!temp.equals(Double.NaN)) {
+////						this.angle = temp;
+////					}
+////				} catch (Exception e) {}
+////				/* ------------------------------------------------------- */
+////				g2.rotate(angle-0.3, this.xPosition, this.yPosition);
+////				g2.drawString(itsDescription, xpos, ypos+10);
+////				// back
+////				g2.rotate(-angle+0.3, this.xPosition, this.yPosition);
+////				/* ------------------------------------------------------- */
+////			} else {
+//				/* ------------------------------------------------------- */
+//				int fontHeight =	(int) this.getFont().getSize2D();
+//				// get the optimal width
+//				int itsW = graphicBuffImgHandle.getFontMetrics().stringWidth(itsDescription);
+//				FontMetrics fm = graphicBuffImgHandle.getFontMetrics();
+//				if (itsW > this.getWidth()) {
+//					/* ------------------------------------------------------- */
+//					// check if the width of the frame area has changed and we
+//					// must find a new fitting length to split the string
+//					int splitWidth = getWidth()-15;
+//					if (lineWrap < 0 
+//							|| fm.stringWidth(itsDescription.substring(0, lineWrap)) < splitWidth - 15 
+//							|| fm.stringWidth(itsDescription.substring(0, lineWrap)) > splitWidth) {
+//						/* ------------------------------------------------------- */
+//						// wrap the lines
+//						String s = itsDescription;
+//						this.lineWrap = s.length()-1;
+//						/* ------------------------------------------------------- */
+//						// shorten the string as often as its painted length
+//						// fits into the framearea
+//						while (fm.stringWidth(s)> splitWidth && lineWrap > -1) {
+//							s = itsDescription.substring(0, lineWrap);
+//							lineWrap--;
+//						}
+//						if (lineWrap < 0) {
+//							lineWrap = 0;
+//						}
+//						/* ------------------------------------------------------- */
+//					}
+//					/* ------------------------------------------------------- */
+//					// paint the string
+//					int pos 		= 0;
+//					int yposString  = ypos;
+//					
+//					while (pos < itsDescription.length() && lineWrap > 0) {
+//						if (pos+lineWrap >= itsDescription.length()){
+//							graphicBuffImgHandle.drawString(itsDescription.substring(pos, itsDescription.length()-1).trim(), xpos, yposString);
+//						}else
+//							try {
+//								graphicBuffImgHandle.drawString(itsDescription.substring(pos, pos+lineWrap).trim(), xpos, yposString);
+//							} catch (Exception e) {
+//								e.printStackTrace();
+//							}
+//						pos = pos+lineWrap;
+//						yposString = yposString + fontHeight + 5;
+//					}
+//					
+//					/* ------------------------------------------------------- */
+//				} else {
+//					// just print
+//					/* ------------------------------------------------------- */
+//					graphicBuffImgHandle.drawString(itsDescription, xpos, ypos);
+//					/* ------------------------------------------------------- */
+//				}
+//				/* ------------------------------------------------------- */
+////			}
+//		}
+//		
+//		// ===============================================================
+//		// draw end time at the bottom
+//		// ===============================================================
+//		Date eTime = null;
+//		if (this.endTime != null)
+//			eTime = endTime;
+//		else {
+//			try {
+//				eTime = this.event.getEnd();
+//			} catch (Exception e) {
+//			}
+//
+//		}
+//		if (eTime != null) {
+//			/* ------------------------------------------------------- */
+//			graphicBuffImgHandle.setFont(timeFont);
+//			graphicBuffImgHandle.drawString(timeFormat.format(eTime) + " ",
+//					xpos
+//					+ this.getBounds().width - 40, ypos
+//					+ this.getBounds().height - 20);
+//			/* ------------------------------------------------------- */
+//		}
+//
+//		// ===============================================================
+//		// draw start time at the top
+//		// ===============================================================
+////		if (this.startTime != null) {
+////			g2.setFont(timeFont);
+////			g2.drawString(timeFormat.format(startTime) + " ",
+////					xpos,
+////					ypos);
+////		}
+//		// ===============================================================
+//		// if an event is moving, draw the new time period at the bottom
+//		// ===============================================================
+//		if (this.isMoving) {
+//			//g2.setPaint(selectionColor);	
+//			graphicBuffImgHandle.setFont(timeFont);
+////			g2.drawString(movingString, xpos + this.getBounds().width - 85,
+////					ypos + this.getBounds().height - 35);
+//			graphicBuffImgHandle.drawString(getMovingTimeString(), xpos + this.getBounds().width - 85,
 //					ypos + this.getBounds().height - 35);
-			g2.drawString(getMovingTimeString(), xpos + this.getBounds().width - 85,
-					ypos + this.getBounds().height - 35);
-		}else{
-			// ============================================================
-			// paint time in the footer
-			// ============================================================
-			String s = timeFormat.format(this.startTime) + " - " + timeFormat.format(this.endTime); 
-			g2.drawString(s, xpos + this.getBounds().width - 85, ypos + this.getBounds().height - 35);
-		}
-		// ===============================================================
-		// draw selection border on this frame area
-		//
-		// background events do not get this
-		// ===============================================================
-		if (this.selected && (this.event == null || !this.event.isBackground())) {
-			/* ------------------------------------------------------- */
-			// ??
-			// float dash1[] = { 1.0f };
-			// BasicStroke dashed = new BasicStroke(10.0f, BasicStroke.CAP_BUTT,
-			// BasicStroke.JOIN_BEVEL, 10.0f, dash1, 0.0f);
-
-			g2.setPaint(selectionColor);
-			g2.setStroke(new BasicStroke(1.5f));
-			if (this.roundedRectangle)
-				g2.draw(new RoundRectangle2D.Double(1, 1, width - 3,height - 3, 18, 18));
-			else
-				g2.draw(new Rectangle2D.Double(1, 1, width - 3, height - 3));
-			/* ------------------------------------------------------- */
-		}
-		if (gbiHeader != null)
-			super.paint(gbiHeader);
-		super.paint(g2);
-		super.paint(gbi);
+//		}else{
+//			// ============================================================
+//			// paint time in the footer
+//			// ============================================================
+//			String s = timeFormat.format(this.startTime) + " - " + timeFormat.format(this.endTime); 
+//			graphicBuffImgHandle.drawString(s, xpos + this.getBounds().width - 85, ypos + this.getBounds().height - 35);
+//		}
+//		// ===============================================================
+//		// draw selection border on this frame area
+//		//
+//		// background events do not get this
+//		// ===============================================================
+//		if (this.selected && (this.event == null || !this.event.isBackground())) {
+//			/* ------------------------------------------------------- */
+//			// ??
+//			// float dash1[] = { 1.0f };
+//			// BasicStroke dashed = new BasicStroke(10.0f, BasicStroke.CAP_BUTT,
+//			// BasicStroke.JOIN_BEVEL, 10.0f, dash1, 0.0f);
+//
+//			graphicBuffImgHandle.setPaint(Color.black);
+//			graphicBuffImgHandle.setStroke(new BasicStroke(1.5f));
+//			if (this.roundedRectangle)
+//				graphicBuffImgHandle.draw(new RoundRectangle2D.Double(1, 1, width - 3,height - 3, 18, 18));
+//			else
+//				graphicBuffImgHandle.draw(new Rectangle2D.Double(1, 1, width - 3, height - 3));
+//			/* ------------------------------------------------------- */
+//		}
+//		// TODO die paint methode sollte nur einmal auf gerufen werden mit dem bufferimage und nicht mit 3 verschieden 2d-grafikhändlern
+////		if (gbiHeader != null)
+////			super.paint(gbiHeader);
+////		super.paint(graphicHandle);
+//		graphicHandle.drawImage(buffImg, null, 0, 0);
+//		super.paint(graphicHandle);
 	}
+	
+	//////////////////////////////////////////////////////////////
+	
+	// TODO die alte paint methode zeichnet auf verschiedene grafikhandles das kann fehler verurschane in der darstellung
+//	// The toolkit will invoke this method when it's time to paint
+//	public void paint(Graphics g) 
+//	{ // TODO look for a perfect painting
+//		/* ================================================== */
+//		// -------------------------------------------------------------
+//		// set the background and the head color of the event to default
+//		// or use the colors of the event if it's not null
+//		// -------------------------------------------------------------
+//		Color backGroundColor = this.getBackground();
+//		Color headerColor     = this.getBackground();
+//		if (event != null) {
+//			backGroundColor = event.getColor();
+//			headerColor     = event.getColor();	
+//		}
+//		
+//		/* ------------------------------------------------------- */
+//		// increase the alpha value if the event is a background event
+//		/* ------------------------------------------------------- */
+//		
+//		/* ------------------------------------------------------- */
+//		// background settings
+//		/* ------------------------------------------------------- */
+//		if (event != null && event.isBackground()) {
+//			/* ------------------------------------------------------- */
+//			headerColor = Color.LIGHT_GRAY;
+//			
+//			this.alphaValue = ALPHA_DEFAULT + SELECT_OFFSET - 0.55f;
+//			/* ------------------------------------------------------- */
+//		}
+//		/* ------------------------------------------------------- */
+//		if (!this.getBackground().equals(backGroundColor))
+//			setBackground(backGroundColor);
+//		/* ------------------------------------------------------- */
+//		
+//		
+//		/* ------------------------------------------------------- */
+//		Graphics2D g2 = (Graphics2D) g;
+//		// makes the graphics smoother
+//		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//				RenderingHints.VALUE_ANTIALIAS_ON);
+//		/* ------------------------------------------------------- */
+//		int width  = getWidth();
+//		int height = getHeight();
+//		BufferedImage buffImg = null;
+//		
+//		/* ------------------------------------------------------- */
+//		buffImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+//		
+//		/* ------------------------------------------------------- */
+//		Graphics2D gbi = buffImg.createGraphics();
+//		gbi.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//									RenderingHints.VALUE_ANTIALIAS_ON);
+//		gbi.setStroke(new BasicStroke(1.0f));
+//		
+//		// ===========================================================
+//		// draw backgorund marker event
+//		//
+//		// ===========================================================
+//		if (isBackgroundMarker) {
+//			/* ------------------------------------------------------- */
+//			// do some modifications
+//			event.setSelectable(false);
+//			event.setBackground(true);
+//			/* ------------------------------------------------------- */
+//			AlphaComposite ac = null;
+//			ac = AlphaComposite.getInstance(AlphaComposite.DST_OVER, alphaValue);
+//			gbi.setComposite(ac);
+//			gbi.setPaint(this.getBackground());
+//			/* ------------------------------------------------------- */
+//			
+//			gbi.fill(new Rectangle2D.Double(0, 0, width, height));
+//			/* ------------------------------------------------------- */
+////			if (this.border && (this.event == null || !this.event.isBackground())) {
+////				gbi.setPaint(Color.black);
+////				gbi.draw(new Rectangle2D.Double(1, 1, width - 2, height - 2));
+////			}
+//			
+//			
+//			g2.drawImage(buffImg, null, 0, 0);
+//			super.paint(g2);
+//			super.paint(gbi);
+//			return;
+//			/* ------------------------------------------------------- */
+//		}
+//		
+//		
+//		// ===========================================================
+//		// draw round rectangle
+//		//
+//		// ===========================================================
+//		if (this.roundedRectangle) {
+//			AlphaComposite ac = AlphaComposite.getInstance(
+//					AlphaComposite.DST_OVER, alphaValue);
+//			gbi.setComposite(ac);
+//			gbi.setPaint(this.getBackground());
+//			/* ------------------------------------------------------- */
+////			if (this.event != null && this.event.isBackground())
+////				drawHatchedRect(gbi, 0, 0, width, height, false);
+////			else
+//				gbi.fill(new RoundRectangle2D.Double(0, 0, width, height, 20, 20));
+//				gbi.setPaint(headerColor);
+//				gbi.fill(new RoundRectangle2D.Double(0, height-18, width, 18, 20 ,20));
+//			/* ------------------------------------------------------- */
+//			if (this.border && (this.event == null || !this.event.isBackground())) {
+//				gbi.setPaint(Color.black);
+//				g2.draw(new RoundRectangle2D.Double(1, 1, width - 3,height - 3, 18, 18));
+//			}
+//		}
+//		// ============================================================
+//		// draw non-round rectangle
+//		// ============================================================
+//		else {
+//			/* ------------------------------------------------------- */
+//			AlphaComposite ac = null;
+//			ac = AlphaComposite.getInstance(AlphaComposite.DST_OVER, alphaValue);
+//			gbi.setComposite(ac);
+//			gbi.setPaint(this.getBackground());
+//			/* ------------------------------------------------------- */
+////			if (this.event != null && this.event.isBackground())
+////				gbi.setPaint(Color.LIGHT_GRAY);
+////				drawHatchedRect(gbi, 0, 0, width, height, false);
+////			else
+//				gbi.fill(new Rectangle2D.Double(0, 0, width, height));
+//				gbi.setPaint(headerColor);
+//				gbi.fill(new Rectangle2D.Double(0, height-18, width, 18));
+//			/* ------------------------------------------------------- */
+////			if (this.border && (this.event == null || !this.event.isBackground())) {
+//			if (this.border && (this.event != null)) {
+////				if (this.event.isBackground())
+//				gbi.setPaint(Color.black);
+//				gbi.draw(new Rectangle2D.Double(1, 1, width - 2, height - 2));
+//			}
+//			/* ------------------------------------------------------- */
+//		}
+//
+//		g2.drawImage(buffImg, null, 0, 0);
+//		/* ------------------------------------------------------- */
+//		// ==============================================================
+//		// creation of the darker header starts here
+//		//
+//		// background events do not have a darker header
+//		// ==============================================================
+//		Graphics2D gbiHeader = null;
+//
+//		if (showHeader)
+////			if (event == null || !event.isBackground()) {
+//			if (event != null) {
+//			/* ------------------------------------------------------- */
+//			// create darker header
+//			BufferedImage buffImgHeader = new BufferedImage(width, HEADER_HEIGHT,
+//					BufferedImage.TYPE_INT_ARGB);
+//			gbiHeader = buffImgHeader.createGraphics();
+//			/* ------------------------------------------------------- */
+//			gbiHeader.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+//					RenderingHints.VALUE_ANTIALIAS_ON);
+//			gbiHeader.setStroke(new BasicStroke(1.0f));
+//			/* ------------------------------------------------------- */
+////			if (event.isBackground())
+////				gbiHeader.setPaint(Color.LIGHT_GRAY);
+////			else
+//				gbiHeader.setPaint(headerColor);
+//			/* ------------------------------------------------------- */
+//			if (isRoundedRectangle())
+//				gbiHeader.fill(new RoundRectangle2D.Double(0, 0, width, 20, 20, 20));
+//			else
+//				gbiHeader.fill(new Rectangle2D.Double(0, 0, width, 20));
+//			/* ------------------------------------------------------- */
+//			// paint
+//			g2.drawImage(buffImgHeader, null, 0, 0);
+//			/* ------------------------------------------------------- */
+//		}
+//
+//		/* ------------------------------------------------------- */
+//		int xpos = 5;
+//		if (icon != null) {
+//			g2.drawImage(icon.getImage(), xpos, 2, this);
+//			xpos += icon.getIconWidth() + 3;
+//		}
+//		/* ------------------------------------------------------- */
+//		// upper right icon
+//		if (upperRightIcon != null) {
+//			/* ------------------------------------------------------- */
+//			g2.drawImage(upperRightIcon.getImage(), getWidth() - 20, 2, this);
+////			xpos += icon.getIconWidth() + 3;
+//			/* ------------------------------------------------------- */
+//		}
+//		
+//		
+//		// =================================================================================
+//		// actions below this point will be placed on top of the "colored glass"
+//		//
+//		// =================================================================================
+//
+//		// ============================================================
+//		// paint the header, normally the time periode
+//		// ============================================================
+//		Font timeFont = this.getFont().deriveFont(Font.BOLD);
+//		/* ------------------------------------------------------- */
+//		// set alpha fontColor for background events
+//		if (this.event == null || !this.event.isBackground())
+//			g2.setPaint(fontColor);
+//		else
+//			g2.setPaint(alphaFontColor);
+//		/* ------------------------------------------------------- */
+//		g2.setFont(timeFont);
+//		int ypos = 15;
+//		if (itsHeadLine != null) {
+//			g2.drawString(itsHeadLine, xpos, ypos);
+//			ypos += 15;
+//			xpos = 5;
+//		}
+//		
+//		Font descriptionFont = this.getFont();
+//		g2.setFont(descriptionFont);
+//		
+//		
+//		// ============================================================
+//		// paint the summary
+//		//
+//		// if the event is a background event, the summary is painted
+//		// in a diagonale
+//		// ============================================================
+//		if (itsDescription != null) {
+//			if (showHeader && itsHeadLine == null)
+//				ypos = HEADER_HEIGHT + 15;
+////			if (this.event != null && this.event.isBackground()) {
+////				/* ------------------------------------------------------- */
+////				// compute angle
+////				// first the diagonale, normal Pythagoras
+////				try {
+////					double diagonale =
+////						Math.sqrt(Math.pow(this.getBounds().width, 2)
+////								+ Math.pow(this.getBounds().height-ypos-10, 2));
+////					/* ------------------------------------------------------- */
+////					Double temp = Math.asin(this.getBounds().height / diagonale);
+////
+////						if (!temp.equals(Double.NaN)) {
+////						this.angle = temp;
+////					}
+////				} catch (Exception e) {}
+////				/* ------------------------------------------------------- */
+////				g2.rotate(angle-0.3, this.xPosition, this.yPosition);
+////				g2.drawString(itsDescription, xpos, ypos+10);
+////				// back
+////				g2.rotate(-angle+0.3, this.xPosition, this.yPosition);
+////				/* ------------------------------------------------------- */
+////			} else {
+//				/* ------------------------------------------------------- */
+//				int fontHeight =	(int) this.getFont().getSize2D();
+//				// get the optimal width
+//				int itsW = g2.getFontMetrics().stringWidth(itsDescription);
+//				FontMetrics fm = g2.getFontMetrics();
+//				if (itsW > this.getWidth()) {
+//					/* ------------------------------------------------------- */
+//					// check if the width of the frame area has changed and we
+//					// must find a new fitting length to split the string
+//					int splitWidth = getWidth()-15;
+//					if (lineWrap < 0 
+//							|| fm.stringWidth(itsDescription.substring(0, lineWrap)) < splitWidth - 15 
+//							|| fm.stringWidth(itsDescription.substring(0, lineWrap)) > splitWidth) {
+//						/* ------------------------------------------------------- */
+//						// wrap the lines
+//						String s = itsDescription;
+//						this.lineWrap = s.length()-1;
+//						/* ------------------------------------------------------- */
+//						// shorten the string as often as its painted length
+//						// fits into the framearea
+//						while (fm.stringWidth(s)> splitWidth && lineWrap > -1) {
+//							s = itsDescription.substring(0, lineWrap);
+//							lineWrap--;
+//						}
+//						if (lineWrap < 0) {
+//							lineWrap = 0;
+//						}
+//						/* ------------------------------------------------------- */
+//					}
+//					/* ------------------------------------------------------- */
+//					// paint the string
+//					int pos 		= 0;
+//					int yposString  = ypos;
+//					
+//					while (pos < itsDescription.length() && lineWrap > 0) {
+//						if (pos+lineWrap >= itsDescription.length()){
+//							g2.drawString(itsDescription.substring(pos, itsDescription.length()-1).trim(), xpos, yposString);
+//						}else
+//							try {
+//							g2.drawString(itsDescription.substring(pos, pos+lineWrap).trim(), xpos, yposString);
+//							} catch (Exception e) {
+//								e.printStackTrace();
+//							}
+//						pos = pos+lineWrap;
+//						yposString = yposString + fontHeight + 5;
+//					}
+//					
+//					/* ------------------------------------------------------- */
+//				} else {
+//					// just print
+//					/* ------------------------------------------------------- */
+//					g2.drawString(itsDescription, xpos, ypos);
+//					/* ------------------------------------------------------- */
+//				}
+//				/* ------------------------------------------------------- */
+////			}
+//		}
+//		
+//		// ===============================================================
+//		// draw end time at the bottom
+//		// ===============================================================
+//		Date eTime = null;
+//		if (this.endTime != null)
+//			eTime = endTime;
+//		else {
+//			try {
+//				eTime = this.event.getEnd();
+//			} catch (Exception e) {
+//			}
+//
+//		}
+//		if (eTime != null) {
+//			/* ------------------------------------------------------- */
+//			g2.setFont(timeFont);
+//			g2.drawString(timeFormat.format(eTime) + " ",
+//					xpos
+//					+ this.getBounds().width - 40, ypos
+//					+ this.getBounds().height - 20);
+//			/* ------------------------------------------------------- */
+//		}
+//
+//		// ===============================================================
+//		// draw start time at the top
+//		// ===============================================================
+////		if (this.startTime != null) {
+////			g2.setFont(timeFont);
+////			g2.drawString(timeFormat.format(startTime) + " ",
+////					xpos,
+////					ypos);
+////		}
+//		// ===============================================================
+//		// if an event is moving, draw the new time period at the bottom
+//		// ===============================================================
+//		if (this.isMoving) {
+//			//g2.setPaint(selectionColor);	
+//			g2.setFont(timeFont);
+////			g2.drawString(movingString, xpos + this.getBounds().width - 85,
+////					ypos + this.getBounds().height - 35);
+//			g2.drawString(getMovingTimeString(), xpos + this.getBounds().width - 85,
+//					ypos + this.getBounds().height - 35);
+//		}else{
+//			// ============================================================
+//			// paint time in the footer
+//			// ============================================================
+//			String s = timeFormat.format(this.startTime) + " - " + timeFormat.format(this.endTime); 
+//			g2.drawString(s, xpos + this.getBounds().width - 85, ypos + this.getBounds().height - 35);
+//		}
+//		// ===============================================================
+//		// draw selection border on this frame area
+//		//
+//		// background events do not get this
+//		// ===============================================================
+//		if (this.selected && (this.event == null || !this.event.isBackground())) {
+//			/* ------------------------------------------------------- */
+//			// ??
+//			// float dash1[] = { 1.0f };
+//			// BasicStroke dashed = new BasicStroke(10.0f, BasicStroke.CAP_BUTT,
+//			// BasicStroke.JOIN_BEVEL, 10.0f, dash1, 0.0f);
+//
+//			g2.setPaint(selectionColor);
+//			g2.setStroke(new BasicStroke(1.5f));
+//			if (this.roundedRectangle)
+//				g2.draw(new RoundRectangle2D.Double(1, 1, width - 3,height - 3, 18, 18));
+//			else
+//				g2.draw(new Rectangle2D.Double(1, 1, width - 3, height - 3));
+//			/* ------------------------------------------------------- */
+//		}
+//		// TODO die paint methode sollte nur einmal auf gerufen werden mit dem bufferimage und nicht mit 3 verschieden 2d-grafikhändlern
+//		if (gbiHeader != null)
+//			super.paint(gbiHeader);
+//		super.paint(g2);
+//		super.paint(gbi);
+//	}
 
 	/**
 	 * @return Returns the border.
@@ -782,6 +1174,10 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.18  2011/05/17 15:22:46  thorstenroth
+	 * <br>1. fix bugs that compute a wrong end time when resize the appointment. it only happens if appointment are recurrence.
+	 * <br>2. New implementation of the FrameArea Paint method (it is not final).
+	 * <br>
 	 * <br>Revision 1.17  2011/03/04 15:35:27  thorstenroth
 	 * <br>Little redesign of the frame area show now the start and end time of a event in the footer too.
 	 * <br>
