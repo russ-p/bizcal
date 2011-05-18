@@ -31,8 +31,6 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.LayoutManager;
 import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -74,6 +72,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.45  2011/05/18 12:56:45  thorstenroth
+ *          New final implementation of the FrameArea Paint method.
+ *
  *          Revision 1.44  2011/05/17 15:22:46  thorstenroth
  *          1. fix bugs that compute a wrong end time when resize the appointment. it only happens if appointment are recurrence.
  *          2. New implementation of the FrameArea Paint method (it is not final).
@@ -418,22 +419,6 @@ public abstract class CalendarView {
 		try {
 		    JPopupMenu popup = popupMenuCallback.getEventPopupMenu(calId, event);
 		    
-		    // TODO throws exception
-//		    System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++");
-//		    System.out.println("getComponent: " + e.getComponent());
-//		    System.out.println(e.getX());
-//		    System.out.println(e.getX());
-//		    System.out.println("Soucre: " + e.getSource());
-		    
-		    //Point componentLocation = e.getComponent().getLocationOnScreen();
-		    //e.getComponent().setVisible(true);
-		    
-		    
-		    //popup.show(this.getComponent(), e.getX(), e.getY());
-		    
-		    //popup.setLocation(componentLocation.x + e.getX(), componentLocation.y + e.getY());
-		    //popup.setLocation(e.getComponent().getX(), e.getComponent().getY());
-		    
 		    popup.show(e.getComponent(), e.getX(), e.getY());
 		    popup.setVisible(true);
 		} catch (Exception e2) {
@@ -555,9 +540,6 @@ public abstract class CalendarView {
 
 		private Event _event;
 		
-		// TODO test Cursors for test the resize and drag of a event
-		// private Cursor resizeCursor = Toolkit.getDefaultToolkit().createCustomCursor(CalendarIcons.getIcon(CalendarIcons.CURSOR_RESIZE).getImage(),new Point(0,0), "Cursor" );
-		
 		private Cursor resizeCursor = new Cursor(Cursor.S_RESIZE_CURSOR);
 		
 		private Cursor handCursor = new Cursor(Cursor.HAND_CURSOR);
@@ -589,7 +571,6 @@ public abstract class CalendarView {
 		}
 
 		public void mousePressed(MouseEvent e) {
-			System.out.println("mouse Pressed");
 			/* ================================================== */
 			if(SwingUtilities.isLeftMouseButton(e))
 			{
@@ -682,7 +663,6 @@ public abstract class CalendarView {
 		 * @see java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
 		 */
 		public void mouseReleased(MouseEvent e) {
-			System.out.println("mouse released");
 			/* ================================================== */
 			if(SwingUtilities.isLeftMouseButton(e))
 			{
@@ -710,7 +690,6 @@ public abstract class CalendarView {
 				if (listener != null) {
 					// only take it out to try something
 					if (isResizeable) {
-						System.out.println("resize area !!!");
 						/* ------------------------------------------------------- */
 						FrameArea fa = findLastFrameArea(baseFrameArea);
 						if (fa == null)
@@ -898,7 +877,6 @@ public abstract class CalendarView {
 
 		private void maybeShowPopup(MouseEvent e) {
 			/* ================================================== */
-			System.out.println("Mause x y: " + e.getX() + " - " + e.getY());
 			try {
 				if (e.isPopupTrigger()) {
 					FrameArea area = getFrameArea(_calId, _event);
@@ -1640,6 +1618,19 @@ public abstract class CalendarView {
 ////							.getY()
 ////							+ tempLast.getHeight()));
 			/* ================================================== */
+		
+
+			// set the time string to draw it in the FrameArea
+			try {
+				_frameArea.setMovingTimeString(getDate(_frameArea
+						.getX(), _frameArea.getY()),
+						getDate(_frameArea.getX(), _frameArea
+								.getY()
+								+ _frameArea.getHeight()));
+
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 		}
 		
 		
@@ -1657,6 +1648,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.45  2011/05/18 12:56:45  thorstenroth
+	 * <br>New final implementation of the FrameArea Paint method.
+	 * <br>
 	 * <br>Revision 1.44  2011/05/17 15:22:46  thorstenroth
 	 * <br>1. fix bugs that compute a wrong end time when resize the appointment. it only happens if appointment are recurrence.
 	 * <br>2. New implementation of the FrameArea Paint method (it is not final).
@@ -1791,6 +1785,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.45  2011/05/18 12:56:45  thorstenroth
+	 * <br>New final implementation of the FrameArea Paint method.
+	 * <br>
 	 * <br>Revision 1.44  2011/05/17 15:22:46  thorstenroth
 	 * <br>1. fix bugs that compute a wrong end time when resize the appointment. it only happens if appointment are recurrence.
 	 * <br>2. New implementation of the FrameArea Paint method (it is not final).
@@ -1934,6 +1931,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.45  2011/05/18 12:56:45  thorstenroth
+	 * <br>New final implementation of the FrameArea Paint method.
+	 * <br>
 	 * <br>Revision 1.44  2011/05/17 15:22:46  thorstenroth
 	 * <br>1. fix bugs that compute a wrong end time when resize the appointment. it only happens if appointment are recurrence.
 	 * <br>2. New implementation of the FrameArea Paint method (it is not final).
@@ -2174,7 +2174,7 @@ public abstract class CalendarView {
 						// try to get a better calendar id with selectedCalendar.getId()
 						// take the selected calendar if possible
 						if(selectedCalendar.getId() != null)
-							listener.newEvent(selectedCalendar.getId(), new DateInterval(date1,date2)); // TODO vielleicht passiert hier ein fehler wenn ja raus
+							listener.newEvent(selectedCalendar.getId(), new DateInterval(date1,date2));
 						// use the old method getCalendarId(e.getPoint().x, e.getPoint().y) how try to get the selected calendar over the day columns
 						// TODO And i don't now how this will work
 						else
@@ -3034,6 +3034,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.45  2011/05/18 12:56:45  thorstenroth
+//	 * <br>New final implementation of the FrameArea Paint method.
+//	 * <br>
 //	 * <br>Revision 1.44  2011/05/17 15:22:46  thorstenroth
 //	 * <br>1. fix bugs that compute a wrong end time when resize the appointment. it only happens if appointment are recurrence.
 //	 * <br>2. New implementation of the FrameArea Paint method (it is not final).
