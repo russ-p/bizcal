@@ -84,6 +84,9 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.16  2011/06/14 14:49:58  thorstenroth
+ * <br>fix Bug #842
+ * <br>
  * <br>Revision 1.15  2011/05/05 16:04:55  thorstenroth
  * <br>Fix Bug that comes up when the current time line should be paint in the agenda view and this view was not a instance of DayView.
  * <br>
@@ -576,8 +579,8 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 	 */
 	public void addNamedCalendar(final NamedCalendar namedCalendar) {
 		/* ================================================== */
-		if (!namedCalendars.containsKey(namedCalendar)) {
-
+		if (!namedCalendars.containsKey(namedCalendar))
+		{
 			final CheckBoxPanel calendarToggler = new CheckBoxPanel(
 					namedCalendar.getName(), namedCalendar.getColor(), calendarButtonGroup);
 			
@@ -589,15 +592,19 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 			calendarToggler.addMouseListener(this);
 			/* ------------------------------------------------------- */
 			// actionlistener for the calender itself
-			calendarToggler.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+			calendarToggler.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
 					/* ------------------------------------------------------- */
 					// notify calendar listeners if a calendar has been
 					// de/activated
-					if (namedCalendar.isActive() != calendarToggler.isActiv()) {
+					if (namedCalendar.isActive() != calendarToggler.isActiv())
+					{
 						/* ------------------------------------------------------- */
 						// save the new state of the calendar
 						namedCalendar.setActive(calendarToggler.isActiv());
+						
 						/* ------------------------------------------------------- */
 						// inform the listeners
 						for (Iterator<NamedCalendarListener> iter = calendarListeners.iterator(); iter.hasNext();) {
@@ -605,7 +612,20 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 							listener.activeCalendarsChanged(namedCalendars.keySet());
 						}
 						/* ------------------------------------------------------- */
+											
+						// =========================================================
+						// send the current selected calendar to the listeners
+						// =========================================================
+						for (Iterator<NamedCalendarListener> iter = calendarListeners.iterator(); iter
+								.hasNext();) {
+							NamedCalendarListener listener = (NamedCalendarListener) iter
+									.next();
+							listener
+									.selectedCalendarChanged(getSelectedCalendar());
+						}
+						
 					} else {
+						
 						/* ------------------------------------------------------- */
 						// =========================================================
 						// set the namedcalendar to the selected state of its
@@ -619,28 +639,29 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 						// selected calendar to work on!
 						// Unselect the rest.
 						// =========================================================
-						if (calendarToggler.isSelected()) {
+						if (calendarToggler.isSelected())
+						{
 							/* ------------------------------------------------------- */
 							// deselect all calendars, except the current
 							// selected
 							for (NamedCalendar cal : namedCalendars.keySet()) {
+								//TODO
 								if (!namedCalendars.get(cal).equals(
 										calendarToggler)) {
-//									namedCalendars.get(cal).setSelected(false);
+								//	namedCalendars.get(cal).setSelected(false);
 									cal.setSelected(false);
 								}
 							}
 							/* ------------------------------------------------------- */
-						}
-						// =========================================================
-						// send the current selected calendar to the listeners
-						// =========================================================
-						for (Iterator<NamedCalendarListener> iter = calendarListeners.iterator(); iter
-								.hasNext();) {
-							NamedCalendarListener listener = (NamedCalendarListener) iter
-									.next();
-							listener
-									.selectedCalendarChanged(getSelectedCalendar());
+						
+							// =========================================================
+							// send the current selected calendar to the listeners
+							// =========================================================
+							for (Iterator<NamedCalendarListener> iter = calendarListeners.iterator(); iter.hasNext();)
+							{
+								NamedCalendarListener listener = (NamedCalendarListener) iter.next();
+								listener.selectedCalendarChanged(getSelectedCalendar());
+							}
 						}
 						/* ------------------------------------------------------- */
 					}
@@ -763,7 +784,9 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 			for (NamedCalendar nc : namedCalendars.keySet()) {
 				/* ------------------------------------------------------- */
 				if (nc.isSelected())
+				{
 					return nc;
+				}
 				/* ------------------------------------------------------- */
 			}
 		}
@@ -780,32 +803,34 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 
 			// setSelectedCalendar(nc);
 			return nc;
-		} 
-		/* ------------------------------------------------------- */
-		// if there are no selected and no active calendars,
-		// we will select and activate the first in the list
-		if (getActiveCalendars() == null || getActiveCalendars().size() < 1) {
-			/* ------------------------------------------------------- */
-			List<NamedCalendar> allCals = getCalendars();
-			if (allCals != null && allCals.size() > 0) {
-				/* ------------------------------------------------------- */
-				NamedCalendar nc = allCals.get(0);
-				nc.setActive(true);
-				nc.getCheckBox().setSelected(true);
-				nc.setSelected(true);
-
-				// triggerUpdate();
-				// inform listeners
-				informListeners();
-
-				// setSelectedCalendar(nc);
-				return nc;
-				/* ------------------------------------------------------- */
-			}
-			/* ------------------------------------------------------- */
 		}
 		/* ------------------------------------------------------- */
-
+		// if there are no selected and no active calendars,
+		// TODO we do nothing 
+		
+//		// we will select and activate the first in the list
+//		if (getActiveCalendars() == null || getActiveCalendars().size() < 1) {
+//			/* ------------------------------------------------------- */
+//			List<NamedCalendar> allCals = getCalendars();
+//			if (allCals != null && allCals.size() > 0) {
+//				/* ------------------------------------------------------- */
+//				NamedCalendar nc = allCals.get(0);
+//				nc.setActive(true);
+//				nc.getCheckBox().setSelected(true);
+//				nc.setSelected(true);
+//
+//				// triggerUpdate();
+//				// inform listeners
+//				
+//				informListeners();
+//
+//				// setSelectedCalendar(nc);
+//				return nc;
+//				/* ------------------------------------------------------- */
+//			}
+//			/* ------------------------------------------------------- */
+//		}
+		/* ------------------------------------------------------- */
 		return null;
 		/* ================================================== */
 	}

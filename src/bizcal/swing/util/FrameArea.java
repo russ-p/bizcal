@@ -533,24 +533,24 @@ public class FrameArea extends JComponent implements ComponentListener {
 		// ============================================================
 		// draw end time at the bottom
 		// ============================================================
-		Date eTime = null;
-		if (this.endTime != null)
-			eTime = endTime;
-		else {
-			try {
-				eTime = this.event.getEnd();
-			} catch (Exception e) {
-			}
-		}
-		
-		if (eTime != null) {
-			graphicBuffImgHandle.setFont(timeFont);
-			// draw time in foot
-			graphicBuffImgHandle.drawString(timeFormat.format(eTime) + " ",
-					xpos
-					+ this.getBounds().width - 40, ypos
-					+ this.getBounds().height - 20);
-		}
+//		Date eTime = null;
+//		if (this.endTime != null)
+//			eTime = endTime;
+//		else {
+//			try {
+//				eTime = this.event.getEnd();
+//			} catch (Exception e) {
+//			}
+//		}
+//		
+//		if (eTime != null) {
+//			graphicBuffImgHandle.setFont(timeFont);
+//			// draw time in foot
+//			graphicBuffImgHandle.drawString(timeFormat.format(eTime) + " ",
+//					xpos
+//					+ this.getBounds().width - 40, ypos
+//					+ this.getBounds().height - 20);
+//		}
 
 		// ============================================================
 		// draw start time at the top
@@ -575,8 +575,11 @@ public class FrameArea extends JComponent implements ComponentListener {
 			// ============================================================
 			// paint time in the footer
 			// ============================================================
-			String s = timeFormat.format(this.startTime) + " - " + timeFormat.format(this.endTime); 
-			graphicBuffImgHandle.drawString(s, xpos + this.getBounds().width - 85, ypos + this.getBounds().height - 35);
+			if(this.startTime != null && this.endTime != null)
+			{
+				String s = timeFormat.format(this.startTime) + " - " + timeFormat.format(this.endTime);
+				graphicBuffImgHandle.drawString(s, xpos + this.getBounds().width - 85, ypos + this.getBounds().height - 35);
+			}
 		}
 		
 		// ===============================================================
@@ -584,7 +587,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 		//
 		// background events do not get this
 		// ===============================================================
-		if (this.selected && (this.event == null || !this.event.isBackground()))
+		if (this.selected)// && (this.event == null))// || !this.event.isBackground()))
 		{
 			graphicBuffImgHandle.setPaint(Color.black);
 			graphicBuffImgHandle.setStroke(new BasicStroke(1.5f));
@@ -1062,6 +1065,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.20  2011/06/14 14:49:58  thorstenroth
+	 * <br>fix Bug #842
+	 * <br>
 	 * <br>Revision 1.19  2011/05/18 12:56:45  thorstenroth
 	 * <br>New final implementation of the FrameArea Paint method.
 	 * <br>

@@ -778,6 +778,9 @@ public class DayView extends CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.44  2011/06/14 14:49:58  thorstenroth
+	 *          fix Bug #842
+	 *
 	 *          Revision 1.43  2011/03/04 12:45:35  thorstenroth
 	 *          1. Improvement of the mouse controls when event gets resize and move in the calendar.
 	 *          2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
@@ -2193,6 +2196,13 @@ public class DayView extends CalendarView {
 
 	public void setActiveCalendars(Collection<NamedCalendar> calendars) {
 		this.activeCalendars = calendars;
+		// deselect all calenders may be but it in the agenda modul //TODO
+		try {
+			this.deselect();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// set the number of active calendars. add 1 more if the
 		// selectedCalendar is not in the list activeCalendars
 		// if(this.activeCalendars.contains(this.selectedCalendar))
@@ -2201,6 +2211,13 @@ public class DayView extends CalendarView {
 	}
 
 	public void setSelectedCalendar(NamedCalendar selectedCalendar) {
+		// deselect all calenders may be but it in the agenda modul
+//		try {
+//			this.deselect();
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		this.selectedCalendar = selectedCalendar;
 		if (calPanel != null)
 			setSelectedCalendarInCV(selectedCalendar);

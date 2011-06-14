@@ -72,6 +72,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.46  2011/06/14 14:49:58  thorstenroth
+ *          fix Bug #842
+ *
  *          Revision 1.45  2011/05/18 12:56:45  thorstenroth
  *          New final implementation of the FrameArea Paint method.
  *
@@ -572,8 +575,8 @@ public abstract class CalendarView {
 
 		public void mousePressed(MouseEvent e) {
 			/* ================================================== */
-			if(SwingUtilities.isLeftMouseButton(e))
-			{
+			//if(SwingUtilities.isLeftMouseButton(e))
+			//{
 			CalendarView.isMousePressed = true;
 			this.dragged = false;
 			_shiftKey = (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0;
@@ -599,23 +602,18 @@ public abstract class CalendarView {
 							&& !isSelected)
 						deselect();
 					/* ------------------------------------------------------- */
-					if (!isSelected) {
-						select(_calId, _event, !isSelected);
+					//if (!isSelected) { //TODO raus geholt damit immer der eintrag selektiert wird der aus gewählt ist
+						
+						select(_calId, _event, true);
 						_lassoArea.setVisible(false);
 						_frameArea.requestFocus();
-					}
+					//}
 					if (listener != null)
 						listener.eventClicked(_calId, _event, area, e);
 					/* ------------------------------------------------------- */
 				}
-				if (e.getClickCount() == 2 && _event.isSelectable()) {
-					/* ------------------------------------------------------- */
-					select(_calId, _event, true);
-					if (listener != null)
-						listener.eventDoubleClick(_calId, _event, e);
-					return;
-					/* ------------------------------------------------------- */
-				}
+				//TODO dopple click raus genommen und in die funktion mouseRelease gesetzt
+				
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
@@ -636,8 +634,8 @@ public abstract class CalendarView {
 				}
 			lastCreatedFrameArea = findLastFrameArea(baseFrameArea);
 			/* ------------------------------------------------------- */
-			}else
-				maybeShowPopup(e);
+			//}else
+				//maybeShowPopup(e);
 		}
 		
 		/**
@@ -731,6 +729,15 @@ public abstract class CalendarView {
 							FrameArea area = getFrameArea(_calId, _event);
 
 							listener.eventClicked(_calId, _event, area, e);
+							/* ------------------------------------------------------- */
+						}
+						//TODO hier ist der dopple click aus der funktion mousePressed
+						if (e.getClickCount() == 2 && _event.isSelectable()) {
+							/* ------------------------------------------------------- */
+							select(_calId, _event, true);
+							if (listener != null)
+								listener.eventDoubleClick(_calId, _event, e);
+							return;
 							/* ------------------------------------------------------- */
 						}
 					}
@@ -833,46 +840,47 @@ public abstract class CalendarView {
 		}
 
 		public void mouseClicked(MouseEvent e) {
-			/* ================================================== */
-			FrameArea baseFrameArea = getBaseArea();
-			if (!baseFrameArea.equals(_frameArea)) {
-				baseFrameArea.getMouseListeners()[0].mouseClicked(e);
-				return;
-			}
-			// ===================================================================
-			// Pipe the mouse event to the calendar panel, if the event is
-			// a background event. We want to have the selection of a timeslot
-			// also available on background events.
-			// ===================================================================
-			if (_event.isBackground()) {
-				MouseEvent me = new MouseEvent(calPanel, e.getID(),
-						e.getWhen(), e.getModifiers(), e.getX()
-								+ _frameArea.getX(), e.getY()
-								+ _frameArea.getY(), e.getClickCount(),
-						e.isPopupTrigger(), e.getButton());
-
-				calPanel.getMouseListeners()[0].mouseClicked(me);
-			}
-			/* ------------------------------------------------------- */
-			try {
-				if (e.getClickCount() == 1) {
-					// TODO check
-					// if (_event.isSelectable()) {
-					// FrameArea area = getFrameArea(_calId, _event);
-					// boolean isSelected = area.isSelected();
-					// if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) ==
-					// 0)
-					// deselect();
-					// select(_calId, _event, !isSelected);
-					// }
-				} else if (e.getClickCount() == 2) {
-					if (listener != null)
-						listener.showEvent(_calId, _event);
-				}
-			} catch (Exception exc) {
-				ErrorHandler.handleError(exc);
-			}
-			/* ================================================== */
+//			//TODO raus will keinen sinn macht
+//			/* ================================================== */
+//			FrameArea baseFrameArea = getBaseArea();
+//			if (!baseFrameArea.equals(_frameArea)) {
+//				baseFrameArea.getMouseListeners()[0].mouseClicked(e);
+//				return;
+//			}
+//			// ===================================================================
+//			// Pipe the mouse event to the calendar panel, if the event is
+//			// a background event. We want to have the selection of a timeslot
+//			// also available on background events.
+//			// ===================================================================
+//			if (_event.isBackground()) {
+//				MouseEvent me = new MouseEvent(calPanel, e.getID(),
+//						e.getWhen(), e.getModifiers(), e.getX()
+//								+ _frameArea.getX(), e.getY()
+//								+ _frameArea.getY(), e.getClickCount(),
+//						e.isPopupTrigger(), e.getButton());
+//
+//				calPanel.getMouseListeners()[0].mouseClicked(me);
+//			}
+//			/* ------------------------------------------------------- */
+//			try {
+//				if (e.getClickCount() == 1) {
+//					// TODO check
+//					// if (_event.isSelectable()) {
+//					// FrameArea area = getFrameArea(_calId, _event);
+//					// boolean isSelected = area.isSelected();
+//					// if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) ==
+//					// 0)
+//					// deselect();
+//					// select(_calId, _event, !isSelected);
+//					// }
+//				} else if (e.getClickCount() == 2) {
+//					if (listener != null)
+//						listener.showEvent(_calId, _event);
+//				}
+//			} catch (Exception exc) {
+//				ErrorHandler.handleError(exc);
+//			}
+//			/* ================================================== */
 		}
 
 		private void maybeShowPopup(MouseEvent e) {
@@ -1648,6 +1656,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.46  2011/06/14 14:49:58  thorstenroth
+	 * <br>fix Bug #842
+	 * <br>
 	 * <br>Revision 1.45  2011/05/18 12:56:45  thorstenroth
 	 * <br>New final implementation of the FrameArea Paint method.
 	 * <br>
@@ -1785,6 +1796,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.46  2011/06/14 14:49:58  thorstenroth
+	 * <br>fix Bug #842
+	 * <br>
 	 * <br>Revision 1.45  2011/05/18 12:56:45  thorstenroth
 	 * <br>New final implementation of the FrameArea Paint method.
 	 * <br>
@@ -1931,6 +1945,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.46  2011/06/14 14:49:58  thorstenroth
+	 * <br>fix Bug #842
+	 * <br>
 	 * <br>Revision 1.45  2011/05/18 12:56:45  thorstenroth
 	 * <br>New final implementation of the FrameArea Paint method.
 	 * <br>
@@ -2789,6 +2806,14 @@ public abstract class CalendarView {
 	public void select(Object calId, Event event, boolean flag)
 			throws Exception {
 		/* ================================================== */
+		//TODO 1
+		/* ------------------------------------------------------- */
+		// inform the listener
+		if (listener != null) {
+			listener.eventsSelected(_selectedEvents);
+			listener.eventSelected(calId, event);
+		}
+		
 //		FrameArea area = getFrameArea(calId, event);
 		FrameArea  area = frameAreaHash.get(event);
 		if (area != null) {
@@ -2803,13 +2828,9 @@ public abstract class CalendarView {
 			_selectedEvents.add(event);
 		else
 			_selectedEvents.remove(event);
-		/* ------------------------------------------------------- */
-		// inform the listener
-		if (listener != null) {
-			listener.eventsSelected(_selectedEvents);
-			listener.eventSelected(calId, event);
-		}
-
+		
+		//---->1 stand hier
+		
 		setSelectionDate(event.getStart());
 		/* ================================================== */
 	}
@@ -3034,6 +3055,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.46  2011/06/14 14:49:58  thorstenroth
+//	 * <br>fix Bug #842
+//	 * <br>
 //	 * <br>Revision 1.45  2011/05/18 12:56:45  thorstenroth
 //	 * <br>New final implementation of the FrameArea Paint method.
 //	 * <br>
@@ -3269,6 +3293,12 @@ public abstract class CalendarView {
 	
 	//TODO Test Calid
 	public void setSelectedCalendarInCV(NamedCalendar selectedCalendar) {
+		try {
+			//deselect();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		this.selectedCalendar = selectedCalendar;
 	}
 }
