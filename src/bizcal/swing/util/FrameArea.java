@@ -471,25 +471,48 @@ public class FrameArea extends JComponent implements ComponentListener {
 		// draw description
 		// if the event is a background event, the summary is painted
 		// in a diagonale
-		Font descriptionFont = this.getFont();
-		graphicBuffImgHandle.setFont(descriptionFont);
-		
+		// TODO just for testing put it out and it is the BUG :)
 		if (itsDescription != null)
 		{
+			// get the font
+			Font descriptionFont = this.getFont();
+			// get the heights of the font
+			int fontHeight = (int) descriptionFont.getSize2D();
+			
+			// set the Font
+			graphicBuffImgHandle.setFont(descriptionFont);
+			// get the metrics of the font
+			FontMetrics fontMetrics = graphicBuffImgHandle.getFontMetrics();
+			// get the optimal width
+			int descriptionOptimalWidth = fontMetrics.stringWidth(itsDescription);
+			// set y draw position for description
 			if (showHeader && itsHeadLine == null)
 				ypos = HEADER_HEIGHT + 15;
-			int fontHeight =	(int) this.getFont().getSize2D();
-			// get the optimal width
-			int itsW = graphicBuffImgHandle.getFontMetrics().stringWidth(itsDescription);
-			FontMetrics fm = graphicBuffImgHandle.getFontMetrics();
-			if (itsW > this.getWidth())
+			
+			if (descriptionOptimalWidth > this.getWidth())
 			{
+				// set the width of a char as default to the width of the character 'm' for the font used.
+				int charWidht = fontMetrics.charWidth('m');
+				// set the width to warp
+				int warpWidth = this.getWidth()-15;
+				// set the count of chars in one line
+				int charsInLine = warpWidth/charWidht;
+				// init position in description string 
+				//int pos = 0;
+//				while(pos < itsDescription.length())
+//				{
+//					
+//					pos = pos + charsInLine;
+//				}
+				
+				
 				// check if the width of the frame area has changed and we
 				// must find a new fitting length to split the string
-				int splitWidth = getWidth()-15;
+				int splitWidth = this.getWidth()-15;
+				
 				if (lineWrap < 0
-						|| fm.stringWidth(itsDescription.substring(0, lineWrap)) < splitWidth - 15 
-						|| fm.stringWidth(itsDescription.substring(0, lineWrap)) > splitWidth) 
+						|| fontMetrics.stringWidth(itsDescription.substring(0, lineWrap)) < splitWidth - 15 
+						|| fontMetrics.stringWidth(itsDescription.substring(0, lineWrap)) > splitWidth) 
 				{
 					// wrap the lines
 					String s = itsDescription;
@@ -497,7 +520,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 					
 					// shorten the string as often as its painted length
 					// fits into the framearea
-					while (fm.stringWidth(s)> splitWidth && lineWrap > -1)
+					while (fontMetrics.stringWidth(s)> splitWidth && lineWrap > -1)
 					{
 						s = itsDescription.substring(0, lineWrap);
 						lineWrap--;
@@ -520,9 +543,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-						pos = pos+lineWrap;
 						yposString = yposString + fontHeight + 5;
 					}
+					pos = pos+lineWrap; // TODO this was the bug the line stand in the else case not here :)
 				}
 			} else {
 				// just print
@@ -1065,6 +1088,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.21  2011/07/05 14:54:18  thorstenroth
+	 * <br>fix the deadlock in class FrameArea in Line 477 where painting the appointment description.
+	 * <br>
 	 * <br>Revision 1.20  2011/06/14 14:49:58  thorstenroth
 	 * <br>fix Bug #842
 	 * <br>

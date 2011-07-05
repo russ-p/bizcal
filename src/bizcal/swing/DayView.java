@@ -778,6 +778,9 @@ public class DayView extends CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.45  2011/07/05 14:54:18  thorstenroth
+	 *          fix the deadlock in class FrameArea in Line 477 where painting the appointment description.
+	 *
 	 *          Revision 1.44  2011/06/14 14:49:58  thorstenroth
 	 *          fix Bug #842
 	 *
@@ -2260,9 +2263,8 @@ public class DayView extends CalendarView {
 	 * 
 	 * @throws Exception
 	 */
-	public void setCurrentTimeLine() throws Exception {
-		
-		
+	public void setCurrentTimeLine()
+	{
 		EventModel dayModel = (EventModel) getModel();
 		Date currentDate 	= new Date();
 		// if current day not in DayView don't draw current timeline
@@ -2286,14 +2288,20 @@ public class DayView extends CalendarView {
 		int x = getWidth() / dayModelDays;
 		
 		// set the text font and bounds of current timeline
-		Date weekStart = dayModel.getInterval().getStartDate();
-		int currentDay = DateUtil.getDiffDay(DateUtil.getDayOfWeek(weekStart), DateUtil.getDayOfWeek(currentDate));
-		currentDay -= 1;
+		Date weekStart;
+		try {
+			weekStart = dayModel.getInterval().getStartDate();
+			int currentDay = DateUtil.getDiffDay(DateUtil.getDayOfWeek(weekStart), DateUtil.getDayOfWeek(currentDate));
+			currentDay -= 1;
 		
-		currentTimeLine.setBounds(0 + (currentDay * x), y - 1, x, 1);
-		currentTimeLineShadow.setBounds(0 + (currentDay * x), y - 6, x, 11);
-		currentTimeLineLabel.setText(timeFormat.format(currentDate));
-		currentTimeLineLabel.setFont(new Font("Arial", Font.BOLD, 9));
-		currentTimeLineLabel.setBounds((x / 2 - 10) + (currentDay * x), y - 5, 23,10);
+			currentTimeLine.setBounds(0 + (currentDay * x), y - 1, x, 1);
+			currentTimeLineShadow.setBounds(0 + (currentDay * x), y - 6, x, 11);
+			currentTimeLineLabel.setText(timeFormat.format(currentDate));
+			currentTimeLineLabel.setFont(new Font("Arial", Font.BOLD, 9));
+			currentTimeLineLabel.setBounds((x / 2 - 10) + (currentDay * x), y - 5, 23,10);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
