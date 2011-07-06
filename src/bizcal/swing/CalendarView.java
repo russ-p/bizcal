@@ -72,6 +72,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.47  2011/07/06 13:55:50  thorstenroth
+ *          fix the deadlock in class DayView in Line 660 when try to get a date form empty hashmap.
+ *
  *          Revision 1.46  2011/06/14 14:49:58  thorstenroth
  *          fix Bug #842
  *
@@ -1656,6 +1659,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.47  2011/07/06 13:55:50  thorstenroth
+	 * <br>fix the deadlock in class DayView in Line 660 when try to get a date form empty hashmap.
+	 * <br>
 	 * <br>Revision 1.46  2011/06/14 14:49:58  thorstenroth
 	 * <br>fix Bug #842
 	 * <br>
@@ -1796,6 +1802,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.47  2011/07/06 13:55:50  thorstenroth
+	 * <br>fix the deadlock in class DayView in Line 660 when try to get a date form empty hashmap.
+	 * <br>
 	 * <br>Revision 1.46  2011/06/14 14:49:58  thorstenroth
 	 * <br>fix Bug #842
 	 * <br>
@@ -1945,6 +1954,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.47  2011/07/06 13:55:50  thorstenroth
+	 * <br>fix the deadlock in class DayView in Line 660 when try to get a date form empty hashmap.
+	 * <br>
 	 * <br>Revision 1.46  2011/06/14 14:49:58  thorstenroth
 	 * <br>fix Bug #842
 	 * <br>
@@ -2069,14 +2081,16 @@ public abstract class CalendarView {
 					// the date is in the range of the lasso area
 					/* ------------------------------------------------------- */
 					int newY = findNextSmallerHorizontalLinePos(e.getPoint().y);
-					
 //					Date date = getDate(	  e.getPoint().x, e.getPoint().y);
 					Date date = getDate(	  e.getPoint().x, newY);
 					Object id = getCalendarId(e.getPoint().x, e.getPoint().y);
+					
 					if (listener == null)
 						return;
+					
 					if (!getModel().isInsertable(id, date))
 						return;
+					
 					listener.newEvent(id, date);
 					/* ------------------------------------------------------- */
 				}
@@ -3055,6 +3069,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.47  2011/07/06 13:55:50  thorstenroth
+//	 * <br>fix the deadlock in class DayView in Line 660 when try to get a date form empty hashmap.
+//	 * <br>
 //	 * <br>Revision 1.46  2011/06/14 14:49:58  thorstenroth
 //	 * <br>fix Bug #842
 //	 * <br>

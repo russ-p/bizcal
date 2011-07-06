@@ -655,6 +655,11 @@ public class DayView extends CalendarView {
 
 		/* ------------------------------------------------------- */
 		Date foundDate = null;
+		// here is the Bug because what is when minuteMapping is empty {}
+		// so we must check it
+		if(minuteMapping == null || minuteMapping.size() == 0)
+			foundDate = new Date(); 
+		
 		while (foundDate == null) {
 			/* ------------------------------------------------------- */
 			foundDate = minuteMapping.get(yPos);
@@ -778,6 +783,9 @@ public class DayView extends CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.46  2011/07/06 13:55:50  thorstenroth
+	 *          fix the deadlock in class DayView in Line 660 when try to get a date form empty hashmap.
+	 *
 	 *          Revision 1.45  2011/07/05 14:54:18  thorstenroth
 	 *          fix the deadlock in class FrameArea in Line 477 where painting the appointment description.
 	 *
