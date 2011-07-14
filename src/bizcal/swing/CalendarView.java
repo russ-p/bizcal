@@ -72,6 +72,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.48  2011/07/14 11:43:14  thorstenroth
+ *          Upgrading the selection of appointments.
+ *
  *          Revision 1.47  2011/07/06 13:55:50  thorstenroth
  *          fix the deadlock in class DayView in Line 660 when try to get a date form empty hashmap.
  *
@@ -637,8 +640,7 @@ public abstract class CalendarView {
 				}
 			lastCreatedFrameArea = findLastFrameArea(baseFrameArea);
 			/* ------------------------------------------------------- */
-			//}else
-				//maybeShowPopup(e);
+			calPanel.repaint();
 		}
 		
 		/**
@@ -725,7 +727,7 @@ public abstract class CalendarView {
 							/* ------------------------------------------------------- */
 						}
 						/* ------------------------------------------------------- */
-						// clicked event for isPopTrigger
+						// mouse click
 						/* ------------------------------------------------------- */
 						if (e.getClickCount() == 1 && _event.isSelectable()) {
 							/* ------------------------------------------------------- */
@@ -734,10 +736,13 @@ public abstract class CalendarView {
 							listener.eventClicked(_calId, _event, area, e);
 							/* ------------------------------------------------------- */
 						}
-						//TODO hier ist der dopple click aus der funktion mousePressed
+						/* ------------------------------------------------------- */
+						// mouse double click
+						/* ------------------------------------------------------- */
 						if (e.getClickCount() == 2 && _event.isSelectable()) {
 							/* ------------------------------------------------------- */
 							select(_calId, _event, true);
+							CalendarView.isMousePressed = false; // TODO test
 							if (listener != null)
 								listener.eventDoubleClick(_calId, _event, e);
 							return;
@@ -1659,6 +1664,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.48  2011/07/14 11:43:14  thorstenroth
+	 * <br>Upgrading the selection of appointments.
+	 * <br>
 	 * <br>Revision 1.47  2011/07/06 13:55:50  thorstenroth
 	 * <br>fix the deadlock in class DayView in Line 660 when try to get a date form empty hashmap.
 	 * <br>
@@ -1802,6 +1810,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.48  2011/07/14 11:43:14  thorstenroth
+	 * <br>Upgrading the selection of appointments.
+	 * <br>
 	 * <br>Revision 1.47  2011/07/06 13:55:50  thorstenroth
 	 * <br>fix the deadlock in class DayView in Line 660 when try to get a date form empty hashmap.
 	 * <br>
@@ -1954,6 +1965,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.48  2011/07/14 11:43:14  thorstenroth
+	 * <br>Upgrading the selection of appointments.
+	 * <br>
 	 * <br>Revision 1.47  2011/07/06 13:55:50  thorstenroth
 	 * <br>fix the deadlock in class DayView in Line 660 when try to get a date form empty hashmap.
 	 * <br>
@@ -3069,6 +3083,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.48  2011/07/14 11:43:14  thorstenroth
+//	 * <br>Upgrading the selection of appointments.
+//	 * <br>
 //	 * <br>Revision 1.47  2011/07/06 13:55:50  thorstenroth
 //	 * <br>fix the deadlock in class DayView in Line 660 when try to get a date form empty hashmap.
 //	 * <br>
