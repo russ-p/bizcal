@@ -72,6 +72,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.49  2011/07/15 15:33:00  thorstenroth
+ *          fixed Ticket #416
+ *
  *          Revision 1.48  2011/07/14 11:43:14  thorstenroth
  *          Upgrading the selection of appointments.
  *
@@ -479,7 +482,6 @@ public abstract class CalendarView {
 
 		/* ================================================== */
 	}
-
 	/**
 	 * Get the default column width
 	 *
@@ -1131,29 +1133,75 @@ public abstract class CalendarView {
 				// } catch (Exception ex) {
 				// ex.printStackTrace();
 				// }
-				int diffPoint = (_startDrag.y - e.getPoint().y);
-				if (Math.abs(diffPoint) > getTimeSlotHeight()
-						|| _shiftKey) {
+				int maus_y = e.getPoint().y;
+				//System.out.println("startDrag.y: " + _startDrag.y);
+				//System.out.println("maus_y: " + maus_y);
+				int diffPoint = (_startDrag.y - maus_y);
+				if (Math.abs(diffPoint) > getTimeSlotHeight() || _shiftKey) {
+				//if (_startDrag.y != maus_y){
 					/* ------------------------------------------------------- */
 					int mov;
 					// move without the line steps
 					if (_shiftKey){
-						
 						mov = Math.abs(diffPoint);
-						//System.out.println("true mov: " + mov);
 					}else{
 						// TODO calculate mov better to get a better snap on time line effect when moving events
-						mov = getTimeSlotHeight();
-						//System.out.println("false mov: " + mov);
+						//mov = getTimeSlotHeight2((Integer)baseFrameArea.getY());
+						mov = 0;
 					}
 					/* ------------------------------------------------------- */
-					if (_startDrag.y > e.getPoint().y) {
+					
+					if (_startDrag.y > maus_y) {
 						mov = mov * (-1);// - 1;
 						//mov = mov * (-1) - 1;
 					}
+					int ay = 0;
+					if (_startDrag.y < maus_y) {	
+						//System.out.println("area nach unten");
+						
+						for (JLabel l : hLines) {
+							if (((Integer)l.getY()) > baseFrameArea.getY()) 
+							{
+								ay = l.getY();
+								break;
+							}
+						}
+						baseFrameArea.setBounds(
+								baseFrameArea.getX(),
+								ay,
+								baseFrameArea.getWidth(),
+								baseFrameArea.getHeight()
+						);
+					}
+					if (_startDrag.y > maus_y) {
+						//System.out.println("area nach oben");
+						
+						int lastLy = 0;
+						for (JLabel l : hLines) 
+						{	
+							if (((Integer)l.getY()) == baseFrameArea.getY()) 
+							{
+								ay = lastLy;
+								break;
+							}
+							lastLy = l.getY();
+						}
+						baseFrameArea.setBounds(
+								baseFrameArea.getX(),
+								ay,
+								baseFrameArea.getWidth(),
+								baseFrameArea.getHeight()
+						);
+						
+					}
+					
+					//_startDrag.y = ay;
 					/* ------------------------------------------------------- */
 					if (baseFrameArea.getY() + mov >= calPanel
 							.getY()) {
+//						System.out.println("panely < area+mov");
+//						System.out.println("base frameArea + mov: " + baseFrameArea.getY() + mov);
+//						System.out.println("panely: " + calPanel.getY());
 						baseFrameArea.setBounds(baseFrameArea
 								.getX(), baseFrameArea
 								.getY()
@@ -1664,6 +1712,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.49  2011/07/15 15:33:00  thorstenroth
+	 * <br>fixed Ticket #416
+	 * <br>
 	 * <br>Revision 1.48  2011/07/14 11:43:14  thorstenroth
 	 * <br>Upgrading the selection of appointments.
 	 * <br>
@@ -1810,6 +1861,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.49  2011/07/15 15:33:00  thorstenroth
+	 * <br>fixed Ticket #416
+	 * <br>
 	 * <br>Revision 1.48  2011/07/14 11:43:14  thorstenroth
 	 * <br>Upgrading the selection of appointments.
 	 * <br>
@@ -1965,6 +2019,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.49  2011/07/15 15:33:00  thorstenroth
+	 * <br>fixed Ticket #416
+	 * <br>
 	 * <br>Revision 1.48  2011/07/14 11:43:14  thorstenroth
 	 * <br>Upgrading the selection of appointments.
 	 * <br>
@@ -3083,6 +3140,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.49  2011/07/15 15:33:00  thorstenroth
+//	 * <br>fixed Ticket #416
+//	 * <br>
 //	 * <br>Revision 1.48  2011/07/14 11:43:14  thorstenroth
 //	 * <br>Upgrading the selection of appointments.
 //	 * <br>
