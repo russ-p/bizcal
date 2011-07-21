@@ -59,6 +59,9 @@ import bizcal.util.Interval;
  *
  * @version
  * <br>$Log: DayViewPanel.java,v $
+ * <br>Revision 1.9  2011/07/21 07:17:28  thorstenroth
+ * <br>Bug: Can not print past or future agenda weeks happens only in the weekview fixed.
+ * <br>
  * <br>Revision 1.8  2011/03/04 12:45:35  thorstenroth
  * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
  * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
@@ -208,14 +211,13 @@ public class DayViewPanel extends AbstractCalendarView {
 	 * Updates the settings from the config file
 	 */
 	public void refresh() {
-		/* ================================================== */
-		if (VIEW_NAME_WEEK.equals(VIEW_NAME)) {
-			/* ------------------------------------------------------- */
-			// set the weekday start/stop to the model
-			this.dayModel.setWeekdayStartEnd(dayViewConfig.getWeekStart(), dayViewConfig.getWeekEnd());
-			/* ------------------------------------------------------- */
-			//TODO damit in der drei tages ansicht die wochenende aus geblendet werden oder ???
-		}
+		// ==================================================
+//		if (VIEW_NAME_WEEK.equals(VIEW_NAME)) {
+//			/* ------------------------------------------------------- */
+//			// set the weekday start/stop to the model
+//			this.dayModel.setWeekdayStartEnd(dayViewConfig.getWeekStart(), dayViewConfig.getWeekEnd());
+//			/* ------------------------------------------------------- */
+//		}
 		
 		try {
 //			dayView.refresh();
@@ -224,7 +226,7 @@ public class DayViewPanel extends AbstractCalendarView {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		/* ================================================== */
+		// ==================================================
 	}
 	
 	
