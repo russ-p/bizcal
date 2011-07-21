@@ -84,6 +84,9 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.17  2011/07/21 07:15:34  thorstenroth
+ * <br>code clearup
+ * <br>
  * <br>Revision 1.16  2011/06/14 14:49:58  thorstenroth
  * <br>fix Bug #842
  * <br>
@@ -117,7 +120,9 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 
 	private NaviBar naviBar;
 	
-	private JCalendar dayChooser;
+	//TODO create a get function
+	//private JCalendar dayChooser;
+	public JCalendar dayChooser;
 
 	private ButtonPanel viewsButtonPanel;
 
