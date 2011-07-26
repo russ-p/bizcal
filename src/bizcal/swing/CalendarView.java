@@ -72,6 +72,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.51  2011/07/26 15:12:17  thorstenroth
+ *          code clearup
+ *
  *          Revision 1.50  2011/07/26 13:46:26  thorstenroth
  *          Fix Ticket #887.
  *
@@ -547,8 +550,6 @@ public abstract class CalendarView {
 			MouseMotionListener {
 
 		private Point _startDrag;
-
-		private Point _startPositionOfFrameArea;
 		
 		private FrameArea _frameArea;
 
@@ -615,7 +616,7 @@ public abstract class CalendarView {
 							&& !isSelected)
 						deselect();
 					/* ------------------------------------------------------- */
-					//if (!isSelected) { //TODO raus geholt damit immer der eintrag selektiert wird der aus gewählt ist
+					//if (!isSelected) {
 						
 						select(_calId, _event, true);
 						_lassoArea.setVisible(false);
@@ -625,20 +626,17 @@ public abstract class CalendarView {
 						listener.eventClicked(_calId, _event, area, e);
 					/* ------------------------------------------------------- */
 				}
-				//TODO dopple click raus genommen und in die funktion mouseRelease gesetzt
+				
 				
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
-			// TODO hier weiter machen wegen neuen versuch dasdragging richtig hin zu bekommen
+			
 			// get FrameArea
 			FrameArea baseFrameArea = getBaseArea();
 			// set position value for dragging
 			_startDrag = e.getPoint();
-			//_startPositionOfFrameArea = baseFrameArea.getPoint(); // TODO wieder raus werfen die variable
-			System.out.println("+++ Neuer drag");
-			System.out.println("+++ startDrag: " + _startDrag);
-			System.out.println("+++ startFArea: " + _startPositionOfFrameArea);
+									
 			// fill additional frames
 			additionalFrames.clear();
 			if (baseFrameArea.getChildren() != null)
@@ -816,9 +814,7 @@ public abstract class CalendarView {
 
 		public void mouseExited(MouseEvent e)
 		{
-			System.out.println("++++ mouse exit +++");
 			/* ================================================== */
-			
 			FrameArea baseFrameArea = getBaseArea();
 			
 			if (!baseFrameArea.equals(_frameArea)) {
@@ -827,16 +823,9 @@ public abstract class CalendarView {
 			}
 			/* ------------------------------------------------------- */
 			
-//			if (this.dragged)
-//			{
-//				System.out.println("--- wird noch geändert die area ----");
-//				moveDrag(_frameArea, e);
-//			}
-			// * sie hier schon raus geht wenn maus isMousePressed ist
 			if (CalendarView.isMousePressed)
 				return;
-			
-			// wie konnt es hier hi wenn * 
+			 
 			if (CalendarView.isResizeable){
 			  CalendarView.isResizeable = false;
 			  baseFrameArea.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -863,8 +852,7 @@ public abstract class CalendarView {
 		}
 
 		public void mouseClicked(MouseEvent e) {
-			System.out.println("############# mouse clicked");
-//			//TODO raus will keinen sinn macht
+//			// TODO take code out for testing
 //			/* ================================================== */
 //			FrameArea baseFrameArea = getBaseArea();
 //			if (!baseFrameArea.equals(_frameArea)) {
@@ -1044,10 +1032,6 @@ public abstract class CalendarView {
 		
 		private void moveDrag(FrameArea baseFrameArea, MouseEvent e)
 		{	
-			System.out.println("Mouse zeiger xy: " + e.getPoint());
-			System.out.println("baseFrameArea xy: " + baseFrameArea.getX() + "/" + baseFrameArea.getY());
-			System.out.println("baseFrameArea bounds: " + baseFrameArea.getBounds());
-			
 			// -------------------------------------------------------
 			// compute values for detecting the crossing of a 
 			// vertical line
@@ -1090,7 +1074,6 @@ public abstract class CalendarView {
 
 			if (newXPos != null && newXPos <= calPanel.getX() + calPanel.getWidth())
 			{
-				System.out.println("+++++++++++++++++ horizontal moving (x-direction) +++++++++++++++++++");
 				int y = baseFrameArea.getY();
 				int width = baseFrameArea.getWidth();
 				int height = baseFrameArea.getHeight();
@@ -1115,147 +1098,91 @@ public abstract class CalendarView {
 				// -------------------------------------------------------
 				// vertical move (y-direction)
 				// -------------------------------------------------------
-				// try {
-				// System.out.println("k: " + _startDrag.y + " - " +
-				// e.getPoint().y);
-				// } catch (Exception ex) {
-				// ex.printStackTrace();
-				// }
 				int maus_y = e.getPoint().y;
-				//System.out.println("startDrag.y: " + _startDrag.y);
-				//System.out.println("maus_y: " + maus_y);
+						
 				
-				// der wo die maus greift
 				int diffPoint = (_startDrag.y - maus_y);
-				if (Math.abs(diffPoint) > getTimeSlotHeight() || _shiftKey) {
-				//if (_startDrag.y != maus_y){
-					/* ------------------------------------------------------- */
+				if (Math.abs(diffPoint) > getTimeSlotHeight() || _shiftKey)
+				{
 					int mov;
 					// move without the line steps
 					if (_shiftKey){
 						mov = Math.abs(diffPoint);
 					}else{
-						// TODO calculate mov better to get a better snap on time line effect when moving events
-						//mov = getTimeSlotHeight2((Integer)baseFrameArea.getY());
 						mov = 0;
-					}
-					/* ------------------------------------------------------- */
-					
-					if (_startDrag.y > maus_y) {
-						mov = mov * (-1);// - 1;
-						//mov = mov * (-1) - 1;
-					}
-					// -------------------------------------------------------
-					if (!_shiftKey)
-					{
-//					int ay = 0;
-//					if (_startDrag.y < maus_y) {	
-//						//System.out.println("area nach unten");
-//						
-//						for (JLabel l : hLines) {
-//							if (((Integer)l.getY()) > baseFrameArea.getY()) 
-//							{
-//								ay = l.getY();
-//								break;
-//							}
-//						}
-//						baseFrameArea.setBounds(
-//								baseFrameArea.getX(),
-//								ay,
-//								baseFrameArea.getWidth(),
-//								baseFrameArea.getHeight()
-//						);
-//					}
-//					
-//					if (_startDrag.y > maus_y) {
-//						//System.out.println("area nach oben");
-//						
-//						int lastLy = 0;//baseFrameArea.getY();
-//						for (JLabel l : hLines) 
-//						{	
-//							if (((Integer)l.getY()) == baseFrameArea.getY()) 
-//							{
-//								ay = lastLy;
-//								break;
-//							}
-//							lastLy = l.getY();
-//						}
-//						baseFrameArea.setBounds(
-//								baseFrameArea.getX(),
-//								ay,
-//								baseFrameArea.getWidth(),
-//								baseFrameArea.getHeight()
-//						);
-//						
-//					}
-					
-						int sy = 0, gy = 0;
-						int lastLy = 0;//baseFrameArea.getY();	
-						for (JLabel l : hLines) {
-								if (((Integer)l.getY()) > baseFrameArea.getY()- diffPoint) 
-								{
-									sy = lastLy; 
-									gy = l.getY();
-									break;
-									
-								}
-								lastLy = l.getY();
+						int sy = 0;
+						int gy = 0;
+						int lastLy = 0;	
+						for (JLabel l : hLines)
+						{
+							if (((Integer)l.getY()) > baseFrameArea.getY()- diffPoint) 
+							{
+								sy = lastLy; 
+								gy = l.getY();
+								break;
 							}
-							
+							lastLy = l.getY();
+						}
 						
-					if (_startDrag.y < maus_y) {
-						baseFrameArea.setBounds(
+						if (_startDrag.y < maus_y)
+						{
+							baseFrameArea.setBounds(
 								baseFrameArea.getX(),
 								gy,
 								baseFrameArea.getWidth(),
 								baseFrameArea.getHeight()
-						);
-					}
+							);
+						}
 						if (_startDrag.y > maus_y) {
 							baseFrameArea.setBounds(
-									baseFrameArea.getX(),
-									sy,
-									baseFrameArea.getWidth(),
-									baseFrameArea.getHeight()
+								baseFrameArea.getX(),
+								sy,
+								baseFrameArea.getWidth(),
+								baseFrameArea.getHeight()
 							);
 						}
 					}
-					//_startDrag.y = ay;
-					/* ------------------------------------------------------- */
-					if (baseFrameArea.getY() + mov >= calPanel
-							.getY()) {
-//						System.out.println("panely < area+mov");
-//						System.out.println("base frameArea + mov: " + baseFrameArea.getY() + mov);
-//						System.out.println("panely: " + calPanel.getY());
-						baseFrameArea.setBounds(baseFrameArea
-								.getX(), baseFrameArea
-								.getY()
-								+ mov, baseFrameArea.getWidth(),
-								baseFrameArea.getHeight());
+					// -------------------------------------------------------
+					if (_startDrag.y > maus_y)
+					{
+						mov = mov * (-1);	
+					}
+					// -------------------------------------------------------
+					
+					
+					if (baseFrameArea.getY() + mov >= calPanel.getY())
+					{
+						baseFrameArea.setBounds(
+							baseFrameArea.getX(),
+							baseFrameArea.getY() + mov,
+							baseFrameArea.getWidth(),
+							baseFrameArea.getHeight()
+						);
 
-						/* ------------------------------------------------------- */
+						// -------------------------------------------------------
 						// find last frame
 						FrameArea lastArea = findLastFrameArea(baseFrameArea);
 						// if the event lasts longer than a day
 						if (baseFrameArea.getChildren() != null
 								&& baseFrameArea.getChildren().size() > 0) {
-							/* ------------------------------------------------------- */
+							// -------------------------------------------------------
 							// set the height of the base frame area to
 							// the panels bottom
-							baseFrameArea.setBounds(baseFrameArea
-									.getX(), baseFrameArea
-									.getY(), baseFrameArea
-									.getWidth(), calPanel
-									.getHeight()
-									- baseFrameArea.getY());
-							/* ------------------------------------------------------- */
+							baseFrameArea.setBounds(
+								baseFrameArea.getX(),
+								baseFrameArea.getY(),
+								baseFrameArea.getWidth(),
+								calPanel.getHeight() - baseFrameArea.getY()
+							);
 						}
 						if (lastArea != null)
-							lastArea.setBounds(lastArea.getX(),
-									lastArea.getY(), lastArea
-											.getWidth(),
-									lastArea.getHeight() + mov);
-						/* ------------------------------------------------------- */
+							lastArea.setBounds(
+								lastArea.getX(),
+								lastArea.getY(),
+								lastArea.getWidth(),
+								lastArea.getHeight() + mov
+							);
+						// -------------------------------------------------------
 						// recall the mousedragged event to the current
 						// frame area if
 						// this is not the first one, in order to update
@@ -1264,7 +1191,7 @@ public abstract class CalendarView {
 						// is this an evil hack?
 						if (!_frameArea.equals(baseFrameArea))
 							this.mousePressed(e);
-						/* ------------------------------------------------------- */
+						// -------------------------------------------------------
 					}
 				}
 			}
@@ -1738,6 +1665,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.51  2011/07/26 15:12:17  thorstenroth
+	 * <br>code clearup
+	 * <br>
 	 * <br>Revision 1.50  2011/07/26 13:46:26  thorstenroth
 	 * <br>Fix Ticket #887.
 	 * <br>
@@ -1890,6 +1820,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.51  2011/07/26 15:12:17  thorstenroth
+	 * <br>code clearup
+	 * <br>
 	 * <br>Revision 1.50  2011/07/26 13:46:26  thorstenroth
 	 * <br>Fix Ticket #887.
 	 * <br>
@@ -2051,6 +1984,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.51  2011/07/26 15:12:17  thorstenroth
+	 * <br>code clearup
+	 * <br>
 	 * <br>Revision 1.50  2011/07/26 13:46:26  thorstenroth
 	 * <br>Fix Ticket #887.
 	 * <br>
@@ -2350,8 +2286,6 @@ public abstract class CalendarView {
 
 		public void mouseDragged(MouseEvent e) {
 			/* ================================================== */
-			System.out.println("Mousepostion from calview: " + e.getPoint());
-			// **************************************************************************
 			try {
 				if (!_dragging) {
 					_dragging = true;
@@ -3176,6 +3110,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.51  2011/07/26 15:12:17  thorstenroth
+//	 * <br>code clearup
+//	 * <br>
 //	 * <br>Revision 1.50  2011/07/26 13:46:26  thorstenroth
 //	 * <br>Fix Ticket #887.
 //	 * <br>
