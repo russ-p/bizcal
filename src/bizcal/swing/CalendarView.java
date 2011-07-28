@@ -72,6 +72,12 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.52  2011/07/28 08:37:28  thorstenroth
+ *          fix bugs:
+ *          - better movement by drag and resize a appointment.
+ *          - current time line are now not repaint when a appointment is create, dragged or resized.
+ *          - the shift-key which allows a pixel accuracy dragging and resizeing of appointments, can now pressed any time not only at the beginning of drag or resize action.
+ *
  *          Revision 1.51  2011/07/26 15:12:17  thorstenroth
  *          code clearup
  *
@@ -180,7 +186,7 @@ import bizcal.util.TimeOfDay;
  *          Revision 1.20 2007/06/12 13:47:50 heinemann <br>
  *          fixed nullpointer <br>
  *          <br>
-
+ *
  *
  */
 public abstract class CalendarView {
@@ -197,7 +203,7 @@ public abstract class CalendarView {
 
 	private Map<String, FrameArea> _frameAreaMap = new HashMap<String, FrameArea>();
 
-	private Map _eventMap = new HashMap();
+	private Map<Object, List<Object>> _eventMap = new HashMap<Object, List<Object>>();
 
 	private List<Event> _selectedEvents = new ArrayList<Event>();
 
@@ -212,6 +218,15 @@ public abstract class CalendarView {
 	private CalendarViewConfig desc;
 
 	private static boolean draggingEnabled = true;
+	
+	// drag status of CalendarView is set if appointment is dragged 
+	private boolean isDragging = false;
+	
+	// create status of CalendarView is set if appointment is in creation
+	private boolean isCreating = false;
+	
+	// resize status of CalendarView is set if appointment is resized
+	private boolean isResizeing = false;
 
 	/**
 	 * Member to store the original clicked FrameArea in a dragging event.
@@ -577,7 +592,7 @@ public abstract class CalendarView {
 
 		private FrameArea baseArea;
 
-		private Integer lastCreatedKey;
+		//private Integer lastCreatedKey;
 
 		public FrameAreaMouseListener(FrameArea frameArea, Object calId, Event event) {
 			/* ================================================== */
@@ -589,11 +604,8 @@ public abstract class CalendarView {
 
 		public void mousePressed(MouseEvent e) {
 			/* ================================================== */
-			//if(SwingUtilities.isLeftMouseButton(e))
-			//{
 			CalendarView.isMousePressed = true;
 			this.dragged = false;
-			_shiftKey = (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0;
 			/* ------------------------------------------------------- */
 			// store the clicked FrameArea
 			/* ------------------------------------------------------- */
@@ -674,7 +686,9 @@ public abstract class CalendarView {
 			/* ================================================== */
 			if(SwingUtilities.isLeftMouseButton(e))
 			{
-			FrameArea baseFrameArea = getBaseArea();
+				isDragging = false;
+				isResizeing = false;
+				FrameArea baseFrameArea = getBaseArea();
 			if (!baseFrameArea.equals(_frameArea)) {
 				baseFrameArea.getMouseListeners()[0].mouseReleased(e);
 				return;
@@ -960,18 +974,21 @@ public abstract class CalendarView {
 					ex.printStackTrace();
 				}
 				this.dragged = true;
-					
+				// if shift key pressed dragging and resizeing steps pixel accuracy
+				_shiftKey = (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0;
 				try {
 					// -------------------------------------------------------
 					// if resizing call resizing function
 					// -------------------------------------------------------
 					if (CalendarView.isResizeable) {
+						isResizeing = true;
 						resizeDrag(baseFrameArea, e);
 					}
 					// -------------------------------------------------------
 					// else dragging call dragging function
 					// -------------------------------------------------------
 					else {
+						isDragging = true;
 						moveDrag(baseFrameArea, e);
 					}
 				} catch (Exception e2) {
@@ -1037,7 +1054,6 @@ public abstract class CalendarView {
 			// vertical line
 			// -------------------------------------------------------
 			int currX = _frameArea.getX();
-//			int currY = _frameArea.getY();
 			int currWidth = _frameArea.getWidth();
 			int nextSmaller = findNextSmallerVerticalLine(currX	+ LINE_OFFSET);
 			int nextGreater = findNextGreaterVerticalLine(currX	+ LINE_OFFSET);
@@ -1115,7 +1131,7 @@ public abstract class CalendarView {
 						int lastLy = 0;	
 						for (JLabel l : hLines)
 						{
-							if (((Integer)l.getY()) > baseFrameArea.getY()- diffPoint) 
+							if (((Integer)l.getY()) > baseFrameArea.getY() - diffPoint) // baseFrameArea.getY() - diffPoint
 							{
 								sy = lastLy; 
 								gy = l.getY();
@@ -1124,19 +1140,19 @@ public abstract class CalendarView {
 							lastLy = l.getY();
 						}
 						
-						if (_startDrag.y < maus_y)
+						if (diffPoint < maus_y)
 						{
 							baseFrameArea.setBounds(
 								baseFrameArea.getX(),
-								gy,
+								sy,
 								baseFrameArea.getWidth(),
 								baseFrameArea.getHeight()
 							);
 						}
-						if (_startDrag.y > maus_y) {
+						if (diffPoint > maus_y) {
 							baseFrameArea.setBounds(
 								baseFrameArea.getX(),
-								sy,
+								gy,
 								baseFrameArea.getWidth(),
 								baseFrameArea.getHeight()
 							);
@@ -1465,7 +1481,7 @@ public abstract class CalendarView {
 //										System.out.println("MAX -> new");
 									}
 									this.lastCreatedFrameArea = fa;
-									this.lastCreatedKey = i;
+									//this.lastCreatedKey = i;
 									currentPoint = convertPoint(currentPoint, currentArea, fa);
 									currentArea = fa;
 									/* ------------------------------------------------------- */
@@ -1665,6 +1681,12 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.52  2011/07/28 08:37:28  thorstenroth
+	 * <br>fix bugs:
+	 * <br>- better movement by drag and resize a appointment.
+	 * <br>- current time line are now not repaint when a appointment is create, dragged or resized.
+	 * <br>- the shift-key which allows a pixel accuracy dragging and resizeing of appointments, can now pressed any time not only at the beginning of drag or resize action.
+	 * <br>
 	 * <br>Revision 1.51  2011/07/26 15:12:17  thorstenroth
 	 * <br>code clearup
 	 * <br>
@@ -1820,6 +1842,12 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.52  2011/07/28 08:37:28  thorstenroth
+	 * <br>fix bugs:
+	 * <br>- better movement by drag and resize a appointment.
+	 * <br>- current time line are now not repaint when a appointment is create, dragged or resized.
+	 * <br>- the shift-key which allows a pixel accuracy dragging and resizeing of appointments, can now pressed any time not only at the beginning of drag or resize action.
+	 * <br>
 	 * <br>Revision 1.51  2011/07/26 15:12:17  thorstenroth
 	 * <br>code clearup
 	 * <br>
@@ -1984,6 +2012,12 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.52  2011/07/28 08:37:28  thorstenroth
+	 * <br>fix bugs:
+	 * <br>- better movement by drag and resize a appointment.
+	 * <br>- current time line are now not repaint when a appointment is create, dragged or resized.
+	 * <br>- the shift-key which allows a pixel accuracy dragging and resizeing of appointments, can now pressed any time not only at the beginning of drag or resize action.
+	 * <br>
 	 * <br>Revision 1.51  2011/07/26 15:12:17  thorstenroth
 	 * <br>code clearup
 	 * <br>
@@ -2143,17 +2177,17 @@ public abstract class CalendarView {
 			}
 			/* ================================================== */
 		}
-
-		private void maybeShowPopup(MouseEvent e) {
-			try {
-				if (e.isPopupTrigger()) {
-					Object id = getCalendarId(e.getPoint().x, e.getPoint().y);
-					showEmptyPopup(e, id);
-				}
-			} catch (Exception exc) {
-				throw BizcalException.create(exc);
-			}
-		}
+		// TODO this methode is not used 2011/07/27
+//		private void maybeShowPopup(MouseEvent e) {
+//			try {
+//				if (e.isPopupTrigger()) {
+//					Object id = getCalendarId(e.getPoint().x, e.getPoint().y);
+//					showEmptyPopup(e, id);
+//				}
+//			} catch (Exception exc) {
+//				throw BizcalException.create(exc);
+//			}
+//		}
 
 		public void mousePressed(MouseEvent e) {
 			/* ================================================== */
@@ -2175,6 +2209,7 @@ public abstract class CalendarView {
 		public void mouseReleased(MouseEvent e) {
 			
 			/* ================================================== */
+			isCreating = false;
 			try {
 				/* ------------------------------------------------------- */
 				//maybeShowPopup(e);
@@ -2287,6 +2322,7 @@ public abstract class CalendarView {
 		public void mouseDragged(MouseEvent e) {
 			/* ================================================== */
 			try {
+				isCreating = true;
 				if (!_dragging) {
 					_dragging = true;
 					Object id = getCalendarId(e.getPoint().x, e.getPoint().y);
@@ -2835,13 +2871,13 @@ public abstract class CalendarView {
 		getComponent().setCursor(cursor);
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void register(Object calId, Event event, FrameArea area) {
 		_frameAreaMap.put("" + calId + event.getId()
 				+ event.getStart().getTime(), area);
-		List list = (List) _eventMap.get(calId);
+		List<Object> list = (List<Object>)_eventMap.get(calId);
+		
 		if (list == null) {
-			list = new ArrayList();
+			list = new ArrayList<Object>();
 			_eventMap.put(calId, list);
 		}
 		list.add(event);
@@ -2861,8 +2897,7 @@ public abstract class CalendarView {
 	public void select(Object calId, Event event, boolean flag)
 			throws Exception {
 		/* ================================================== */
-		//TODO 1
-		/* ------------------------------------------------------- */
+		//TODO <--- 1
 		// inform the listener
 		if (listener != null) {
 			listener.eventsSelected(_selectedEvents);
@@ -2884,7 +2919,7 @@ public abstract class CalendarView {
 		else
 			_selectedEvents.remove(event);
 		
-		//---->1 stand hier
+		// ---> 1
 		
 		setSelectionDate(event.getStart());
 		/* ================================================== */
@@ -2899,14 +2934,14 @@ public abstract class CalendarView {
 	public void deselect() throws Exception {
 		/* ================================================== */
 		_selectedEvents.clear();
-		Iterator iCal = broker.getSelectedCalendars().iterator();
+		Iterator<?> iCal = broker.getSelectedCalendars().iterator();
 		while (iCal.hasNext()) {
 			bizcal.common.Calendar cal = (bizcal.common.Calendar) iCal.next();
 			Object calId = cal.getId();
-			List events = (List) _eventMap.get(calId);
+			List<Object> events = (List<Object>) _eventMap.get(calId);
 			if (events == null)
 				return;
-			Iterator i = events.iterator();
+			Iterator<Object> i = events.iterator();
 			while (i.hasNext()) {
 				Event event = (Event) i.next();
 //				FrameArea area = getFrameArea(calId, event);
@@ -2982,7 +3017,7 @@ public abstract class CalendarView {
 		} else
 			_selectedEvents.addAll(getEditibleEvents(id, new DateInterval(
 					date1, date2)));
-		Iterator i = _selectedEvents.iterator();
+		Iterator<Event> i = _selectedEvents.iterator();
 		while (i.hasNext()) {
 			Event event = (Event) i.next();
 			FrameArea area = getFrameArea(id, event);
@@ -3005,12 +3040,12 @@ public abstract class CalendarView {
 										throws Exception {
 		/* ================================================== */
 		List<Event> result = new ArrayList<Event>();
-		List events 	   = (List) _eventMap.get(calId);
+		List<Object> events = (List<Object>) _eventMap.get(calId);
 		/* ------------------------------------------------------- */
 		if (events == null || events.size() < 1)
 			return result;
 		/* ------------------------------------------------------- */
-		Iterator i = events.iterator();
+		Iterator<Object> i = events.iterator();
 		while (i.hasNext()) {
 			/* ------------------------------------------------------- */
 			Event event = (Event) i.next();
@@ -3030,7 +3065,7 @@ public abstract class CalendarView {
 	private boolean isSelected(Event event) {
 		if (event == null)
 			return false;
-		Iterator i = _selectedEvents.iterator();
+		Iterator<Event> i = _selectedEvents.iterator();
 		while (i.hasNext()) {
 			Event tmpEvent = (Event) i.next();
 			if (tmpEvent.getId().equals(event.getId()))
@@ -3110,6 +3145,12 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.52  2011/07/28 08:37:28  thorstenroth
+//	 * <br>fix bugs:
+//	 * <br>- better movement by drag and resize a appointment.
+//	 * <br>- current time line are now not repaint when a appointment is create, dragged or resized.
+//	 * <br>- the shift-key which allows a pixel accuracy dragging and resizeing of appointments, can now pressed any time not only at the beginning of drag or resize action.
+//	 * <br>
 //	 * <br>Revision 1.51  2011/07/26 15:12:17  thorstenroth
 //	 * <br>code clearup
 //	 * <br>
@@ -3259,7 +3300,7 @@ public abstract class CalendarView {
 //		/* ================================================== */
 //	}
 
-	protected List getSelectedCalendars() throws Exception {
+	protected List<?> getSelectedCalendars() throws Exception {
 		return broker.getSelectedCalendars();
 	}
 
@@ -3361,7 +3402,7 @@ public abstract class CalendarView {
 		/* ================================================== */
 	}
 	
-	//TODO Test Calid
+	// TODO Test Calid
 	public void setSelectedCalendarInCV(NamedCalendar selectedCalendar) {
 		try {
 			//deselect();
@@ -3370,5 +3411,38 @@ public abstract class CalendarView {
 			e.printStackTrace();
 		}
 		this.selectedCalendar = selectedCalendar;
+	}
+	
+	/**
+	 * Get creating status of CalendarView.
+	 * Return true if a appointment is in creation process.
+	 * 
+	 * @return isCreating the creating status
+	 */
+	public boolean getIsCreating()
+	{
+		return isCreating;
+	}
+	
+	/**
+	 * Get dragging status of CalendarView.
+	 * Return true if a appointment is in dragging.
+	 * 
+	 * @return isDragging the dragging status
+	 */
+	public boolean getIsDragging()
+	{
+		return isDragging;
+	}
+	
+	/**
+	 * Get resizeing status of CalendarView.
+	 * Return true if a appointment is in resizeing.
+	 * 
+	 * @return isResizeing the resizeing status 
+	 */
+	public boolean getIsResizeing()
+	{
+		return isResizeing;
 	}
 }

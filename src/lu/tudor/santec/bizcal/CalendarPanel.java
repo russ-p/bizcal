@@ -84,6 +84,12 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.18  2011/07/28 08:37:28  thorstenroth
+ * <br>fix bugs:
+ * <br>- better movement by drag and resize a appointment.
+ * <br>- current time line are now not repaint when a appointment is create, dragged or resized.
+ * <br>- the shift-key which allows a pixel accuracy dragging and resizeing of appointments, can now pressed any time not only at the beginning of drag or resize action.
+ * <br>
  * <br>Revision 1.17  2011/07/21 07:15:34  thorstenroth
  * <br>code clearup
  * <br>
@@ -207,8 +213,11 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 							if(currentView.getView() instanceof DayView)
 							{
 								DayView currentDayView = (DayView) currentView.getView();
-								currentDayView.setCurrentTimeLine();
-								repaint();							
+								if(!currentDayView.getIsCreating() && !currentDayView.getIsDragging() && !currentDayView.getIsResizeing())
+								{
+									currentDayView.setCurrentTimeLine();
+									repaint();
+								}
 							}
 						}
 						
