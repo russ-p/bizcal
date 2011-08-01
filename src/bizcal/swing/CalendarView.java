@@ -72,6 +72,9 @@ import bizcal.util.TimeOfDay;
  *
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.53  2011/08/01 14:59:40  thorstenroth
+ *          Implement a new function that scale the resize region when resizing a appointment.
+ *
  *          Revision 1.52  2011/07/28 08:37:28  thorstenroth
  *          fix bugs:
  *          - better movement by drag and resize a appointment.
@@ -591,7 +594,10 @@ public abstract class CalendarView {
 		private long lastEventTime = 0;
 
 		private FrameArea baseArea;
-
+		// define max y size of resize region
+		private static final int DEFAULT_SIZE_Y_RESIZE_REGION = 6;
+		// set resize region to max y
+		private int resizeRegionY = DEFAULT_SIZE_Y_RESIZE_REGION;
 		//private Integer lastCreatedKey;
 
 		public FrameAreaMouseListener(FrameArea frameArea, Object calId, Event event) {
@@ -1006,18 +1012,23 @@ public abstract class CalendarView {
 			// return;
 			// }
 			/* ------------------------------------------------------- */
-
+			// scale resize region
+			if(baseFrameArea.getHeight() <= DEFAULT_SIZE_Y_RESIZE_REGION*2)
+			{
+				this.resizeRegionY = baseFrameArea.getHeight()/2;
+				if(this.resizeRegionY <= 0) this.resizeRegionY = 5;
+			}
 			/* ------------------------------------------------------- */
 			FrameArea areaToChange = null;
 			areaToChange = findLastFrameArea(baseFrameArea);
 			/* ------------------------------------------------------- */
 			if (areaToChange == null)
 				areaToChange = baseFrameArea;
+			
 			// if mouse is at the bottom, switch to resize mode
-
 			if (!areaToChange.getCursor().equals(this.resizeCursor)) {
 				
-				if (e.getPoint().y > areaToChange.getHeight() - 18) {
+				if (e.getPoint().y > areaToChange.getHeight() - resizeRegionY) {
 					/* ------------------------------------------------------- */
 					// this is the latest frame area
 					if (e.getSource().equals(areaToChange)) {
@@ -1030,7 +1041,7 @@ public abstract class CalendarView {
 				}
 			} else {
 				if (!areaToChange.getCursor().equals(this.handCursor)) {
-					if (e.getPoint().y < areaToChange.getHeight() - 18) {
+					if (e.getPoint().y < areaToChange.getHeight() - resizeRegionY) {
 						areaToChange.setCursor(this.handCursor);
 						CalendarView.isResizeable = false;
 						e.consume();
@@ -1038,8 +1049,6 @@ public abstract class CalendarView {
 					}
 				}
 			}
-
-			/* ================================================== */
 		}
 		
 		
@@ -1681,6 +1690,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.53  2011/08/01 14:59:40  thorstenroth
+	 * <br>Implement a new function that scale the resize region when resizing a appointment.
+	 * <br>
 	 * <br>Revision 1.52  2011/07/28 08:37:28  thorstenroth
 	 * <br>fix bugs:
 	 * <br>- better movement by drag and resize a appointment.
@@ -1842,6 +1854,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.53  2011/08/01 14:59:40  thorstenroth
+	 * <br>Implement a new function that scale the resize region when resizing a appointment.
+	 * <br>
 	 * <br>Revision 1.52  2011/07/28 08:37:28  thorstenroth
 	 * <br>fix bugs:
 	 * <br>- better movement by drag and resize a appointment.
@@ -2012,6 +2027,9 @@ public abstract class CalendarView {
 	 *
 	 * @version
 	 * <br>$Log: CalendarView.java,v $
+	 * <br>Revision 1.53  2011/08/01 14:59:40  thorstenroth
+	 * <br>Implement a new function that scale the resize region when resizing a appointment.
+	 * <br>
 	 * <br>Revision 1.52  2011/07/28 08:37:28  thorstenroth
 	 * <br>fix bugs:
 	 * <br>- better movement by drag and resize a appointment.
@@ -3145,6 +3163,9 @@ public abstract class CalendarView {
 //	 *
 //	 * @version
 //	 * <br>$Log: CalendarView.java,v $
+//	 * <br>Revision 1.53  2011/08/01 14:59:40  thorstenroth
+//	 * <br>Implement a new function that scale the resize region when resizing a appointment.
+//	 * <br>
 //	 * <br>Revision 1.52  2011/07/28 08:37:28  thorstenroth
 //	 * <br>fix bugs:
 //	 * <br>- better movement by drag and resize a appointment.
