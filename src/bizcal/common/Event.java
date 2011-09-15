@@ -200,10 +200,20 @@ public class Event
 		if (toolTip != null)
 			return toolTip;
 		DateFormat format = DateFormat.getTimeInstance(DateFormat.SHORT, LocaleBroker.getLocale());
+		
+		// format htmlString to textString
+		String str = null;
+		if(description != null)
+		{
+			str = description.replaceAll("<", "&#60;");
+			str = str.replaceAll(">", "&#62;");
+			str = str.replaceAll("\n", "<br>");
+		}
+		
 		return "<html>[" + format.format(getStart()) +
 			"-" + format.format(getEnd()) + "] <b>" +
-			summary+"</b><br><hr><br><table width=\"300\"><tr><td>"
-			+description+"</td></tr></table>";
+			summary+"</b><br><hr><table width=\"300\"><tr><td>"
+			+str+"</td></tr></table>";
 	}
 	public void setToolTip(String toolTip) {
 		this.toolTip = toolTip;

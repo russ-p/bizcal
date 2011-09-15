@@ -425,7 +425,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 			// draw head
 			if (showHeader) graphicBuffImgHandle.fill(new Rectangle2D.Double(0, 0, width, 20));
 			// draw foot
-			graphicBuffImgHandle.fill(new Rectangle2D.Double(0, height-18, width, 18));
+			graphicBuffImgHandle.fill(new Rectangle2D.Double(0, height - 18, width, 18));
 			// draw border
 			if (this.border && (this.event != null))
 			{
@@ -491,21 +491,6 @@ public class FrameArea extends JComponent implements ComponentListener {
 			
 			if (descriptionOptimalWidth > this.getWidth())
 			{
-				// set the width of a char as default to the width of the character 'm' for the font used.
-				int charWidht = fontMetrics.charWidth('m');
-				// set the width to warp
-				int warpWidth = this.getWidth()-15;
-				// set the count of chars in one line
-				int charsInLine = warpWidth/charWidht;
-				// init position in description string 
-				//int pos = 0;
-//				while(pos < itsDescription.length())
-//				{
-//					
-//					pos = pos + charsInLine;
-//				}
-				
-				
 				// check if the width of the frame area has changed and we
 				// must find a new fitting length to split the string
 				int splitWidth = this.getWidth()-15;
@@ -520,7 +505,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 					
 					// shorten the string as often as its painted length
 					// fits into the framearea
-					while (fontMetrics.stringWidth(s)> splitWidth && lineWrap > -1)
+					while (fontMetrics.stringWidth(s) > splitWidth && lineWrap > -1)
 					{
 						s = itsDescription.substring(0, lineWrap);
 						lineWrap--;
@@ -529,23 +514,52 @@ public class FrameArea extends JComponent implements ComponentListener {
 						lineWrap = 0;
 				}
 				// paint the string
-				int pos 		= 0;
+				//int pos 		= 0;
 				int yposString  = ypos;
-					
-				while (pos < itsDescription.length() && lineWrap > 0)
+				int posInStr = 0;
+				int posOfNL = 0;
+				String pieceStr = null;
+				int count = 0;
+				String newStr = itsDescription;
+				
+				while(posInStr < itsDescription.length())
 				{
-					if (pos+lineWrap >= itsDescription.length())
-					{
-						graphicBuffImgHandle.drawString(itsDescription.substring(pos, itsDescription.length()-1).trim(), xpos, yposString);
-					}else{
-						try {
-							graphicBuffImgHandle.drawString(itsDescription.substring(pos, pos+lineWrap).trim(), xpos, yposString);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						yposString = yposString + fontHeight + 5;
+					posOfNL = newStr.indexOf("\n");
+					if(posOfNL == -1) posOfNL = newStr.length();
+					else{ 
+						count++;
+						posOfNL  = posOfNL + 1;
 					}
-					pos = pos+lineWrap; // TODO this was the bug the line stand in the else case not here :)
+					
+					pieceStr = newStr.substring(0, posOfNL);
+					
+					int pos 		= 0;
+					while (pos < pieceStr.length() && lineWrap > 0)
+					{
+						// stop drawing the description in the Area foot
+						if(yposString > this.getHeight() - 18) break;
+						
+						if (pos+lineWrap >= pieceStr.length())
+						{
+							graphicBuffImgHandle.drawString(pieceStr.substring(pos, pieceStr.length()).trim(), xpos, yposString);
+						}else{
+							try { 
+								graphicBuffImgHandle.drawString(pieceStr.substring(pos, pos+lineWrap).trim(), xpos, yposString);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+							yposString = yposString + fontHeight + 5;
+						}
+						pos = pos+lineWrap; // TODO this was the bug the line stand in the else case not here :)
+					}
+					yposString = yposString + fontHeight + 5;
+					
+					if(posOfNL != newStr.length())
+					{
+						newStr = newStr.substring(posOfNL, newStr.length());
+					}
+					
+					posInStr = posInStr + posOfNL;
 				}
 			} else {
 				// just print
@@ -1088,6 +1102,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.22  2011/09/15 16:18:51  thorstenroth
+	 * <br>Fix Bug - Now the line breaks in the FrameArea and tootips are are visible.
+	 * <br>
 	 * <br>Revision 1.21  2011/07/05 14:54:18  thorstenroth
 	 * <br>fix the deadlock in class FrameArea in Line 477 where painting the appointment description.
 	 * <br>
