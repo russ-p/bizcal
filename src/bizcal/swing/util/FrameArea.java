@@ -484,13 +484,13 @@ public class FrameArea extends JComponent implements ComponentListener {
 			// get the metrics of the font
 			FontMetrics fontMetrics = graphicBuffImgHandle.getFontMetrics();
 			// get the optimal width
-			int descriptionOptimalWidth = fontMetrics.stringWidth(itsDescription);
+			//int descriptionOptimalWidth = fontMetrics.stringWidth(itsDescription);
 			// set y draw position for description
 			if (showHeader && itsHeadLine == null)
 				ypos = HEADER_HEIGHT + 15;
 			
-			if (descriptionOptimalWidth > this.getWidth())
-			{
+			//if (descriptionOptimalWidth > this.getWidth())
+			//{
 				// check if the width of the frame area has changed and we
 				// must find a new fitting length to split the string
 				int splitWidth = this.getWidth()-15;
@@ -500,8 +500,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 						|| fontMetrics.stringWidth(itsDescription.substring(0, lineWrap)) > splitWidth) 
 				{
 					// wrap the lines
+					
 					String s = itsDescription;
-					this.lineWrap = s.length()-1;
+					this.lineWrap = s.length();//-1
 					
 					// shorten the string as often as its painted length
 					// fits into the framearea
@@ -532,7 +533,6 @@ public class FrameArea extends JComponent implements ComponentListener {
 					}
 					
 					pieceStr = newStr.substring(0, posOfNL);
-					
 					int pos 		= 0;
 					while (pos < pieceStr.length() && lineWrap > 0)
 					{
@@ -561,10 +561,10 @@ public class FrameArea extends JComponent implements ComponentListener {
 					
 					posInStr = posInStr + posOfNL;
 				}
-			} else {
-				// just print
-				graphicBuffImgHandle.drawString(itsDescription, xpos, ypos);
-			}
+//			} else {
+//				// just print
+//				graphicBuffImgHandle.drawString(itsDescription, xpos, ypos);
+//			}
 		}
 		
 		// ============================================================
@@ -1102,6 +1102,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.23  2011/09/22 14:11:20  thorstenroth
+	 * <br>Fix Bug - Now the line breaks in the FrameArea and tootips are are visible.
+	 * <br>
 	 * <br>Revision 1.22  2011/09/15 16:18:51  thorstenroth
 	 * <br>Fix Bug - Now the line breaks in the FrameArea and tootips are are visible.
 	 * <br>
