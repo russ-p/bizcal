@@ -56,10 +56,11 @@ public class ListRenderer extends DefaultTableCellRenderer {
 		Color c = Color.WHITE;
 		try {
 			c = e.getColor();		
-			c = new Color(c.getRed(),c.getGreen(),c.getBlue(),60);
-			if (e.getStart().before(new Date()))
-				c = new Color(230,230,230);
-			
+			if (new Date().before(e.getEnd()))
+				c = new Color(c.getRed(),c.getGreen(),c.getBlue(),120);
+			else
+				c = new Color(c.getRed(),c.getGreen(),c.getBlue(),20);
+
 			if (! DateUtil.isSameDay(e.getStart(), model.getEvent(p_Row-1).getStart()))
 					border = newDayBorder;
 			else 
