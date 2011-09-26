@@ -55,11 +55,13 @@ public class CheckBoxPanel extends JPanel implements ActionListener {
 
 	public CheckBoxPanel(String text, Color c, ButtonGroup group) {
 
-		this.setOpaque(true);
+		//this.setOpaque(true);
+		this.setOpaque(false);
 		
 		this.setLayout(new BorderLayout());
 		this.checkBox = new JCheckBox();
-		this.checkBox.setOpaque(true);
+		//this.checkBox.setOpaque(true);
+		this.checkBox.setOpaque(false);
 		this.checkBox.requestFocus(false);
 		this.add(checkBox, BorderLayout.EAST);
 		
@@ -137,7 +139,7 @@ public class CheckBoxPanel extends JPanel implements ActionListener {
 		/* ================================================== */
 //		Thread t = new Thread() {
 //			public void run() {
-				for (Iterator iter = listeners.iterator(); iter.hasNext();) {
+				for (Iterator<ActionListener> iter = listeners.iterator(); iter.hasNext();) {
 					ActionListener element = (ActionListener) iter.next();
 					element.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "selection changed"));
 				}
@@ -177,6 +179,9 @@ public class CheckBoxPanel extends JPanel implements ActionListener {
 	 *
 	 * @version
 	 * <br>$Log: CheckBoxPanel.java,v $
+	 * <br>Revision 1.6  2011/09/26 15:19:48  thorstenroth
+	 * <br>Add a scroll bar to the CalendarPanel to show all Calendar.
+	 * <br>
 	 * <br>Revision 1.5  2008/10/21 16:05:06  heine_
 	 * <br>*** empty log message ***
 	 * <br>

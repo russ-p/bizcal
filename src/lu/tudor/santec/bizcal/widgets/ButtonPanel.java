@@ -37,6 +37,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 
 import com.jgoodies.forms.layout.CellConstraints;
@@ -77,7 +78,7 @@ public class ButtonPanel extends JPanel {
 	 */
 	public ButtonPanel(String title, Color color, int columns, Vector<Action> actions, boolean toggleActions) {
 		Vector<AbstractButton> buttons = new Vector<AbstractButton>();
-		for (Iterator iter = actions.iterator(); iter.hasNext();) {
+		for (Iterator<Action> iter = actions.iterator(); iter.hasNext();) {
 			Action action = (Action) iter.next();
 			if (toggleActions) {
 				buttons.add(new JToggleButton(action));
@@ -100,7 +101,7 @@ public class ButtonPanel extends JPanel {
 	 */
 	public ButtonPanel(String title, Color color, int columns, Vector<Action> actions, boolean toggleActions, boolean captionOnTop) {
 		Vector<AbstractButton> buttons = new Vector<AbstractButton>();
-		for (Iterator iter = actions.iterator(); iter.hasNext();) {
+		for (Iterator<Action> iter = actions.iterator(); iter.hasNext();) {
 			Action action = (Action) iter.next();
 			if (toggleActions) {
 				buttons.add(new JToggleButton(action));
@@ -146,22 +147,26 @@ public class ButtonPanel extends JPanel {
 		this.add(label, BorderLayout.NORTH);
 		content = new JPanel(new GridLayout(0,columns, 2, 2));
 		content.setOpaque(false);
-		for (Iterator iter = buttons.iterator(); iter.hasNext();) {
+		for (Iterator<AbstractButton> iter = buttons.iterator(); iter.hasNext();) {
 			AbstractButton element = (AbstractButton) iter.next();
 			addButton(element);
 		}
 		/* ------------------------------------------------------- */
+		JScrollPane scrollPane = new JScrollPane(content);
+		scrollPane.setOpaque(false);
+		scrollPane.getViewport().setOpaque(false);
+		
 		if (captionOnTop) {
 			/* ------------------------------------------------------- */
-			JPanel stretchPanel = new JPanel(new FormLayout("fill:pref", "fill:pref:grow,pref"));
+			JPanel stretchPanel = new JPanel(new FormLayout("fill:pref", "fill:1dlu:grow,pref"));
 			stretchPanel.setOpaque(false);
 			CellConstraints cc = new CellConstraints();
-			stretchPanel.add(content, cc.xy(1, 2));
+			stretchPanel.add(scrollPane, cc.xy(1, 2));
 			this.add(stretchPanel, BorderLayout.CENTER);
 			/* ------------------------------------------------------- */
+		}else{
+			this.add(scrollPane, BorderLayout.CENTER);
 		}
-		else
-			this.add(content, BorderLayout.CENTER);
 		/* ================================================== */
 	}
 

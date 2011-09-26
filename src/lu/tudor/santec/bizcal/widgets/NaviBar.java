@@ -50,6 +50,7 @@ public class NaviBar extends JPanel {
 	public static final int TOP 	= 1;
 	public static final int BOTTOM 	= 2;
 	public static final int FILL 	= 3;
+	public static final int GROW 	= 4;
 	
 	private CellConstraints cc;
 	private FormLayout layout;
@@ -104,18 +105,30 @@ public class NaviBar extends JPanel {
 //			this.layout.insertRow(pos, new RowSpec("fill:pref:grow"));
 //			this.add(new JLabel("f "+pos), cc.xy(2, pos));
 //			pos++;
-			this.layout.insertRow(pos, new RowSpec("fill:pref:grow"));
+			this.layout.insertRow(pos, new RowSpec("fill:pref:grow")); 
 			this.add(buttonPanel, cc.xy(2, pos));
 			pos++;
 			this.layout.insertRow(pos, new RowSpec("3dlu"));
 			pos++;
 			/* ------------------------------------------------------- */
-		}
-		else {
+		}else
+		if (GROW == alignment) {
+				/* ------------------------------------------------------- */
+//				this.layout.insertRow(pos, new RowSpec("fill:pref:grow"));
+//				this.add(new JLabel("f "+pos), cc.xy(2, pos));
+//				pos++;
+				this.layout.insertRow(pos, new RowSpec("fill:1dlu:grow")); 
+				this.add(buttonPanel, cc.xy(2, pos));
+				pos++;
+				this.layout.insertRow(pos, new RowSpec("3dlu"));
+				pos++;
+				/* ------------------------------------------------------- */
+		} else{
 			this.layout.appendRow(new RowSpec("pref"));
 			this.add(buttonPanel, cc.xy(2, layout.getRowCount()));
 			this.layout.appendRow(new RowSpec("3dlu"));
 		}
+		
 		/* ================================================== */
 	}
 	

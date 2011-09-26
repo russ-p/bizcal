@@ -84,6 +84,9 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.19  2011/09/26 15:19:48  thorstenroth
+ * <br>Add a scroll bar to the CalendarPanel to show all Calendar.
+ * <br>
  * <br>Revision 1.18  2011/07/28 08:37:28  thorstenroth
  * <br>fix bugs:
  * <br>- better movement by drag and resize a appointment.
@@ -272,14 +275,14 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 				functionsActionsVector, false, true);
 		//functionsButtonPanel.setContentLayout(new BorderLayout());
 		
-		this.naviBar.addButtonPanel(functionsButtonPanel, NaviBar.FILL);
+		this.naviBar.addButtonPanel(functionsButtonPanel, NaviBar.TOP);
 
 		// create the calendar buttons
 		this.calendarButtonPanel = new ButtonPanel(Translatrix
 				.getTranslationString("bizcal.calendar"), headerColor, 1,
 				new Vector<AbstractButton>());
-
-		this.naviBar.addButtonPanel(calendarButtonPanel, NaviBar.BOTTOM);
+		
+		this.naviBar.addButtonPanel(this.calendarButtonPanel, NaviBar.GROW);
 
 		// this.calendarButtonPanel.addComponent(new CheckBoxPanel("text",
 		// Color.RED));
