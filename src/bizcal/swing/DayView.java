@@ -783,6 +783,10 @@ public class DayView extends CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.47  2011/10/20 15:32:21  thorstenroth
+	 *          1. add new calendar type the background calendar type which is displayed over a whole column.
+	 *          2. fix Bug: public holidays are not displayed over the whole daily column
+	 *
 	 *          Revision 1.46  2011/07/06 13:55:50  thorstenroth
 	 *          fix the deadlock in class DayView in Line 660 when try to get a date form empty hashmap.
 	 *
@@ -1579,11 +1583,16 @@ public class DayView extends CalendarView {
 					// count the calendars of the events per column
 					Set<Object> calendersOfEventsPerColumn = new HashSet<Object>();
 
+					
+					
 					for (int j = 0; j < events.size(); j++) {
 						Event event = events.get(j);
-						calendersOfEventsPerColumn.add(event
-								.get(Event.CALENDAR_ID));
+						// ignor holydays | holyday events have no calendar id
+						// ignor background calendars
+						if(event.get(Event.CALENDAR_ID) != null && !(Boolean) event.get(Event.CALENDAR_IS_BACKGROUND))
+							calendersOfEventsPerColumn.add(event.get(Event.CALENDAR_ID));
 					}
+					
 
 					// sort the calendar
 					Integer calendarCount = calendersOfEventsPerColumn.size();
@@ -1658,9 +1667,13 @@ public class DayView extends CalendarView {
 								x1 = x1 + (c * (colWidth / calendarCount));
 							}
 						}
-
-						area.setBounds(x1, y1, colWidth / calendarCount,
-								dHeight);
+						// set position of event
+						if(event.get(Event.CALENDAR_ID) != null  && !(Boolean) event.get(Event.CALENDAR_IS_BACKGROUND))
+							// normal appointment event and unavailable event
+							area.setBounds(x1, y1, colWidth / calendarCount,dHeight);
+						else
+							// holidays and background calendars
+							area.setBounds(xpos, y1, colWidth ,dHeight);
 						/*
 						 * ------------------------------------------------------
 						 * -

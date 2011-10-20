@@ -36,6 +36,10 @@ import bizcal.common.Event;
  *
  * @version
  * <br>$Log: NamedCalendar.java,v $
+ * <br>Revision 1.4  2011/10/20 15:32:21  thorstenroth
+ * <br>1. add new calendar type the background calendar type which is displayed over a whole column.
+ * <br>2. fix Bug: public holidays are not displayed over the whole daily column
+ * <br>
  * <br>Revision 1.3  2008/04/08 13:17:53  heine_
  * <br>*** empty log message ***
  * <br>
@@ -58,25 +62,33 @@ public abstract class NamedCalendar  {
 	private boolean showing;
 	private boolean selected;
 	private Integer id;
+	private Boolean isBackground;
 
 	private CheckBoxPanel checkBox;
 
 	public NamedCalendar(String name){
 		this.name = name;
+		this.isBackground = false;
 	}
 
 	public NamedCalendar(String name, String description) {
 		this.name = name;
 		this.description = description;
+		this.isBackground = false;
 	}
 
 	public NamedCalendar(String name, String description, Color color) {
 		this.name = name;
 		this.description = description;
 		this.color = color;
+		this.isBackground = false;
 	}
-
-
+	
+	public NamedCalendar(String name, Boolean isBackground)
+	{
+		this.name = name;
+		this.isBackground = isBackground;
+	}
 	/**
 	 * @return
 	 */
@@ -186,7 +198,15 @@ public abstract class NamedCalendar  {
 		this.checkBox = checkBox;
 	}
 
-
+	public void setBackground(Boolean isBackground)
+	{
+		this.isBackground = isBackground;
+	}
+	
+	public Boolean isBackground()
+	{
+		return this.isBackground;
+	}
 
 	public abstract List<Event> addEvent(String clientId, Event event);
 

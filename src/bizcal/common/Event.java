@@ -57,6 +57,8 @@ public class Event
 	
 	public static final String CALENDAR_ID = "calendarId";
 	
+	public static final String CALENDAR_IS_BACKGROUND = "calendarIsBackground";
+	
 	private Object id;
 	private String summary;
 	private String description;

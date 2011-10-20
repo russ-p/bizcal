@@ -40,6 +40,7 @@ import lu.tudor.santec.bizcal.util.ObservableEventList;
 import lu.tudor.santec.bizcal.views.DayViewPanel;
 import lu.tudor.santec.bizcal.views.ListViewPanel;
 import lu.tudor.santec.bizcal.views.MonthViewPanel;
+//import lu.tudor.santec.gecamed.agenda.gui.AgendaModule;
 import bizcal.common.Event;
 import bizcal.swing.CalendarListener;
 import bizcal.swing.DayView;
@@ -55,6 +56,10 @@ import bizcal.util.DateInterval;
  *
  * @version
  * <br>$Log: CalendarDemo.java,v $
+ * <br>Revision 1.13  2011/10/20 15:32:21  thorstenroth
+ * <br>1. add new calendar type the background calendar type which is displayed over a whole column.
+ * <br>2. fix Bug: public holidays are not displayed over the whole daily column
+ * <br>
  * <br>Revision 1.12  2011/03/04 12:45:35  thorstenroth
  * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
  * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
@@ -481,6 +486,10 @@ public class CalendarDemo extends JFrame{
 	 *
 	 * @version
 	 * <br>$Log: CalendarDemo.java,v $
+	 * <br>Revision 1.13  2011/10/20 15:32:21  thorstenroth
+	 * <br>1. add new calendar type the background calendar type which is displayed over a whole column.
+	 * <br>2. fix Bug: public holidays are not displayed over the whole daily column
+	 * <br>
 	 * <br>Revision 1.12  2011/03/04 12:45:35  thorstenroth
 	 * <br>1. Improvement of the mouse controls when event gets resize and move in the calendar.
 	 * <br>2. Bug Fix: The position of the current timeline is now correct and only shown ar the current day.
@@ -549,7 +558,10 @@ public class CalendarDemo extends JFrame{
 		@Override
 		public List<Event> addEvent(String clientId, Event event) {
 			/* ====================================================== */
+			// set the calendar id of the event
 			event.set(Event.CALENDAR_ID, this.getId());
+			// set Calendar isBackground to Event
+			event.set(Event.CALENDAR_IS_BACKGROUND, this.isBackground());
 			event.setColor(this.getColor());
 			
 			eventDataList.add(event);

@@ -84,6 +84,10 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.20  2011/10/20 15:32:21  thorstenroth
+ * <br>1. add new calendar type the background calendar type which is displayed over a whole column.
+ * <br>2. fix Bug: public holidays are not displayed over the whole daily column
+ * <br>
  * <br>Revision 1.19  2011/09/26 15:19:48  thorstenroth
  * <br>Add a scroll bar to the CalendarPanel to show all Calendar.
  * <br>
@@ -686,7 +690,10 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 			});
 			// end of actionlistener
 			/* ------------------------------------------------------- */
-			this.calendarButtonPanel.addComponent(calendarToggler);
+			// add calendar if it is not a background calendar
+			if(!namedCalendar.isBackground())
+				this.calendarButtonPanel.addComponent(calendarToggler);
+			
 			this.namedCalendars.put(namedCalendar, calendarToggler);
 		}
 		// =========================================================
@@ -808,6 +815,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 			}
 		}
 		/* ------------------------------------------------------- */
+		// TODO check if this work
 		// if we are here, no calendar is selected
 		// if there are active calendars, we will select the first
 		if (getActiveCalendars() != null && getActiveCalendars().size() > 0) {

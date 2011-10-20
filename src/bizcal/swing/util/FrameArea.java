@@ -119,7 +119,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 
 	private int lineWrap = -1;
 
-	private boolean isBackgroundMarker 	= false;
+	private boolean isBackgroundMarker = false;
 
 	private int boundX;
 
@@ -129,7 +129,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 
 	private int boundHeight;
 
-	private static Color   backgroundMarkColor = new Color(205, 207, 255);
+	private static Color backgroundMarkColor = new Color(205, 207, 255);
 	
 	public final DateFormat timeFormat = new SimpleDateFormat("HH:mm",
 			Locale.getDefault());
@@ -164,7 +164,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 	public FrameArea(boolean backgroundMarker) {
 		/* ================================================== */
 		this();
-		this.isBackgroundMarker  = backgroundMarker;
+		this.isBackgroundMarker = backgroundMarker;
 		if (this.isBackgroundMarker) {
 			/* ------------------------------------------------------- */
 			setBackground(backgroundMarkColor);
@@ -343,6 +343,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 		if (event != null && event.isBackground())
 		{
 			headerColor = Color.LIGHT_GRAY;
+			//headerColor = Color.GREEN; 
 			this.alphaValue = ALPHA_DEFAULT + SELECT_OFFSET - 0.55f;	
 		}
 		
@@ -378,7 +379,6 @@ public class FrameArea extends JComponent implements ComponentListener {
 			ac = AlphaComposite.getInstance(AlphaComposite.DST_OVER, alphaValue);
 			graphicBuffImgHandle.setComposite(ac);
 			graphicBuffImgHandle.setPaint(this.getBackground());
-						
 			graphicBuffImgHandle.fill(new Rectangle2D.Double(0, 0, width, height));			
 			g2.drawImage(bufferedImage, null, 0, 0);
 			return;
@@ -1102,6 +1102,10 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.24  2011/10/20 15:32:21  thorstenroth
+	 * <br>1. add new calendar type the background calendar type which is displayed over a whole column.
+	 * <br>2. fix Bug: public holidays are not displayed over the whole daily column
+	 * <br>
 	 * <br>Revision 1.23  2011/09/22 14:11:20  thorstenroth
 	 * <br>Fix Bug - Now the line breaks in the FrameArea and tootips are are visible.
 	 * <br>
