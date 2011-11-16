@@ -74,18 +74,19 @@ private HashPrintRequestAttributeSet aset;
     PrinterJob printJob = PrinterJob.getPrinterJob();
     printJob.setPrintable(this);
     if (showPrinterDialog) {
-	    if (printJob.printDialog())
-	      try {
-	        printJob.print(aset);
-	      } catch(PrinterException pe) {
-	        System.out.println("Error printing: " + pe);
-	      }
+    	if (printJob.printDialog())
+    		try {
+    			printJob.print(aset);
+    		} catch(PrinterException pe) {
+    			System.out.println("Error printing: " + pe);
+    		}
     } else {
     	try {
-	        printJob.print(aset);
-	      } catch(PrinterException pe) {
+    		printJob.print(aset);
+    		
+    	} catch(PrinterException pe) {
 	        System.out.println("Error printing: " + pe);
-	      }
+	    }
     }
   }
 
@@ -99,12 +100,13 @@ private HashPrintRequestAttributeSet aset;
       double height = pageFormat.getImageableHeight() / componentToBePrinted.getHeight() ;
       g2d.scale(width, height);
       disableDoubleBuffering(componentToBePrinted);
-      componentToBePrinted.paint(g2d);
+      componentToBePrinted.paintAll(g2d);
       enableDoubleBuffering(componentToBePrinted);
       return(PAGE_EXISTS);
     }
   }
 
+  
   /** The speed and quality of printing suffers dramatically if
    *  any of the containers have double buffering turned on.
    *  So this turns if off globally.
@@ -115,8 +117,8 @@ private HashPrintRequestAttributeSet aset;
     currentManager.setDoubleBufferingEnabled(false);
   }
 
-  /** Re-enables double buffering globally. */
   
+  /** Re-enables double buffering globally. */
   public static void enableDoubleBuffering(Component c) {
     RepaintManager currentManager = RepaintManager.currentManager(c);
     currentManager.setDoubleBufferingEnabled(true);
