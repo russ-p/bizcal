@@ -783,6 +783,9 @@ public class DayView extends CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.48  2011/11/28 16:23:52  thorstenroth
+	 *          Workaround: Take the code 'minuteMapping.put(currPos + k * pixelsPerMinute, pixelDate);' out because in some resolutions the position of the event can not move to the minute lines in the day view.
+	 *
 	 *          Revision 1.47  2011/10/20 15:32:21  thorstenroth
 	 *          1. add new calendar type the background calendar type which is displayed over a whole column.
 	 *          2. fix Bug: public holidays are not displayed over the whole daily column
@@ -2038,8 +2041,14 @@ public class DayView extends CalendarView {
 						// Date dstDate = new
 						// Date(pixelDate.getTime()+dstOffset);
 						// shift the dst offset
-						minuteMapping.put(currPos + k * pixelsPerMinute,
-								pixelDate);
+						
+						// ------------------------------------------------------
+						// 28/11/2011 workaround - find another solution for that problem
+						// TODO take the code out because in some resolutions the position
+						// of the event can not move to the minute lines in the day view.
+//						minuteMapping.put(currPos + k * pixelsPerMinute, pixelDate);
+						// ------------------------------------------------------
+						
 						/*
 						 * ------------------------------------------------------
 						 * -
