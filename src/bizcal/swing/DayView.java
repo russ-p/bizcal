@@ -783,6 +783,9 @@ public class DayView extends CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: DayView.java,v $
+	 *          Revision 1.49  2012/01/23 15:35:30  thorstenroth
+	 *          Bug fix in both layouts of the views. Separate the (1)holiday-, (2)office-, (3)background- and (4)normal events in different layers for the order of drawing ((1) - (4) the order of drawing).
+	 *
 	 *          Revision 1.48  2011/11/28 16:23:52  thorstenroth
 	 *          Workaround: Take the code 'minuteMapping.put(currPos + k * pixelsPerMinute, pixelDate);' out because in some resolutions the position of the event can not move to the minute lines in the day view.
 	 *
@@ -968,8 +971,8 @@ public class DayView extends CalendarView {
 		 *            the parent container of all elements
 		 */
 		public void layoutContainer(Container parent) {
+
 			if (activeCalendars == null) {
-				// System.out.println("### Calenders not set");
 				return;
 			}
 
@@ -979,11 +982,10 @@ public class DayView extends CalendarView {
 			}
 
 			if (layoutMode == DAY_COLUMN_SEPARATED_BY_MAX_NUMBER_OF_CALENDAR) {
-
 				layoutContainerDayColumnSeparatedByMaxNumberCalendar(parent);
 				return;
 			}
-
+			
 			/* ================================================== */
 			try {
 				DayView.this.resetVerticalLines();
@@ -1272,6 +1274,9 @@ public class DayView extends CalendarView {
 				for (List<FrameArea> fAreas : frameAreaCols) {
 					/* ------------------------------------------------------- */
 					if (fAreas != null)
+					{
+						int countFrontLayer = 0;
+						int countBackLayer = 0;
 						for (FrameArea fa : fAreas) {
 							/*
 							 * --------------------------------------------------
@@ -1290,31 +1295,53 @@ public class DayView extends CalendarView {
 							}
 							fa.setBounds(fa.getX(), fa.getY(), sw, fa
 									.getHeight());
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
+							
+							// -------------------------------------------------------
 							// ensure, that the background events are really
 							// painted in the background!
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
-							try {
-								/* --------------------------------------------- */
-								if (fa.getEvent().isBackground())
+							// -------------------------------------------------------
+							
+							// holiday events have no calendar id
+							if(fa.getEvent().get(Event.CALENDAR_ID) != null)
+							{	
+								// set draw layer of Office Calendar events
+								if ((Boolean) fa.getEvent().get(Event.CALENDAR_IS_BACKGROUND))
+								{
 									calPanel.setComponentZOrder(fa, calPanel
-											.getComponents().length - 5);
-								/* --------------------------------------------- */
-							} catch (Exception e) {
-								// e.printStackTrace();
-							}
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
+											.getComponents().length - 4 - countBackLayer);
+//									System.out.println("--- BC: Calid: " + fa.getEvent().get(Event.CALENDAR_ID));
+									countBackLayer ++;
+								}
+								// set draw layer of Background events
+								if (fa.getEvent().isBackground() && !(Boolean) fa.getEvent().get(Event.CALENDAR_IS_BACKGROUND))
+								{
+									calPanel.setComponentZOrder(fa, calPanel
+											.getComponents().length/2 - countBackLayer);
+//									System.out.println("+++ BE: Calid: " + fa.getEvent().get(Event.CALENDAR_ID));
+									countBackLayer++;
+								}
+//								GregorianCalendar cal = new GregorianCalendar();
+//								cal.setTime(fa.getEvent().getStart());
+//								int hour = cal.get(Calendar.HOUR_OF_DAY);
+//								int min = cal.get(Calendar.MINUTE);
+//								min = min + hour * 60;
+								
+								// set draw layer of normal events
+								if (!fa.getEvent().isBackground()) {
+									// cf count the frameAreas of one Area
+//									calPanel.setComponentZOrder(fa, calPanel
+//											.getComponents().length
+//											- 6 - cf);
+									calPanel.setComponentZOrder(fa, fAreas.size() - countFrontLayer);
+									countFrontLayer++;
+//									System.out.println("*** EV: Calid: " + fa.getEvent().get(Event.CALENDAR_ID));
+								}
+							}else
+								// set draw layer of holiday events
+								calPanel.setComponentZOrder(fa, calPanel
+										.getComponents().length - 4);
 						}
-					/* ------------------------------------------------------- */
+					}
 				}
 
 				// old obsolete
@@ -1490,6 +1517,27 @@ public class DayView extends CalendarView {
 							getHeight());
 					/* ------------------------------------------------------- */
 				}
+				// -------------------------------------------------------
+				// set postion of horizontal line of current time
+				// -------------------------------------------------------
+				setCurrentTimeLine();
+				
+				// -------------------------------------------------------
+				// put the timelines in the background
+				// -------------------------------------------------------
+				for (JLabel l : timeLines.values()) {
+					try {
+						/* --------------------------------------------- */
+						calPanel.setComponentZOrder(l,
+								calPanel.getComponents().length - 2);
+						/* --------------------------------------------- */
+					} catch (Exception e) {
+						/* --------------------------------------------- */
+						e.printStackTrace();
+						/* --------------------------------------------- */
+					}
+				}
+
 
 			} catch (Exception e) {
 				throw BizcalException.create(e);
@@ -1590,7 +1638,7 @@ public class DayView extends CalendarView {
 					
 					for (int j = 0; j < events.size(); j++) {
 						Event event = events.get(j);
-						// ignor holydays | holyday events have no calendar id
+						// ignor holidays | holiday events have no calendar id
 						// ignor background calendars
 						if(event.get(Event.CALENDAR_ID) != null && !(Boolean) event.get(Event.CALENDAR_IS_BACKGROUND))
 							calendersOfEventsPerColumn.add(event.get(Event.CALENDAR_ID));
@@ -1832,14 +1880,11 @@ public class DayView extends CalendarView {
 				// and set areas that belong to an event to the same width
 				/* ------------------------------------------------------- */
 				for (List<FrameArea> fAreas : frameAreaCols) {
-					/* ------------------------------------------------------- */
+					
 					if (fAreas != null) {
-						int cf = 0;
+						int countFrontLayer = 0;
+						int countBackLayer = 0;
 						for (FrameArea fa : fAreas) {
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
 							int sw = findSmallestFrameArea(fa);
 							int baseFAWidth;
 							try {
@@ -1853,47 +1898,41 @@ public class DayView extends CalendarView {
 							}
 							fa.setBounds(fa.getX(), fa.getY(), sw, fa
 									.getHeight());
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
+							
+							// -------------------------------------------------------
 							// ensure, that the background events are really
 							// painted in the background!
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
-							try {
-								/* --------------------------------------------- */
-								if (fa.getEvent().isBackground())
+							// -------------------------------------------------------
+							
+							// holiday events have no calendar id
+							if(fa.getEvent().get(Event.CALENDAR_ID) != null)
+							{
+								// set draw layer of Office Calendar events
+								if ((Boolean) fa.getEvent().get(Event.CALENDAR_IS_BACKGROUND))
+								{
 									calPanel.setComponentZOrder(fa, calPanel
-											.getComponents().length - 5);
-								GregorianCalendar cal = new GregorianCalendar();
-								cal.setTime(fa.getEvent().getStart());
-								int hour = cal.get(Calendar.HOUR_OF_DAY);
-								int min = cal.get(Calendar.MINUTE);
-								min = min + hour * 60;
-								if (!fa.getEvent().isBackground()) {
-									// cf count the frameAreas of one Area
-									calPanel.setComponentZOrder(fa, calPanel
-											.getComponents().length
-											- 6 - cf);
-									cf++;
+											.getComponents().length - 5 - countBackLayer);
+									countBackLayer ++;
 								}
-								/* --------------------------------------------- */
-							} catch (Exception e) {
-								// e.printStackTrace();
-							}
-
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
+								// set draw layer of Background events
+								if (fa.getEvent().isBackground() && !(Boolean) fa.getEvent().get(Event.CALENDAR_IS_BACKGROUND))
+								{
+									calPanel.setComponentZOrder(fa, calPanel
+											.getComponents().length/2 - countBackLayer);
+									countBackLayer++;
+								}
+								
+								// set draw layer of normal events
+								if (!fa.getEvent().isBackground()) {
+									// countFrontLayer count the frameAreas of one Area
+									calPanel.setComponentZOrder(fa, fAreas.size() - countFrontLayer);
+									countFrontLayer++;
+								}
+							}else
+								// set draw layer of holiday events
+								calPanel.setComponentZOrder(fa, calPanel
+										.getComponents().length - 4);
 						}
-						/*
-						 * ------------------------------------------------------
-						 * -
-						 */
 					}
 				}
 
@@ -2046,7 +2085,7 @@ public class DayView extends CalendarView {
 						// 28/11/2011 workaround - find another solution for that problem
 						// TODO take the code out because in some resolutions the position
 						// of the event can not move to the minute lines in the day view.
-//						minuteMapping.put(currPos + k * pixelsPerMinute, pixelDate);
+						// minuteMapping.put(currPos + k * pixelsPerMinute, pixelDate);
 						// ------------------------------------------------------
 						
 						/*
