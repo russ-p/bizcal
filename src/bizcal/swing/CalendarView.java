@@ -72,6 +72,9 @@ import bizcal.util.TimeOfDay;
  * 
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.55  2012/01/30 16:06:43  thorstenroth
+ *          Bug fix: right click on a event was broken.
+ *
  *          Revision 1.54  2011/09/15 16:18:51  thorstenroth
  *          Fix Bug - Now the line breaks in the FrameArea and tootips are are visible.
  * Revision 1.53 2011/08/01 14:59:40
@@ -617,6 +620,8 @@ public abstract class CalendarView {
 
 		public void mousePressed(MouseEvent e) {
 			/* ================================================== */
+			if (e.isPopupTrigger()) maybeShowPopup(e);
+			
 			CalendarView.isMousePressed = true;
 			this.dragged = false;
 			/* ------------------------------------------------------- */
@@ -697,6 +702,9 @@ public abstract class CalendarView {
 		 */
 		public void mouseReleased(MouseEvent e) {
 			/* ================================================== */
+			if (e.isPopupTrigger()) maybeShowPopup(e);
+			else
+			{
 			if (SwingUtilities.isLeftMouseButton(e)) {
 				isDragging = false;
 				isResizeing = false;
@@ -849,8 +857,10 @@ public abstract class CalendarView {
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
-			} else
-				maybeShowPopup(e);
+			}
+			}
+			
+				
 			/* ================================================== */
 		}
 
@@ -936,6 +946,7 @@ public abstract class CalendarView {
 		}
 
 		public void mouseClicked(MouseEvent e) {
+			if (e.isPopupTrigger()) maybeShowPopup(e);
 			// // TODO take code out for testing
 			// /* ================================================== */
 			// FrameArea baseFrameArea = getBaseArea();
@@ -1824,6 +1835,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.55  2012/01/30 16:06:43  thorstenroth
+	 *          Bug fix: right click on a event was broken.
+	 *
 	 *          Revision 1.54  2011/09/15 16:18:51  thorstenroth
 	 *          Fix Bug - Now the line breaks in the FrameArea and tootips are are visible.
 	 * <br>
@@ -2011,6 +2025,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.55  2012/01/30 16:06:43  thorstenroth
+	 *          Bug fix: right click on a event was broken.
+	 *
 	 *          Revision 1.54  2011/09/15 16:18:51  thorstenroth
 	 *          Fix Bug - Now the line breaks in the FrameArea and tootips are are visible.
 	 * <br>
@@ -2210,6 +2227,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.55  2012/01/30 16:06:43  thorstenroth
+	 *          Bug fix: right click on a event was broken.
+	 *
 	 *          Revision 1.54  2011/09/15 16:18:51  thorstenroth
 	 *          Fix Bug - Now the line breaks in the FrameArea and tootips are are visible.
 	 * <br>
@@ -3463,6 +3483,9 @@ public abstract class CalendarView {
 	// *
 	// * @version
 	// * <br>$Log: CalendarView.java,v $
+	// * <br>Revision 1.55  2012/01/30 16:06:43  thorstenroth
+	// * <br>Bug fix: right click on a event was broken.
+	// * <br>
 	// * <br>Revision 1.54  2011/09/15 16:18:51  thorstenroth
 	// * <br>Fix Bug - Now the line breaks in the FrameArea and tootips are are visible.
 	// * <br>
