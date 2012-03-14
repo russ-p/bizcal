@@ -72,6 +72,9 @@ import bizcal.util.TimeOfDay;
  * 
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.56  2012/03/14 13:06:47  thorstenroth
+ *          Bug fix:  Popup menu open now again if there is a right click in the CalendarView.
+ *
  *          Revision 1.55  2012/01/30 16:06:43  thorstenroth
  *          Bug fix: right click on a event was broken.
  *
@@ -1835,6 +1838,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.56  2012/03/14 13:06:47  thorstenroth
+	 *          Bug fix:  Popup menu open now again if there is a right click in the CalendarView.
+	 *
 	 *          Revision 1.55  2012/01/30 16:06:43  thorstenroth
 	 *          Bug fix: right click on a event was broken.
 	 *
@@ -2025,6 +2031,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.56  2012/03/14 13:06:47  thorstenroth
+	 *          Bug fix:  Popup menu open now again if there is a right click in the CalendarView.
+	 *
 	 *          Revision 1.55  2012/01/30 16:06:43  thorstenroth
 	 *          Bug fix: right click on a event was broken.
 	 *
@@ -2227,6 +2236,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.56  2012/03/14 13:06:47  thorstenroth
+	 *          Bug fix:  Popup menu open now again if there is a right click in the CalendarView.
+	 *
 	 *          Revision 1.55  2012/01/30 16:06:43  thorstenroth
 	 *          Bug fix: right click on a event was broken.
 	 *
@@ -2381,6 +2393,8 @@ public abstract class CalendarView {
 		private int startDragMouseY = -1;
 
 		public void mouseClicked(MouseEvent e) {
+			if (e.isPopupTrigger()) maybeShowPopup(e);
+			else{
 			/* ================================================== */
 			try {
 				if (e.getClickCount() < 2) {
@@ -2420,22 +2434,25 @@ public abstract class CalendarView {
 				ErrorHandler.handleError(exc);
 			}
 			/* ================================================== */
+			}
 		}
 
-		// TODO this methode is not used 2011/07/27
-		// private void maybeShowPopup(MouseEvent e) {
-		// try {
-		// if (e.isPopupTrigger()) {
-		// Object id = getCalendarId(e.getPoint().x, e.getPoint().y);
-		// showEmptyPopup(e, id);
-		// }
-		// } catch (Exception exc) {
-		// throw BizcalException.create(exc);
-		// }
-		// }
+		
+		private void maybeShowPopup(MouseEvent e) {
+			try {
+				if (e.isPopupTrigger()) {
+					Object id = getCalendarId(e.getPoint().x, e.getPoint().y);
+					showEmptyPopup(e, id);
+				}
+			} catch (Exception exc) {
+				throw BizcalException.create(exc);
+			}
+		}
 
 		public void mousePressed(MouseEvent e) {
 			/* ================================================== */
+			if (e.isPopupTrigger()) maybeShowPopup(e);
+			else{
 			try {
 				deselect();
 				_startDrag = e.getPoint();
@@ -2448,11 +2465,13 @@ public abstract class CalendarView {
 			}
 			this.startDragMouseY = findNextSmallerHorizontalLinePos(e
 					.getPoint().y);
+			}
 			/* ================================================== */
 		}
 
 		public void mouseReleased(MouseEvent e) {
-
+			if (e.isPopupTrigger() && draggingEnabled) maybeShowPopup(e);
+			else{
 			/* ================================================== */
 			isCreating = false;
 			try {
@@ -2571,6 +2590,7 @@ public abstract class CalendarView {
 			/* ------------------------------------------------------- */
 			draggingEnabled = true;
 			/* ================================================== */
+			}
 		}
 
 		public void mouseDragged(MouseEvent e) {
@@ -3483,6 +3503,9 @@ public abstract class CalendarView {
 	// *
 	// * @version
 	// * <br>$Log: CalendarView.java,v $
+	// * <br>Revision 1.56  2012/03/14 13:06:47  thorstenroth
+	// * <br>Bug fix:  Popup menu open now again if there is a right click in the CalendarView.
+	// * <br>
 	// * <br>Revision 1.55  2012/01/30 16:06:43  thorstenroth
 	// * <br>Bug fix: right click on a event was broken.
 	// * <br>
