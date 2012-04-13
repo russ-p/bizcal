@@ -84,6 +84,9 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.21  2012/04/13 11:52:16  thorstenroth
+ * <br>Office calendar are not longer hide by the function 'toggleShowCalendars'.
+ * <br>
  * <br>Revision 1.20  2011/10/20 15:32:21  thorstenroth
  * <br>1. add new calendar type the background calendar type which is displayed over a whole column.
  * <br>2. fix Bug: public holidays are not displayed over the whole daily column
@@ -1004,7 +1007,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 			/* ------------------------------------------------------- */
 		} else {  
 			// ===================================================================
-			// hide all but the last selected
+			// hide all but not the last selected and the office calendar
 			// 
 			// ===================================================================
 			NamedCalendar cal = lastShowingCalendarBeforeShowAll;
@@ -1018,9 +1021,13 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 			for (NamedCalendar nc : list) {
 				/* ------------------------------------------------------- */
 				if (!cal.equals(nc)) {
-					nc.setActive(false);
-					// activate the button
-					namedCalendars.get(nc).setActiv(false);
+					// don't hide the office calendar
+					if(!nc.getName().equals("OFFICE"))
+					{
+						nc.setActive(false);
+						// activate the button
+						namedCalendars.get(nc).setActiv(false);
+					}
 				}
 				/* ------------------------------------------------------- */
 			}
