@@ -105,7 +105,7 @@ public class MonthViewPanel extends AbstractCalendarView{
 	}
 
 	@Override
-	public List getEvents() {
+	public List<Event> getEvents() {
 		try {
 			Interval interval = this.monthModel.getInterval();
 			/* ------------------------------------------------------- */

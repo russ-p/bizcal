@@ -52,12 +52,12 @@ public class ListView extends CalendarView implements MouseListener {
 	private int showDays = 7;
 	private ListViewPanel parent;
 	private Date date;
-	private List showEvents;
+	private List<Event> showEvents;
 
 	public ListView(CalendarViewConfig desc, ListViewPanel parent) throws Exception {
 		super(desc);
 		
-		showEvents = new ArrayList();
+		showEvents = new ArrayList<Event>();
 		
 		this.parent = parent;
 		this.panel = new JPanel();
@@ -215,7 +215,7 @@ public class ListView extends CalendarView implements MouseListener {
 		/* ====================================================== */
 	}
 
-	public List getEvents() {
+	public List<Event> getEvents() {
 		return showEvents;
 	}
 

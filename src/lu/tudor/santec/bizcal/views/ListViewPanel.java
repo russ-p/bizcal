@@ -42,6 +42,7 @@ import lu.tudor.santec.bizcal.print.PrintUtilities;
 import lu.tudor.santec.bizcal.views.list.ListView;
 import lu.tudor.santec.i18n.Translatrix;
 import bizcal.common.DayViewConfig;
+import bizcal.common.Event;
 import bizcal.swing.CalendarListener;
 import bizcal.swing.CalendarView;
 import bizcal.swing.util.GradientArea;
@@ -143,7 +144,7 @@ public class ListViewPanel extends AbstractCalendarView{
 	}
 
 	@Override
-	public List getEvents() {
+	public List<Event> getEvents() {
 		try {
 			return listView.getEvents();
 		} catch (Exception e) {
