@@ -84,6 +84,10 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.22  2012/04/24 13:49:49  thorstenroth
+ * <br>1. Add border to class NamedCalendar to bordered a select Calendar in the calendar panel.
+ * <br>2. Fix Bug: Sometimes if a agenda entry has been selected the calendar of the entry was not selected. Now: The Calendar will be selected if a entry of the calendar is selected.
+ * <br>
  * <br>Revision 1.21  2012/04/13 11:52:16  thorstenroth
  * <br>Office calendar are not longer hide by the function 'toggleShowCalendars'.
  * <br>
@@ -649,13 +653,18 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 						}
 						
 					} else {
-						
+
 						/* ------------------------------------------------------- */
 						// =========================================================
 						// set the namedcalendar to the selected state of its
 						// calendar toggle button.
 						// =========================================================
 						namedCalendar.setSelected(calendarToggler.isSelected());
+						
+						/* ------------------------------------------------------- */
+						// set border of Calendar
+						namedCalendar.addBorder();
+						
 						// =========================================================
 						// the namedcalendar that is in charge of this
 						// togglebutton
@@ -666,14 +675,14 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 						if (calendarToggler.isSelected())
 						{
 							/* ------------------------------------------------------- */
-							// deselect all calendars, except the current
-							// selected
-							for (NamedCalendar cal : namedCalendars.keySet()) {
-								//TODO
-								if (!namedCalendars.get(cal).equals(
-										calendarToggler)) {
-								//	namedCalendars.get(cal).setSelected(false);
+							// deselect all calendars, except the current selected
+							for (NamedCalendar cal : namedCalendars.keySet())
+							{	
+								if (!namedCalendars.get(cal).equals(calendarToggler))
+								{ 
 									cal.setSelected(false);
+									// remove border of Calendar				
+									cal.removeBorder();
 								}
 							}
 							/* ------------------------------------------------------- */

@@ -30,17 +30,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFrame;
-
 import lu.tudor.santec.bizcal.listeners.NamedCalendarListener;
 import lu.tudor.santec.bizcal.util.ObservableEventList;
 import lu.tudor.santec.bizcal.views.DayViewPanel;
 import lu.tudor.santec.bizcal.views.ListViewPanel;
 import lu.tudor.santec.bizcal.views.MonthViewPanel;
-//import lu.tudor.santec.gecamed.agenda.gui.AgendaModule;
 import bizcal.common.Event;
 import bizcal.swing.CalendarListener;
 import bizcal.swing.DayView;
@@ -56,6 +53,10 @@ import bizcal.util.DateInterval;
  *
  * @version
  * <br>$Log: CalendarDemo.java,v $
+ * <br>Revision 1.14  2012/04/24 13:49:49  thorstenroth
+ * <br>1. Add border to class NamedCalendar to bordered a select Calendar in the calendar panel.
+ * <br>2. Fix Bug: Sometimes if a agenda entry has been selected the calendar of the entry was not selected. Now: The Calendar will be selected if a entry of the calendar is selected.
+ * <br>
  * <br>Revision 1.13  2011/10/20 15:32:21  thorstenroth
  * <br>1. add new calendar type the background calendar type which is displayed over a whole column.
  * <br>2. fix Bug: public holidays are not displayed over the whole daily column
@@ -378,16 +379,24 @@ public class CalendarDemo extends JFrame{
 
 		public void eventSelected(Object id, Event event) throws Exception {
 			/* ====================================================== */
-//			 try to find the calendar by its id
+			// try to find the calendar by its id
 			if (calendarPanel.getCalendars() == null)
 				return;
-			/* ------------------------------------------------------- */
-			for (NamedCalendar nc : calendarPanel.getCalendars()) {
-				if (nc.getId().equals(event.get(Event.CALENDAR_ID))) {
-					/* ------------------------------------------------------- */
-					calendarPanel.setSelectedCalendar(nc);
-					return;
-					/* ------------------------------------------------------- */
+			
+			// deselect all calendars, except the current selected calendar of the event
+			for (NamedCalendar cal : calendarPanel.getCalendars())
+			{
+				// deselect calendar first
+				cal.setSelected(false);
+				// remove border from Calendar						
+				cal.removeBorder();
+				
+				if (cal.getId().equals(event.get(Event.CALENDAR_ID))) {
+					
+					calendarPanel.setSelectedCalendar(cal);
+					cal.setSelected(true);
+					// add border to Calendar
+					cal.addBorder();
 				}
 			}
 			/* ====================================================== */
@@ -486,6 +495,10 @@ public class CalendarDemo extends JFrame{
 	 *
 	 * @version
 	 * <br>$Log: CalendarDemo.java,v $
+	 * <br>Revision 1.14  2012/04/24 13:49:49  thorstenroth
+	 * <br>1. Add border to class NamedCalendar to bordered a select Calendar in the calendar panel.
+	 * <br>2. Fix Bug: Sometimes if a agenda entry has been selected the calendar of the entry was not selected. Now: The Calendar will be selected if a entry of the calendar is selected.
+	 * <br>
 	 * <br>Revision 1.13  2011/10/20 15:32:21  thorstenroth
 	 * <br>1. add new calendar type the background calendar type which is displayed over a whole column.
 	 * <br>2. fix Bug: public holidays are not displayed over the whole daily column

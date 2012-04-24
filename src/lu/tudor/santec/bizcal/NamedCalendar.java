@@ -25,6 +25,9 @@ import java.awt.Color;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.border.Border;
+
 import lu.tudor.santec.bizcal.widgets.CheckBoxPanel;
 import bizcal.common.Event;
 
@@ -36,6 +39,10 @@ import bizcal.common.Event;
  *
  * @version
  * <br>$Log: NamedCalendar.java,v $
+ * <br>Revision 1.5  2012/04/24 13:49:49  thorstenroth
+ * <br>1. Add border to class NamedCalendar to bordered a select Calendar in the calendar panel.
+ * <br>2. Fix Bug: Sometimes if a agenda entry has been selected the calendar of the entry was not selected. Now: The Calendar will be selected if a entry of the calendar is selected.
+ * <br>
  * <br>Revision 1.4  2011/10/20 15:32:21  thorstenroth
  * <br>1. add new calendar type the background calendar type which is displayed over a whole column.
  * <br>2. fix Bug: public holidays are not displayed over the whole daily column
@@ -65,6 +72,8 @@ public abstract class NamedCalendar  {
 	private Boolean isBackground;
 
 	private CheckBoxPanel checkBox;
+	
+	private Border border = BorderFactory.createLineBorder(Color.BLACK, 2);
 
 	public NamedCalendar(String name){
 		this.name = name;
@@ -207,7 +216,23 @@ public abstract class NamedCalendar  {
 	{
 		return this.isBackground;
 	}
-
+	
+	public void setBorder(Color color, int thickness)
+	{
+		this.border = BorderFactory.createLineBorder(color, thickness);
+		this.getCheckBox().setBorder(this.border);
+	}
+	
+	public void addBorder()
+	{
+		this.getCheckBox().setBorder(this.border);
+	}
+	
+	public void removeBorder()
+	{
+		this.getCheckBox().setBorder(null);
+	}
+	
 	public abstract List<Event> addEvent(String clientId, Event event);
 
 	public abstract void deleteEvent(String clientId, Event event);
