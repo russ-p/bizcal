@@ -72,6 +72,9 @@ import bizcal.util.TimeOfDay;
  * 
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.57  2012/06/19 16:09:17  thorstenroth
+ *          Bug fix: double click on Appointment has not work.
+ *
  *          Revision 1.56  2012/03/14 13:06:47  thorstenroth
  *          Bug fix:  Popup menu open now again if there is a right click in the CalendarView.
  *
@@ -705,165 +708,104 @@ public abstract class CalendarView {
 		 */
 		public void mouseReleased(MouseEvent e) {
 			/* ================================================== */
-			if (e.isPopupTrigger()) maybeShowPopup(e);
-			else
+			if(e.isPopupTrigger())
 			{
-			if (SwingUtilities.isLeftMouseButton(e)) {
-				isDragging = false;
-				isResizeing = false;
-				FrameArea baseFrameArea = getBaseArea();
-				if (!baseFrameArea.equals(_frameArea)) {
-					baseFrameArea.getMouseListeners()[0].mouseReleased(e);
-					return;
-				}
-				/* ------------------------------------------------------- */
-				// clear the deleted
-				/* ------------------------------------------------------- */
-				for (FrameArea fa : deletedFrameAreas) {
-					fa.setVisible(false);
-					calPanel.remove(fa);
-					removeAdditionalArea(fa);
-				}
-				deletedFrameAreas.clear();
-				getComponent().revalidate();
-
-				// if (e.isPopupTrigger()) maybeShowPopup(e);
-				// else{
-				/* ------------------------------------------------------- */
-				try {
+				maybeShowPopup(e);
+			}else{
+				
+				if (SwingUtilities.isLeftMouseButton(e))
+				{
+					isDragging = false;
+					isResizeing = false;
+					FrameArea baseFrameArea = getBaseArea();
+					if (!baseFrameArea.equals(_frameArea))
+					{
+						baseFrameArea.getMouseListeners()[0].mouseReleased(e);
+						return;
+					}
 					/* ------------------------------------------------------- */
-					if (listener != null) {
-						// only take it out to try something
-						if (isResizeable) {
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
-							FrameArea fa = findLastFrameArea(baseFrameArea);
-							if (fa == null)
-								fa = baseFrameArea;
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
-							Date movDate = getDate(fa.getX() + 5, fa.getY()
-									+ fa.getHeight());
-							if (!movDate.equals(_event.getStart())) {
-								listener.resized(_event, _calId, _event
-										.getEnd(), getDate(fa.getX() + 5, fa
-										.getY()
-										+ fa.getHeight()));
-							}
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
-						} else {
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
-							// if the date has not changed, do nothing
-							Date eventDateNew = getDate(
-									baseFrameArea.getX() + 5, baseFrameArea
-											.getY());
-							// =============================================================
-							// cut the seconds from both dates, they can differ
-							// but
-							// are not significant for us because we create a
-							// calendar
-							// and not a scientific timetable
-							// =============================================================
-							if (dragged
+					// clear the deleted
+					/* ------------------------------------------------------- */
+					for (FrameArea fa : deletedFrameAreas)
+					{
+						fa.setVisible(false);
+						calPanel.remove(fa);
+						removeAdditionalArea(fa);
+					}
+					deletedFrameAreas.clear();
+					getComponent().revalidate();
+					try {
+						/* ------------------------------------------------------- */
+						if(listener != null)
+						{
+							
+							if(isResizeable)
+							{
+								FrameArea fa = findLastFrameArea(baseFrameArea);
+								if (fa == null)
+									fa = baseFrameArea;
+							
+								Date movDate = getDate(fa.getX() + 5, fa.getY() + fa.getHeight());
+								
+								if (!movDate.equals(_event.getStart()))
+								{
+									listener.resized(_event, _calId, _event.getEnd(), getDate(fa.getX() + 5, fa.getY() + fa.getHeight()));
+								}
+							}else{
+								
+								// if the date has not changed, do nothing
+								Date eventDateNew = getDate(baseFrameArea.getX() + 5, baseFrameArea.getY());
+								// =============================================================
+								// cut the seconds from both dates, they can differ
+								// but
+								// are not significant for us because we create a
+								// calendar
+								// and not a scientific timetable
+								// =============================================================
+								if (dragged
 									&& !(DateUtil.round2Minute(eventDateNew)
-											.equals(DateUtil
-													.round2Minute(_event
-															.getStart())))) {
-								// if (!eventDateNew.equals(_event.getStart()))
-								// {
-								/*
-								 * ----------------------------------------------
-								 * ---------
-								 */
-								// move
-								listener.moved(_event, _calId, _event
-										.getStart(), _calId, eventDateNew);
-								/*
-								 * ----------------------------------------------
-								 * ---------
-								 */
-							}
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
-							// mouse click
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
-							if (e.getClickCount() == 1 && _event.isSelectable()) {
-								/*
-								 * ----------------------------------------------
-								 * ---------
-								 */
-								FrameArea area = getFrameArea(_calId, _event);
-
-								listener.eventClicked(_calId, _event, area, e);
-								/*
-								 * ----------------------------------------------
-								 * ---------
-								 */
-							}
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
-							// mouse double click
-							/*
-							 * --------------------------------------------------
-							 * -----
-							 */
-							if (e.getClickCount() == 2 && _event.isSelectable()) {
-								/*
-								 * ----------------------------------------------
-								 * ---------
-								 */
-								select(_calId, _event, true);
-								CalendarView.isMousePressed = false; // TODO
-																		// test
-								if (listener != null)
-									listener
-											.eventDoubleClick(_calId, _event, e);
-								return;
-								/*
-								 * ----------------------------------------------
-								 * ---------
-								 */
+									.equals(DateUtil.round2Minute(_event.getStart()))))
+								{
+									// move
+									listener.moved(_event, _calId, _event.getStart(), _calId, eventDateNew);
+								}
+								
+								// mouse click
+								if (e.getClickCount() == 1 && _event.isSelectable())
+								{
+									
+									FrameArea area = getFrameArea(_calId, _event);
+									listener.eventClicked(_calId, _event, area, e);
+								}
+								
+								// mouse double click
+								if (e.getClickCount() == 2 && _event.isSelectable())
+								{
+									select(_calId, _event, true);
+									CalendarView.isMousePressed = false;
+									listener.eventDoubleClick(_calId, _event, e);
+									return;
+								}
 							}
 						}
+
+					} catch (Exception exc) {
+						ErrorHandler.handleError(exc);
 					}
-
-					/* ------------------------------------------------------- */
-				} catch (Exception exc) {
-					ErrorHandler.handleError(exc);
-				}
-				// }
-				_frameArea.setIsMoving(false);
-
-				// reset the original frameArea
-				originalClickedFrameArea = null;
-
-				CalendarView.isMousePressed = false;
-				try {
-					refresh();
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-			}
-			
 				
+					_frameArea.setIsMoving(false);
+
+					// reset the original frameArea
+					originalClickedFrameArea = null;
+
+					CalendarView.isMousePressed = false;
+//					try {
+//						refresh();
+//					} catch (Exception e1) {
+//						e1.printStackTrace();
+//					}
+				}
+			}
 			/* ================================================== */
 		}
 
@@ -949,6 +891,7 @@ public abstract class CalendarView {
 		}
 
 		public void mouseClicked(MouseEvent e) {
+			System.out.println("mouseclicked e.getClickCount(): " + e.getClickCount());
 			if (e.isPopupTrigger()) maybeShowPopup(e);
 			// // TODO take code out for testing
 			// /* ================================================== */
@@ -1838,6 +1781,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.57  2012/06/19 16:09:17  thorstenroth
+	 *          Bug fix: double click on Appointment has not work.
+	 *
 	 *          Revision 1.56  2012/03/14 13:06:47  thorstenroth
 	 *          Bug fix:  Popup menu open now again if there is a right click in the CalendarView.
 	 *
@@ -2031,6 +1977,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.57  2012/06/19 16:09:17  thorstenroth
+	 *          Bug fix: double click on Appointment has not work.
+	 *
 	 *          Revision 1.56  2012/03/14 13:06:47  thorstenroth
 	 *          Bug fix:  Popup menu open now again if there is a right click in the CalendarView.
 	 *
@@ -2236,6 +2185,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.57  2012/06/19 16:09:17  thorstenroth
+	 *          Bug fix: double click on Appointment has not work.
+	 *
 	 *          Revision 1.56  2012/03/14 13:06:47  thorstenroth
 	 *          Bug fix:  Popup menu open now again if there is a right click in the CalendarView.
 	 *
@@ -3503,6 +3455,9 @@ public abstract class CalendarView {
 	// *
 	// * @version
 	// * <br>$Log: CalendarView.java,v $
+	// * <br>Revision 1.57  2012/06/19 16:09:17  thorstenroth
+	// * <br>Bug fix: double click on Appointment has not work.
+	// * <br>
 	// * <br>Revision 1.56  2012/03/14 13:06:47  thorstenroth
 	// * <br>Bug fix:  Popup menu open now again if there is a right click in the CalendarView.
 	// * <br>
