@@ -72,6 +72,9 @@ import bizcal.util.TimeOfDay;
  * 
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.58  2012/06/19 16:16:24  thorstenroth
+ *          remove system.out.println.
+ *
  *          Revision 1.57  2012/06/19 16:09:17  thorstenroth
  *          Bug fix: double click on Appointment has not work.
  *
@@ -891,7 +894,6 @@ public abstract class CalendarView {
 		}
 
 		public void mouseClicked(MouseEvent e) {
-			System.out.println("mouseclicked e.getClickCount(): " + e.getClickCount());
 			if (e.isPopupTrigger()) maybeShowPopup(e);
 			// // TODO take code out for testing
 			// /* ================================================== */
@@ -1781,6 +1783,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.58  2012/06/19 16:16:24  thorstenroth
+	 *          remove system.out.println.
+	 *
 	 *          Revision 1.57  2012/06/19 16:09:17  thorstenroth
 	 *          Bug fix: double click on Appointment has not work.
 	 *
@@ -1977,6 +1982,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.58  2012/06/19 16:16:24  thorstenroth
+	 *          remove system.out.println.
+	 *
 	 *          Revision 1.57  2012/06/19 16:09:17  thorstenroth
 	 *          Bug fix: double click on Appointment has not work.
 	 *
@@ -2185,6 +2193,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.58  2012/06/19 16:16:24  thorstenroth
+	 *          remove system.out.println.
+	 *
 	 *          Revision 1.57  2012/06/19 16:09:17  thorstenroth
 	 *          Bug fix: double click on Appointment has not work.
 	 *
@@ -3455,6 +3466,9 @@ public abstract class CalendarView {
 	// *
 	// * @version
 	// * <br>$Log: CalendarView.java,v $
+	// * <br>Revision 1.58  2012/06/19 16:16:24  thorstenroth
+	// * <br>remove system.out.println.
+	// * <br>
 	// * <br>Revision 1.57  2012/06/19 16:09:17  thorstenroth
 	// * <br>Bug fix: double click on Appointment has not work.
 	// * <br>
