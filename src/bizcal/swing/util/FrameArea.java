@@ -387,7 +387,13 @@ public class FrameArea extends JComponent implements ComponentListener {
 		// ===========================================================
 		// draw round rectangle
 		// ===========================================================
-		if (this.roundedRectangle)
+		if (this.roundedRectangle
+				||
+				// or if event is in proposal state draw it with round rectangle
+				(this.event != null
+				&& this.event.get(Event.EVENT_PROPOSAL_STATE) != null
+				&& (Boolean) this.event.get(Event.EVENT_PROPOSAL_STATE) == true)
+				)
 		{
 			AlphaComposite ac = AlphaComposite.getInstance(
 					AlphaComposite.DST_OVER, alphaValue);
@@ -633,6 +639,21 @@ public class FrameArea extends JComponent implements ComponentListener {
 			else
 				graphicBuffImgHandle.draw(new Rectangle2D.Double(1, 1, width - 3, height - 3));
 		}
+		
+		// if event is in proposal state draw border with round rectangle
+		if (this.event != null
+			&& this.event.get(Event.EVENT_PROPOSAL_STATE) != null 
+			&& (Boolean) this.event.get(Event.EVENT_PROPOSAL_STATE) == true)
+		{
+			graphicBuffImgHandle.setPaint(Color.red);
+			graphicBuffImgHandle.setStroke(new BasicStroke(1.5f));
+//			if (this.roundedRectangle)
+				graphicBuffImgHandle.draw(new RoundRectangle2D.Double(1, 1, width - 3,height - 3, 18, 18));
+//			else
+//				graphicBuffImgHandle.draw(new Rectangle2D.Double(1, 1, width - 3, height - 3));
+		}
+		
+		
 		g2.drawImage(bufferedImage, null, 0, 0);
 	}
 	
@@ -1102,6 +1123,9 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 *
 	 * @version
 	 * <br>$Log: FrameArea.java,v $
+	 * <br>Revision 1.25  2012/07/10 16:06:47  thorstenroth
+	 * <br>Fix NullPointerException.
+	 * <br>
 	 * <br>Revision 1.24  2011/10/20 15:32:21  thorstenroth
 	 * <br>1. add new calendar type the background calendar type which is displayed over a whole column.
 	 * <br>2. fix Bug: public holidays are not displayed over the whole daily column
