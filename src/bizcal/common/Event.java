@@ -59,6 +59,12 @@ public class Event
 	
 	public static final String CALENDAR_IS_BACKGROUND = "calendarIsBackground";
 	
+	/**
+	 * Optional property of an event to mark if the event should be persisted or
+	 * not when it is dragged or something else
+	 */
+	public static final String EVENT_PROPOSAL_STATE = "eventProposalState";
+	
 	private Object id;
 	private String summary;
 	private String description;
