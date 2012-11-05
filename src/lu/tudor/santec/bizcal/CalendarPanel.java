@@ -84,6 +84,9 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.23  2012/11/05 14:24:54  thorstenroth
+ * <br>Double call of DateListener when date of DayChooser was set.
+ * <br>
  * <br>Revision 1.22  2012/04/24 13:49:49  thorstenroth
  * <br>1. Add border to class NamedCalendar to bordered a select Calendar in the calendar panel.
  * <br>2. Fix Bug: Sometimes if a agenda entry has been selected the calendar of the entry was not selected. Now: The Calendar will be selected if a entry of the calendar is selected.
@@ -762,50 +765,50 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 	/**
 	 * @param forward
 	 */
-	private void stepDate(boolean forward) {
+	private void stepDate(boolean forward){
 		/* ================================================== */
-		try {
-			String currentName = this.getCurrentView().getViewName();
+//		try {
+		String currentName = this.getCurrentView().getViewName();
 
-			int step = 0;
+		int step = 0;
 
-			if (MonthViewPanel.VIEW_NAME.equals(currentName)) {
-				/* ------------------------------------------------------- */
-				step = 31;
-				/* ------------------------------------------------------- */
-		} else
-				if (DayViewPanel.VIEW_NAME_DAY.equals(currentName)) {
-					step = 1;
-				} else
-					if (DayViewPanel.VIEW_NAME_WEEK.equals(currentName)) {
-						step = 7;
-					} else 
-						if (DayViewPanel.VIEW_NAME_THREE_DAY.equals(currentName)) {
-							step = 3;
-						}else
-						if (ListViewPanel.VIEW_NAME.equals(currentName)) {
-						try {
-							ListViewPanel listView = (ListViewPanel) calendarViews.get(ListViewPanel.VIEW_NAME);
-							step = listView.listView.getShowDays();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-			if (!forward)
-				step = step * (-1);
+		if (MonthViewPanel.VIEW_NAME.equals(currentName)) {
 			/* ------------------------------------------------------- */
-			this.dayChooser.setDate(DateUtil.getDiffDay(dayChooser.getDate(),
-					step));
-			this.date = dayChooser.getDate();
-
-			for (Iterator<DateListener> iter = dateListeners.iterator(); iter.hasNext();) {
-				DateListener listener = (DateListener) iter.next();
-				listener.dateChanged(date);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			// FICKEN
-		}
+			step = 31;
+			/* ------------------------------------------------------- */
+		} else
+			if (DayViewPanel.VIEW_NAME_DAY.equals(currentName)) {
+				step = 1;
+			} else
+				if (DayViewPanel.VIEW_NAME_WEEK.equals(currentName)) {
+					step = 7;
+				} else 
+					if (DayViewPanel.VIEW_NAME_THREE_DAY.equals(currentName)) {
+						step = 3;
+					}else
+						if (ListViewPanel.VIEW_NAME.equals(currentName)) {
+							try {
+								ListViewPanel listView = (ListViewPanel) calendarViews.get(ListViewPanel.VIEW_NAME);
+								step = listView.listView.getShowDays();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+		if (!forward)
+			step = step * (-1);
+		/* ------------------------------------------------------- */
+		this.dayChooser.setDate(DateUtil.getDiffDay(dayChooser.getDate(),step));
+			
+//			this.date = dayChooser.getDate();
+		
+//			for (Iterator<DateListener> iter = dateListeners.iterator(); iter.hasNext();) {
+//				DateListener listener = (DateListener) iter.next();
+//				listener.dateChanged(date);
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			// FICKEN
+//		}
 		/* ================================================== */
 	}
 
