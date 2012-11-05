@@ -84,6 +84,9 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.24  2012/11/05 14:28:43  thorstenroth
+ * <br>Remove Comment.
+ * <br>
  * <br>Revision 1.23  2012/11/05 14:24:54  thorstenroth
  * <br>Double call of DateListener when date of DayChooser was set.
  * <br>
@@ -807,7 +810,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 //			}
 //		} catch (Exception e) {
 //			e.printStackTrace();
-//			// FICKEN
+//			
 //		}
 		/* ================================================== */
 	}
