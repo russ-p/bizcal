@@ -84,6 +84,9 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.25  2013/05/23 14:28:11  thorstenroth
+ * <br>Disable the init of the default timezone.
+ * <br>
  * <br>Revision 1.24  2012/11/05 14:28:43  thorstenroth
  * <br>Remove Comment.
  * <br>
@@ -201,7 +204,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 	 */
 	public CalendarPanel() {
 		
-		TimeZone.setDefault(TimeZone.getTimeZone("Europe/Brussels"));
+//		TimeZone.setDefault(TimeZone.getTimeZone("Europe/Brussels"));
 		
 		// load translations
 		Translatrix.loadSupportedLocales("lu.tudor.santec.bizcal.resources.supportedLocales");
