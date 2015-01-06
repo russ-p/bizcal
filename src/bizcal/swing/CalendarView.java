@@ -31,6 +31,7 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.LayoutManager;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -53,7 +54,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 import lu.tudor.santec.bizcal.NamedCalendar;
-
 import bizcal.common.CalendarModel;
 import bizcal.common.CalendarViewConfig;
 import bizcal.common.Event;
@@ -72,6 +72,9 @@ import bizcal.util.TimeOfDay;
  * 
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.59  2015/01/06 15:12:54  schorsch262
+ *          calendar selection automatically deselects the former selected calendar
+ *
  *          Revision 1.58  2012/06/19 16:16:24  thorstenroth
  *          remove system.out.println.
  *
@@ -615,6 +618,8 @@ public abstract class CalendarView {
 		private static final int DEFAULT_SIZE_Y_RESIZE_REGION = 6;
 		// set resize region to max y
 		private int resizeRegionY = DEFAULT_SIZE_Y_RESIZE_REGION;
+		
+		private boolean isPopupTrigger = false;
 
 		// private Integer lastCreatedKey;
 
@@ -626,10 +631,14 @@ public abstract class CalendarView {
 			_event = event;
 			/* ================================================== */
 		}
-
-		public void mousePressed(MouseEvent e) {
-			/* ================================================== */
-			if (e.isPopupTrigger()) maybeShowPopup(e);
+		
+		
+		public void mousePressed (MouseEvent e)
+		{
+			System.out.println("mousePressed" + (e.isPopupTrigger() ? " - isPopupTrigger!" : "!"));
+			
+			if (e.isPopupTrigger())
+				isPopupTrigger = true;
 			
 			CalendarView.isMousePressed = true;
 			this.dragged = false;
@@ -639,46 +648,54 @@ public abstract class CalendarView {
 			if (originalClickedFrameArea == null)
 				originalClickedFrameArea = _frameArea;
 			/* ------------------------------------------------------- */
-			try {
+			try
+			{
 				/* ------------------------------------------------------- */
 				// select the event
 				/* ------------------------------------------------------- */
-				if (e.getClickCount() == 1 && _event.isSelectable()) {
+				if (e.getClickCount() == 1 && _event.isSelectable())
+				{
 					/* ------------------------------------------------------- */
 					// FrameArea area = getFrameArea(_calId, _event);
 					FrameArea area = getBaseArea();
-
-					boolean isSelected = area.isSelected();
-					/* ------------------------------------------------------- */
-					// 
-					if ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) == 0
-							&& !isSelected)
+					
+					if ((e.getModifiersEx() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0)
+					{
+						if (area.isSelected())
+							select(_calId, _event, false);
+						else
+							select(_calId, _event, true);
+					}
+					else
+					{
 						deselect();
-					/* ------------------------------------------------------- */
-					// if (!isSelected) {
-
-					select(_calId, _event, true);
+						select(_calId, _event, true);
+					}
+					
 					_lassoArea.setVisible(false);
 					_frameArea.requestFocus();
-					// }
+					
 					if (listener != null)
 						listener.eventClicked(_calId, _event, area, e);
 					/* ------------------------------------------------------- */
 				}
-
-			} catch (Exception e1) {
+				
+			}
+			catch (Exception e1)
+			{
 				e1.printStackTrace();
 			}
-
+			
 			// get FrameArea
 			FrameArea baseFrameArea = getBaseArea();
 			// set position value for dragging
 			_startDrag = e.getPoint();
-
+			
 			// fill additional frames
 			additionalFrames.clear();
 			if (baseFrameArea.getChildren() != null)
-				for (FrameArea fa : baseFrameArea.getChildren()) {
+				for (FrameArea fa : baseFrameArea.getChildren())
+				{
 					additionalFrames.put(fa.getX(), fa);
 				}
 			lastCreatedFrameArea = findLastFrameArea(baseFrameArea);
@@ -709,107 +726,110 @@ public abstract class CalendarView {
 		 * @see
 		 * java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
 		 */
-		public void mouseReleased(MouseEvent e) {
-			/* ================================================== */
-			if(e.isPopupTrigger())
+		public void mouseReleased (MouseEvent e)
+		{
+			System.out.println("mouseReleased" + (e.isPopupTrigger() ? " - isPopupTrigger!" : "!"));
+			
+			if (isPopupTrigger || e.isPopupTrigger())
 			{
-				maybeShowPopup(e);
-			}else{
-				
-				if (SwingUtilities.isLeftMouseButton(e))
+				showPopup(e);
+			}
+			else
+			{
+				isDragging = false;
+				isResizeing = false;
+				FrameArea baseFrameArea = getBaseArea();
+				if (!baseFrameArea.equals(_frameArea))
 				{
-					isDragging = false;
-					isResizeing = false;
-					FrameArea baseFrameArea = getBaseArea();
-					if (!baseFrameArea.equals(_frameArea))
+					baseFrameArea.getMouseListeners()[0].mouseReleased(e);
+					return;
+				}
+				/* ------------------------------------------------------- */
+				// clear the deleted
+				/* ------------------------------------------------------- */
+				for (FrameArea fa : deletedFrameAreas)
+				{
+					fa.setVisible(false);
+					calPanel.remove(fa);
+					removeAdditionalArea(fa);
+				}
+				deletedFrameAreas.clear();
+				getComponent().revalidate();
+				try
+				{
+					if (listener != null)
 					{
-						baseFrameArea.getMouseListeners()[0].mouseReleased(e);
-						return;
-					}
-					/* ------------------------------------------------------- */
-					// clear the deleted
-					/* ------------------------------------------------------- */
-					for (FrameArea fa : deletedFrameAreas)
-					{
-						fa.setVisible(false);
-						calPanel.remove(fa);
-						removeAdditionalArea(fa);
-					}
-					deletedFrameAreas.clear();
-					getComponent().revalidate();
-					try {
-						/* ------------------------------------------------------- */
-						if(listener != null)
+						
+						if (isResizeable)
 						{
+							FrameArea fa = findLastFrameArea(baseFrameArea);
+							if (fa == null)
+								fa = baseFrameArea;
 							
-							if(isResizeable)
+							Date movDate = getDate(fa.getX() + 5, fa.getY() + fa.getHeight());
+							
+							if (!movDate.equals(_event.getStart()))
 							{
-								FrameArea fa = findLastFrameArea(baseFrameArea);
-								if (fa == null)
-									fa = baseFrameArea;
-							
-								Date movDate = getDate(fa.getX() + 5, fa.getY() + fa.getHeight());
-								
-								if (!movDate.equals(_event.getStart()))
-								{
-									listener.resized(_event, _calId, _event.getEnd(), getDate(fa.getX() + 5, fa.getY() + fa.getHeight()));
-								}
-							}else{
-								
-								// if the date has not changed, do nothing
-								Date eventDateNew = getDate(baseFrameArea.getX() + 5, baseFrameArea.getY());
-								// =============================================================
-								// cut the seconds from both dates, they can differ
-								// but
-								// are not significant for us because we create a
-								// calendar
-								// and not a scientific timetable
-								// =============================================================
-								if (dragged
-									&& !(DateUtil.round2Minute(eventDateNew)
-									.equals(DateUtil.round2Minute(_event.getStart()))))
-								{
-									// move
-									listener.moved(_event, _calId, _event.getStart(), _calId, eventDateNew);
-								}
-								
-								// mouse click
-								if (e.getClickCount() == 1 && _event.isSelectable())
-								{
-									
-									FrameArea area = getFrameArea(_calId, _event);
-									listener.eventClicked(_calId, _event, area, e);
-								}
-								
-								// mouse double click
-								if (e.getClickCount() == 2 && _event.isSelectable())
-								{
-									select(_calId, _event, true);
-									CalendarView.isMousePressed = false;
-									listener.eventDoubleClick(_calId, _event, e);
-									return;
-								}
+								listener.resized(_event, _calId, _event.getEnd(), getDate(fa.getX() + 5, fa.getY() + fa.getHeight()));
 							}
 						}
-
-					} catch (Exception exc) {
-						ErrorHandler.handleError(exc);
+						else
+						{
+							
+							// if the date has not changed, do nothing
+							Date eventDateNew = getDate(baseFrameArea.getX() + 5, baseFrameArea.getY());
+							// =============================================================
+							// cut the seconds from both dates, they can differ
+							// but
+							// are not significant for us because we create a
+							// calendar
+							// and not a scientific timetable
+							// =============================================================
+							if (dragged
+									&& !(DateUtil.round2Minute(eventDateNew)
+											.equals(DateUtil.round2Minute(_event.getStart()))))
+							{
+								// move
+								listener.moved(_event, _calId, _event.getStart(), _calId, eventDateNew);
+							}
+							
+							// mouse click
+							if (e.getClickCount() == 1 && _event.isSelectable())
+							{
+								
+								FrameArea area = getFrameArea(_calId, _event);
+								listener.eventClicked(_calId, _event, area, e);
+							}
+							
+							// mouse double click
+							if (e.getClickCount() == 2 && _event.isSelectable())
+							{
+								select(_calId, _event, true);
+								CalendarView.isMousePressed = false;
+								listener.eventDoubleClick(_calId, _event, e);
+								return;
+							}
+						}
 					}
-				
-					_frameArea.setIsMoving(false);
-
-					// reset the original frameArea
-					originalClickedFrameArea = null;
-
-					CalendarView.isMousePressed = false;
-//					try {
-//						refresh();
-//					} catch (Exception e1) {
-//						e1.printStackTrace();
-//					}
+					
 				}
+				catch (Exception exc)
+				{
+					ErrorHandler.handleError(exc);
+				}
+				
+				_frameArea.setIsMoving(false);
+				
+				// reset the original frameArea
+				originalClickedFrameArea = null;
+				
+				CalendarView.isMousePressed = false;
+//				try {
+//					refresh();
+//				} catch (Exception e1) {
+//					e1.printStackTrace();
+//				}
 			}
-			/* ================================================== */
 		}
 
 		// TODO FIX ME in this mouse action there are sometimes null pointer
@@ -894,7 +914,6 @@ public abstract class CalendarView {
 		}
 
 		public void mouseClicked(MouseEvent e) {
-			if (e.isPopupTrigger()) maybeShowPopup(e);
 			// // TODO take code out for testing
 			// /* ================================================== */
 			// FrameArea baseFrameArea = getBaseArea();
@@ -941,18 +960,18 @@ public abstract class CalendarView {
 			// /* ================================================== */
 		}
 
-		private void maybeShowPopup(MouseEvent e) {
+		private void showPopup(MouseEvent e) {
 			/* ================================================== */
 			try {
-				if (e.isPopupTrigger()) {
-					FrameArea area = getFrameArea(_calId, _event);
-					if (_event.isSelectable()) {
-						if (!area.isSelected())
-							deselect();
+				FrameArea area = getFrameArea(_calId, _event);
+				if (_event.isSelectable()) {
+					if (!area.isSelected())
+					{
+						deselect();
 						select(_calId, _event, true);
 					}
-					showEventpopup(e, _calId, _event);
 				}
+				showEventpopup(e, _calId, _event);
 			} catch (Exception exc) {
 				ErrorHandler.handleError(exc);
 			}
@@ -1783,6 +1802,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.59  2015/01/06 15:12:54  schorsch262
+	 *          calendar selection automatically deselects the former selected calendar
+	 *
 	 *          Revision 1.58  2012/06/19 16:16:24  thorstenroth
 	 *          remove system.out.println.
 	 *
@@ -1982,6 +2004,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.59  2015/01/06 15:12:54  schorsch262
+	 *          calendar selection automatically deselects the former selected calendar
+	 *
 	 *          Revision 1.58  2012/06/19 16:16:24  thorstenroth
 	 *          remove system.out.println.
 	 *
@@ -2193,6 +2218,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.59  2015/01/06 15:12:54  schorsch262
+	 *          calendar selection automatically deselects the former selected calendar
+	 *
 	 *          Revision 1.58  2012/06/19 16:16:24  thorstenroth
 	 *          remove system.out.println.
 	 *
@@ -3210,25 +3238,20 @@ public abstract class CalendarView {
 				+ event.getStart().getTime());
 	}
 
+	
 	/**
 	 * @param calId
 	 * @param event
 	 * @param flag
 	 * @throws Exception
 	 */
-	public void select(Object calId, Event event, boolean flag)
-			throws Exception {
-		/* ================================================== */
-		// TODO <--- 1
-		// inform the listener
-		if (listener != null) {
-			listener.eventsSelected(_selectedEvents);
-			listener.eventSelected(calId, event);
-		}
-
+	public void select (Object calId, Event event, boolean flag)
+			throws Exception
+	{
 		// FrameArea area = getFrameArea(calId, event);
 		FrameArea area = frameAreaHash.get(event);
-		if (area != null) {
+		if (area != null)
+		{
 			/* ------------------------------------------------------- */
 			area.setSelected(flag);
 			if (area.getChildren() != null)
@@ -3236,15 +3259,25 @@ public abstract class CalendarView {
 					fa.setSelected(true);
 			/* ------------------------------------------------------- */
 		}
+		
 		if (flag)
-			_selectedEvents.add(event);
+		{
+			if (!_selectedEvents.contains(event))
+				_selectedEvents.add(event);
+		}
 		else
+		{
 			_selectedEvents.remove(event);
-
-		// ---> 1
-
+		}
+		
+		// inform the listener
+		if (listener != null)
+		{
+			listener.eventsSelected(_selectedEvents);
+			listener.eventSelected(calId, event);
+		}
+		
 		setSelectionDate(event.getStart());
-		/* ================================================== */
 	}
 
 	/**
@@ -3466,6 +3499,9 @@ public abstract class CalendarView {
 	// *
 	// * @version
 	// * <br>$Log: CalendarView.java,v $
+	// * <br>Revision 1.59  2015/01/06 15:12:54  schorsch262
+	// * <br>calendar selection automatically deselects the former selected calendar
+	// * <br>
 	// * <br>Revision 1.58  2012/06/19 16:16:24  thorstenroth
 	// * <br>remove system.out.println.
 	// * <br>

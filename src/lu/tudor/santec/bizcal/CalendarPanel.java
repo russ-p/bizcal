@@ -44,8 +44,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 import java.util.Vector;
+
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -84,6 +84,9 @@ import com.toedter.calendar.JCalendar;
  *
  * @version
  * <br>$Log: CalendarPanel.java,v $
+ * <br>Revision 1.26  2015/01/06 15:12:54  schorsch262
+ * <br>calendar selection automatically deselects the former selected calendar
+ * <br>
  * <br>Revision 1.25  2013/05/23 14:28:11  thorstenroth
  * <br>Disable the init of the default timezone.
  * <br>
@@ -880,35 +883,64 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 		return null;
 		/* ================================================== */
 	}
-
+	
+	
+	public void setSelectedCalendar(Integer calendarId)
+	{
+		if (calendarId == null)
+			return;
+		
+		for (NamedCalendar nc : namedCalendars.keySet())
+		{
+			if (calendarId.equals(nc.getId()))
+			{
+				setSelectedCalendar(nc);
+				return;
+			}
+		}
+	}
+	
+	
 	/**
 	 * Sets the selected calendar
 	 *
 	 * @param cal
 	 */
-	public void setSelectedCalendar(NamedCalendar cal) {
+	public void setSelectedCalendar (NamedCalendar cal)
+	{
 		/* ================================================== */
 		// if the to selected calendar is not active, do so
 		//
 		// ... hmm, some kind of weird....
 		/* ------------------------------------------------------- */
-		if (!cal.isActive()) {
-			cal.setActive(true);
-		}
+//		if (!cal.isActive()) {
+//			cal.setActive(true);
+//		}
+		if (cal.isSelected())
+			// calendar is already selected
+			return;
+		
 		/* ------------------------------------------------------- */
-		// try to set selected
+		// deselect the currently selected calendar
 		/* ------------------------------------------------------- */
-		if (!cal.isSelected()) {
-			/* ------------------------------------------------------- */
-			// select the new one
-			/* ------------------------------------------------------- */
-			cal.setSelected(true);
-			cal.getCheckBox().setSelected(true);
-			if (this.lastShowingCalendarBeforeShowAll != null)
-				this.lastShowingCalendarBeforeShowAll = null;
-			/* ------------------------------------------------------- */
+		for (NamedCalendar nc : namedCalendars.keySet())
+		{
+			if (nc.isSelected())
+			{
+				nc.setSelected(false);
+				nc.removeBorder();
+				break;
+			}
 		}
-		/* ================================================== */
+		
+		/* ------------------------------------------------------- */
+		// select the new one
+		/* ------------------------------------------------------- */
+		cal.setSelected(true);
+		cal.getCheckBox().setSelected(true);
+		cal.addBorder();
+		if (this.lastShowingCalendarBeforeShowAll != null)
+			this.lastShowingCalendarBeforeShowAll = null;
 	}
 	
 	
@@ -937,7 +969,7 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 		namedCalendars.get(currCal).setActiv(true);
 		
 		this.setSelectedCalendar(list.get(pos));
-		deactivateOthers(currCal);
+//		deactivateOthers(currCal);
 		
 		informListeners();
 		/* ================================================== */
@@ -971,33 +1003,33 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 		
 		this.setSelectedCalendar(list.get(pos));
 		
-		deactivateOthers(currCal);
+//		deactivateOthers(currCal);
 		informListeners();
 		/* ================================================== */
 	}
 	
 	
-	/**
-	 * Deactivates all but the given calendar
-	 * 
-	 * @param activeCal
-	 */
-	private void deactivateOthers(NamedCalendar activeCal) {
-		/* ================================================== */
-		ArrayList<NamedCalendar> list = new ArrayList<NamedCalendar>(namedCalendars.keySet());
-		
-		for (NamedCalendar nc : list) {
-			/* ------------------------------------------------------- */
-			if (!activeCal.equals(nc)) {
-				nc.setActive(false);
-				// activate the button
-				namedCalendars.get(nc).setActiv(false);
-			}
-			/* ------------------------------------------------------- */
-		}
-		this.lastShowingCalendarBeforeShowAll = null;
-		/* ================================================== */
-	}
+//	/**
+//	 * Deactivates all but the given calendar
+//	 * 
+//	 * @param activeCal
+//	 */
+//	private void deactivateOthers(NamedCalendar activeCal) {
+//		/* ================================================== */
+//		ArrayList<NamedCalendar> list = new ArrayList<NamedCalendar>(namedCalendars.keySet());
+//		
+//		for (NamedCalendar nc : list) {
+//			/* ------------------------------------------------------- */
+//			if (!activeCal.equals(nc)) {
+//				nc.setActive(false);
+//				// activate the button
+//				namedCalendars.get(nc).setActiv(false);
+//			}
+//			/* ------------------------------------------------------- */
+//		}
+//		this.lastShowingCalendarBeforeShowAll = null;
+//		/* ================================================== */
+//	}
 	
 	
 	/**
