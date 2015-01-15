@@ -72,6 +72,9 @@ import bizcal.util.TimeOfDay;
  * 
  * @version <br>
  *          $Log: CalendarView.java,v $
+ *          Revision 1.60  2015/01/15 10:21:48  schorsch262
+ *          printlines removed
+ *
  *          Revision 1.59  2015/01/06 15:12:54  schorsch262
  *          calendar selection automatically deselects the former selected calendar
  *
@@ -635,8 +638,6 @@ public abstract class CalendarView {
 		
 		public void mousePressed (MouseEvent e)
 		{
-			System.out.println("mousePressed" + (e.isPopupTrigger() ? " - isPopupTrigger!" : "!"));
-			
 			if (e.isPopupTrigger())
 				isPopupTrigger = true;
 			
@@ -728,8 +729,6 @@ public abstract class CalendarView {
 		 */
 		public void mouseReleased (MouseEvent e)
 		{
-			System.out.println("mouseReleased" + (e.isPopupTrigger() ? " - isPopupTrigger!" : "!"));
-			
 			if (isPopupTrigger || e.isPopupTrigger())
 			{
 				showPopup(e);
@@ -1802,6 +1801,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.60  2015/01/15 10:21:48  schorsch262
+	 *          printlines removed
+	 *
 	 *          Revision 1.59  2015/01/06 15:12:54  schorsch262
 	 *          calendar selection automatically deselects the former selected calendar
 	 *
@@ -2004,6 +2006,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.60  2015/01/15 10:21:48  schorsch262
+	 *          printlines removed
+	 *
 	 *          Revision 1.59  2015/01/06 15:12:54  schorsch262
 	 *          calendar selection automatically deselects the former selected calendar
 	 *
@@ -2218,6 +2223,9 @@ public abstract class CalendarView {
 	 * 
 	 * @version <br>
 	 *          $Log: CalendarView.java,v $
+	 *          Revision 1.60  2015/01/15 10:21:48  schorsch262
+	 *          printlines removed
+	 *
 	 *          Revision 1.59  2015/01/06 15:12:54  schorsch262
 	 *          calendar selection automatically deselects the former selected calendar
 	 *
@@ -3499,6 +3507,9 @@ public abstract class CalendarView {
 	// *
 	// * @version
 	// * <br>$Log: CalendarView.java,v $
+	// * <br>Revision 1.60  2015/01/15 10:21:48  schorsch262
+	// * <br>printlines removed
+	// * <br>
 	// * <br>Revision 1.59  2015/01/06 15:12:54  schorsch262
 	// * <br>calendar selection automatically deselects the former selected calendar
 	// * <br>
