@@ -111,21 +111,20 @@ public class DateInterval extends Interval
     /**
      * Startdate of the interval
      * @return
-     * @throws Exception
      */
-    public Date getStartDate() throws Exception {
+    public Date getStartDate() {
 		return (Date) getStart();
 	}
 
-	public void setStartDate(Date start) throws Exception {
+	public void setStartDate(Date start) {
 		setStart(start);
 	}
 
-	public Date getEndDate() throws Exception {
+	public Date getEndDate() {
 		return (Date) getEnd();
 	}
 
-	public void setEndDate(Date end) throws Exception {
+	public void setEndDate(Date end) {
 		setEnd(end);
 		if (getStartDate() == null)
 			return;
