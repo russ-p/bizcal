@@ -25,18 +25,23 @@
  *******************************************************************************/
 package bizcal.demo;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 import bizcal.common.Calendar;
 import bizcal.common.CalendarModel;
 import bizcal.common.DayViewConfig;
 import bizcal.common.Event;
 import bizcal.swing.DayView;
+import bizcal.swing.PopupMenuCallback;
 import bizcal.util.DateInterval;
 import bizcal.util.DateUtil;
 
@@ -52,6 +57,11 @@ public class BizcalDemo
 		// The DayView class creates the GUI. Use the getComponent() method to
 		// retrieve the Swing component to embed it into a frame.
 		DayView dayView = new DayView(config);
+		
+		// Add a popup menu that will be opened when you right-click on an event.
+		// There are also other popup callbacks available.
+		// See PopupMenuCallback.BaseImpl for more information
+		addPopupMenuCallback(dayView);
 		
 		// MyEventModel is an implementation of the CalendarModel interface.
 		// It will be used by Bizcal to fetch data like the events or number of
@@ -69,6 +79,37 @@ public class BizcalDemo
 		frame.setContentPane(dayView.getComponent());
 		frame.setSize(800, 600);
 		frame.setVisible(true);
+	}
+
+	private static void addPopupMenuCallback(DayView dayView) {
+		dayView.setPopupMenuCallback(new PopupMenuCallback.BaseImpl() {
+
+			public JPopupMenu getEventPopupMenu(Object calId, Event event)
+					throws Exception {
+				JPopupMenu popup = new JPopupMenu();
+				
+				// Item "Schnitzel"
+				JMenuItem item1 = new JMenuItem("Schnitzel");
+				item1.addActionListener(new ActionListener() {
+					
+					public void actionPerformed(ActionEvent e) {
+						System.out.println(e.paramString());
+					}
+				});
+				
+				// Item "Invitatio ad offendum"
+				JMenuItem item2 = new JMenuItem("Invitatio ad offendum");
+				item2.addActionListener(new ActionListener() {
+					
+					public void actionPerformed(ActionEvent e) {
+						System.out.println(e.paramString());
+					}
+				});
+				
+				popup.add(item1);
+				popup.add(item2);
+				return popup;
+			}});		
 	}
 
 	private static class MyEventModel
