@@ -46,7 +46,9 @@ public class BizcalDemo
 		throws Exception
 	{
 		DayView dayView = new DayView(new DayViewConfig());
-		dayView.setModel(new ThisModel());
+		ThisModel model = new ThisModel();
+		dayView.setModel(model);
+		dayView.setActiveCalendars(model.getSelectedCalendars());
 		JFrame frame = new JFrame("Bizcal Demo");
 		dayView.refresh();
 		frame.setContentPane(dayView.getComponent());
