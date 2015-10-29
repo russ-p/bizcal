@@ -57,7 +57,7 @@ import javax.swing.JScrollPane;
 
 import lu.tudor.santec.bizcal.EventModel;
 import lu.tudor.santec.bizcal.NamedCalendar;
-
+import bizcal.common.CalendarModel;
 import bizcal.common.DayViewConfig;
 import bizcal.common.Event;
 import bizcal.swing.util.FrameArea;
@@ -390,7 +390,7 @@ public class DayView extends CalendarView {
 		// create a horizontal line of current time. Layout will be done later
 		// in the layout manager
 
-		EventModel dayModel = (EventModel) getModel();
+		CalendarModel dayModel = getModel();
 		Date currentDate 	= new Date();
 		// if current day not in DayView don't draw current timeline
 		if(dayModel.getInterval().isDayIn(currentDate))
@@ -2332,9 +2332,9 @@ public class DayView extends CalendarView {
 	 * 
 	 * @throws Exception
 	 */
-	public void setCurrentTimeLine()
+	public void setCurrentTimeLine() throws Exception
 	{
-		EventModel dayModel = (EventModel) getModel();
+		CalendarModel dayModel = getModel();
 		Date currentDate 	= new Date();
 		// if current day not in DayView don't draw current timeline
 		if(!dayModel.getInterval().isDayIn(currentDate))
@@ -2352,7 +2352,7 @@ public class DayView extends CalendarView {
 		double timeSpan = config.getHours() * 3600 * 1000;
 		// calculate the start position of current timeline
 		currentTime -= currentDayStarttime;
-		int dayModelDays = dayModel.getDays();
+		int dayModelDays = dayModel.getInterval().getDiffInDays();
 		int y = (int) ((currentTime / timeSpan) * viewPortHeight);
 		int x = getWidth() / dayModelDays;
 		
