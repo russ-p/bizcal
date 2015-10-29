@@ -78,24 +78,36 @@ public class BizcalDemo
 		private DateInterval interval;
 		private Calendar cal;
 
-		@SuppressWarnings("unchecked")
 		public MyEventModel()
 			throws Exception
 		{
 			Date date = DateUtil.round2Week(new Date());
 			date = new Date(date.getTime() + 8*60*60*1000);
+			
 			for (int i=0; i < 7; i++) {
 				Event event = new Event();
 				event.setStart(date);
 				event.setEnd(new Date(date.getTime() + 90*60*1000));
-				event.setSummary("Test " + i);
+				event.setSummary("Summary " + i);
+				event.setDescription("Description " + i);
+				event.setToolTip("Tooltip " + i);
+				
 				events.add(event);
+				if (i % 2 == 0) {
+					// Add the event again to show how multiple events at the
+					// same time look like.
+					events.add(event.copy());
+				}
+				
 				date = DateUtil.getDiffDay(date, +1);
 				date = new Date(date.getTime() + 60*60*1000);
 			}
+			
+			// Show a full week
 			Date start = DateUtil.round2Week(new Date());
-			Date end = DateUtil.getDiffDay(start, +5);
+			Date end = DateUtil.getDiffDay(start, 7);
 			interval = new DateInterval(start, end);
+			
 			cal = new Calendar();
 			cal.setId(1);
 			cal.setSummary("Peter");
