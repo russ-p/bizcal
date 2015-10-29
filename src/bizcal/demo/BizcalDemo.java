@@ -45,10 +45,25 @@ public class BizcalDemo
 	public static void main(String[] args)
 		throws Exception
 	{
-		DayView dayView = new DayView(new DayViewConfig());
-		ThisModel model = new ThisModel();
+		// Create a new config. It can be used to change the display behaviour.
+		// E.g. you can change the initial position of the scrollbar
+		DayViewConfig config = new DayViewConfig();
+		
+		// The DayView class creates the GUI. Use the getComponent() method to
+		// retrieve the Swing component to embed it into a frame.
+		DayView dayView = new DayView(config);
+		
+		// MyEventModel is an implementation of the CalendarModel interface.
+		// It will be used by Bizcal to fetch data like the events or number of
+		// days to show.
+		MyEventModel model = new MyEventModel();
 		dayView.setModel(model);
+		
+		// Set all active calendars. In this case there is only one calendar.
+		// Events are only displayed if their calendars are active.
 		dayView.setActiveCalendars(model.getSelectedCalendars());
+		
+		// Create a container for the DayView.
 		JFrame frame = new JFrame("Bizcal Demo");
 		dayView.refresh();
 		frame.setContentPane(dayView.getComponent());
@@ -56,7 +71,7 @@ public class BizcalDemo
 		frame.setVisible(true);
 	}
 
-	private static class ThisModel
+	private static class MyEventModel
 		extends CalendarModel.BaseImpl
 	{
 		private List<Event> events = new ArrayList<Event>();
@@ -64,7 +79,7 @@ public class BizcalDemo
 		private Calendar cal;
 
 		@SuppressWarnings("unchecked")
-		public ThisModel()
+		public MyEventModel()
 			throws Exception
 		{
 			Date date = DateUtil.round2Week(new Date());
