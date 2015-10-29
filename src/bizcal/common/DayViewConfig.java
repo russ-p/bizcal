@@ -112,7 +112,7 @@ public class DayViewConfig extends CalendarViewConfig {
 	/**
 	 * The default end time of the day view
 	 */
-	public  int DAY_END_DEFAULT   = 18;
+	public  int DAY_END_DEFAULT   = 24;
 
 
 	/**
