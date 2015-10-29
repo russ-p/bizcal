@@ -472,15 +472,15 @@ public abstract class CalendarView {
 			throws Exception {
 		if (popupMenuCallback == null)
 			return;
-		try {
-			JPopupMenu popup = popupMenuCallback
-					.getEventPopupMenu(calId, event);
 
-			popup.show(e.getComponent(), e.getX(), e.getY());
-			popup.setVisible(true);
-		} catch (Exception e2) {
-			e2.printStackTrace();
-		}
+		JPopupMenu popup = popupMenuCallback
+				.getEventPopupMenu(calId, event);
+
+		if (popup == null)
+			return;
+		
+		popup.show(e.getComponent(), e.getX(), e.getY());
+		popup.setVisible(true);
 	}
 
 	protected void showEmptyPopup(MouseEvent e, Object calId) throws Exception {
@@ -2545,7 +2545,7 @@ public abstract class CalendarView {
 				// notify the listener for a new event
 				/* ------------------------------------------------------- */
 				if (!_lasso)// && (date1.before(date2)))
-					if (listener != null) {
+					if (listener != null && selectedCalendar != null) {
 						// try to get a better calendar id with
 						// selectedCalendar.getId()
 						// take the selected calendar if possible
@@ -3425,7 +3425,7 @@ public abstract class CalendarView {
 	}
 
 	private boolean isSelected(Event event) {
-		if (event == null)
+		if (event == null || event.getId() == null)
 			return false;
 		Iterator<Event> i = _selectedEvents.iterator();
 		while (i.hasNext()) {
