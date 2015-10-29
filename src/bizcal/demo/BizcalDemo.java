@@ -25,6 +25,7 @@
  *******************************************************************************/
 package bizcal.demo;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -32,8 +33,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import bizcal.common.Calendar;
@@ -56,8 +59,8 @@ public class BizcalDemo
 		
 		// The DayView class creates the GUI. Use the getComponent() method to
 		// retrieve the Swing component to embed it into a frame.
-		DayView dayView = new DayView(config);
-		
+		final DayView dayView = new DayView(config);
+
 		// Add a popup menu that will be opened when you right-click on an event.
 		// There are also other popup callbacks available.
 		// See PopupMenuCallback.BaseImpl for more information
@@ -66,19 +69,73 @@ public class BizcalDemo
 		// MyEventModel is an implementation of the CalendarModel interface.
 		// It will be used by Bizcal to fetch data like the events or number of
 		// days to show.
-		MyEventModel model = new MyEventModel();
+		final MyEventModel model = new MyEventModel();
 		dayView.setModel(model);
 		
 		// Set all active calendars. In this case there is only one calendar.
 		// Events are only displayed if their calendars are active.
 		dayView.setActiveCalendars(model.getSelectedCalendars());
 		
-		// Create a container for the DayView.
+		// Create a container for the calendar.
 		JFrame frame = new JFrame("Bizcal Demo");
 		dayView.refresh();
-		frame.setContentPane(dayView.getComponent());
+		frame.setLayout(new BorderLayout());
+		
+		// Create and add a panel that provides buttons to switch to the
+		// previous/next week.
+		frame.add(createButtonPanel(dayView), BorderLayout.PAGE_START);
+		
+		// Add the actual calendar
+		frame.add(dayView.getComponent(), BorderLayout.CENTER);
 		frame.setSize(800, 600);
 		frame.setVisible(true);
+	}
+
+	private static JPanel createButtonPanel(final DayView dayView) {
+		final MyEventModel model = (MyEventModel) dayView.getModel();
+		
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BorderLayout());
+		
+		// Previous week button
+		JButton button1 = new JButton("Previous week");
+		button1.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				Date end = model.interval.getStartDate();
+				Date start = DateUtil.getDiffDay(end, -7);
+
+				model.interval.setStartDate(start);
+				model.interval.setEndDate(end);
+				
+				try {
+					dayView.refresh();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}});
+		buttonPanel.add(button1, BorderLayout.LINE_START);
+		
+		// Next week button
+		JButton button2 = new JButton("Next week");
+		button2.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				Date start = model.interval.getEndDate();
+				Date end = DateUtil.getDiffDay(start, 7);
+
+				model.interval.setStartDate(start);
+				model.interval.setEndDate(end);
+				
+				try {
+					dayView.refresh();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}});
+		buttonPanel.add(button2, BorderLayout.LINE_END);
+		
+		return buttonPanel;
 	}
 
 	private static void addPopupMenuCallback(DayView dayView) {
@@ -125,7 +182,7 @@ public class BizcalDemo
 			Date date = DateUtil.round2Week(new Date());
 			date = new Date(date.getTime() + 8*60*60*1000);
 			
-			for (int i=0; i < 7; i++) {
+			for (int i=0; i < 10; i++) {
 				Event event = new Event();
 				event.setStart(date);
 				event.setEnd(new Date(date.getTime() + 90*60*1000));
