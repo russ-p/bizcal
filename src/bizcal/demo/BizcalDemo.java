@@ -155,7 +155,7 @@ public class BizcalDemo
 				});
 				
 				// Item "Invitatio ad offendum"
-				JMenuItem item2 = new JMenuItem("Invitatio ad offendum");
+				JMenuItem item2 = new JMenuItem("Invitatio ad offerendum");
 				item2.addActionListener(new ActionListener() {
 					
 					public void actionPerformed(ActionEvent e) {
