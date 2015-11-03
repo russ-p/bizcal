@@ -103,7 +103,7 @@ public class BizcalDemo
 
 			public void actionPerformed(ActionEvent arg0) {
 				Date end = model.interval.getStartDate();
-				Date start = DateUtil.getDiffDay(end, -7);
+				Date start = DateUtil.getDiffDay(end, -model.interval.getDiffInDays());
 
 				model.interval.setStartDate(start);
 				model.interval.setEndDate(end);
@@ -122,7 +122,7 @@ public class BizcalDemo
 
 			public void actionPerformed(ActionEvent arg0) {
 				Date start = model.interval.getEndDate();
-				Date end = DateUtil.getDiffDay(start, 7);
+				Date end = DateUtil.getDiffDay(start, model.interval.getDiffInDays());
 
 				model.interval.setStartDate(start);
 				model.interval.setEndDate(end);
