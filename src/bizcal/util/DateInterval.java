@@ -174,7 +174,7 @@ public class DateInterval extends Interval
 		}
 	}
 	
-	public int getDiffInDays() throws Exception {
+	public int getDiffInDays() {
 		return (int) (DateUtil.getDiffDay(getStartDate(), getEndDate()) / (1000 * 60 * 60 * 24));
 	}
 	
