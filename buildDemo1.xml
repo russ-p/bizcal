@@ -3,7 +3,7 @@
    <property name="dist.dir"          value="dist"/>   
    <property name="lib.dir"            value="lib"/>  
    <property name="bin.dir"           value="bin"/>  
-   <property name="jar.file"           value="${dist.dir}/bizcalDemoApplication.jar"/>   
+   <property name="jar.file"           value="${dist.dir}/bizcalDemo1.jar"/>   
 
 	   <path id="libs">      
 	      <fileset dir="lib">
