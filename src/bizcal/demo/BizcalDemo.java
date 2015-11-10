@@ -50,6 +50,8 @@ import bizcal.util.DateUtil;
 
 public class BizcalDemo
 {
+	private static int DAYS_TO_SHOW = 7;
+	
 	public static void main(String[] args)
 		throws Exception
 	{
@@ -103,7 +105,7 @@ public class BizcalDemo
 
 			public void actionPerformed(ActionEvent arg0) {
 				Date end = model.interval.getStartDate();
-				Date start = DateUtil.getDiffDay(end, -model.interval.getDiffInDays());
+				Date start = DateUtil.getDiffDay(end, -DAYS_TO_SHOW);
 
 				model.interval.setStartDate(start);
 				model.interval.setEndDate(end);
@@ -122,7 +124,7 @@ public class BizcalDemo
 
 			public void actionPerformed(ActionEvent arg0) {
 				Date start = model.interval.getEndDate();
-				Date end = DateUtil.getDiffDay(start, model.interval.getDiffInDays());
+				Date end = DateUtil.getDiffDay(start, DAYS_TO_SHOW);
 
 				model.interval.setStartDate(start);
 				model.interval.setEndDate(end);
