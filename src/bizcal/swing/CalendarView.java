@@ -441,11 +441,10 @@ public abstract class CalendarView {
 			area.addMouseMotionListener(mouseListener);
 			area.addKeyListener(new FrameAreaKeyListener(event));
 		}
-		if (event.isEditable()) {
-			String tip = event.getToolTip();
-			area.setToolTipText(tip);
-		}
-		/* ------------------------------------------------------- */
+
+		area.setToolTipText(event.getToolTip());
+
+			/* ------------------------------------------------------- */
 		// set icons
 		area.setIcon(event.getIcon());
 		area.setUpperRightIcon(event.getUpperRightIcon());
