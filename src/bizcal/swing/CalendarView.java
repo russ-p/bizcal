@@ -3329,7 +3329,8 @@ public abstract class CalendarView {
 	}
 
 	public void copy() throws Exception {
-		listener.copy(_selectedEvents);
+		if (listener != null)
+			listener.copy(_selectedEvents);
 	}
 
 	protected boolean supportsDrag() {
