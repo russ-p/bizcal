@@ -69,6 +69,8 @@ public class FrameArea extends JComponent implements ComponentListener {
 
 	private boolean border;
 
+	private Color bordercolor;
+	
 	private boolean roundedRectangle;
 
 	private boolean selected;
@@ -410,7 +412,7 @@ public class FrameArea extends JComponent implements ComponentListener {
 			if (this.border && (this.event == null || !this.event.isBackground()))
 			{
 				graphicBuffImgHandle.setComposite(compositeDefault);
-				graphicBuffImgHandle.setPaint(Color.DARK_GRAY);
+				graphicBuffImgHandle.setPaint(this.bordercolor);
 				graphicBuffImgHandle.draw(new RoundRectangle2D.Double(0, 0, width - 1,height - 1, 18, 18));
 			}
 		}
@@ -1052,6 +1054,10 @@ public class FrameArea extends JComponent implements ComponentListener {
 	 */
 	public void setBorder(boolean border) {
 		this.border = border;
+	}
+	
+	public void setBordercolor(Color color) {
+		this.bordercolor = color;
 	}
 
 	public void setRoundedRectangle(boolean rounded) {

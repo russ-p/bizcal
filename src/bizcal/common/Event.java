@@ -86,6 +86,8 @@ public class Event
 
 	private ImageIcon upperRightIcon;
 
+	private Color bordercolor = Color.DARK_GRAY;
+
 	public Object getId() {
 		return id;
 	}
@@ -126,9 +128,15 @@ public class Event
 	}
 	public boolean isFrame() {
 		return frame;
-	}
+	}	
 	public void setFrame(boolean frame) {
 		this.frame = frame;
+	}
+	public Color getBordercolor() {
+		return this.bordercolor ;
+	}
+	public void setBordercolor(Color color) {
+		this.bordercolor = color;
 	}
 	public int getLevel() {
 		return level;

@@ -428,6 +428,7 @@ public abstract class CalendarView {
 		// }
 		area.setBackground(event.getColor());
 		area.setBorder(event.isFrame());
+		area.setBordercolor(event.getBordercolor());
 		area.setRoundedRectangle(event.isRoundedCorner());
 		area.showHeader(event.showHeader());
 		// area.setAlphaValue(event.isFrame() ? 0.4f : 0.3f);
