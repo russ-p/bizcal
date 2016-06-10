@@ -1381,4 +1381,8 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 //		/* ================================================== */
 //	}
 
+	public Thread getDayViewUpdateThread() {
+		return dayViewUpdateThread;
+	}
+
 }
