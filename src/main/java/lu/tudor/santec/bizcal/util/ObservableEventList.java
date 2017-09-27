@@ -310,5 +310,18 @@ public class ObservableEventList extends Observable implements List<Event> {
 		this.notifyEnabled = b;
 		/* ================================================== */
 	}
+	
+	public synchronized boolean replaceAll(Collection<? extends Event> c) {
+		/* ====================================================== */
+		list.clear();
+		boolean b = list.addAll(c);
+		if (notifyEnabled) {
+			setChanged();
+			notifyObservers();
+		}
+
+		/* ====================================================== */
+		return b;
+	}
 
 }

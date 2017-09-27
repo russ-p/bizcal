@@ -3040,7 +3040,8 @@ public abstract class CalendarView {
 		/* ------------------------------------------------------- */
 		// if the pointer is in the first row, return the startY of the panel
 		/* ------------------------------------------------------- */
-		if (mouseY < getTimeSlotHeight())
+		int timeSlotHeight = getTimeSlotHeight();
+		if (mouseY < timeSlotHeight)
 			return calPanel.getY();
 		/* ------------------------------------------------------- */
 		int linePos = calPanel.getHeight();
@@ -3048,7 +3049,7 @@ public abstract class CalendarView {
 		for (JLabel l : hLines) {
 			/* ------------------------------------------------------- */
 			// System.out.println("LineY: " + l.getY());
-			if (l.getY() < linePos && l.getY() >= mouseY - getTimeSlotHeight())
+			if (l.getY() < linePos && l.getY() >= mouseY - timeSlotHeight)
 				linePos = l.getY();
 			/* ------------------------------------------------------- */
 		}

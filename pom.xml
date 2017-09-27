@@ -4,7 +4,7 @@
 	<groupId>lu.tudor.santec</groupId>
 	<artifactId>bizcal</artifactId>
 	<packaging>jar</packaging>
-	<version>0.7-SNAPSHOT</version>
+	<version>0.7.2-SNAPSHOT</version>
 	<name>bizcal</name>
 	<url>https://sourceforge.net/projects/bizcal/</url>
 
