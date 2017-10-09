@@ -63,7 +63,7 @@ public class CheckBoxPanel extends JPanel implements ActionListener {
 		//this.checkBox.setOpaque(true);
 		this.checkBox.setOpaque(false);
 		this.checkBox.requestFocus(false);
-		this.add(checkBox, BorderLayout.EAST);
+		this.add(checkBox, BorderLayout.WEST);
 		
 		this.button = new JToggleButton(text);
 		group.add(this.button);

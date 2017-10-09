@@ -40,7 +40,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -49,14 +48,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import lu.tudor.santec.bizcal.EventModel;
-import lu.tudor.santec.bizcal.NamedCalendar;
 import bizcal.common.CalendarModel;
 import bizcal.common.DayViewConfig;
 import bizcal.common.Event;
@@ -67,6 +65,7 @@ import bizcal.util.DateUtil;
 import bizcal.util.Interval;
 import bizcal.util.TimeOfDay;
 import bizcal.util.Tuple;
+import lu.tudor.santec.bizcal.NamedCalendar;
 
 public class DayView extends CalendarView {
 
@@ -85,6 +84,7 @@ public class DayView extends CalendarView {
 	private List<Date> _dateList = new ArrayList<Date>();
 
 	private Map<Tuple, JLabel> timeLines = new HashMap<Tuple, JLabel>();
+	private Map<Tuple, JPanel> timeBox = new HashMap<Tuple, JPanel>();
 
 	private HashMap<Date, Integer> linePositionMap = new HashMap<Date, Integer>();
 
@@ -254,6 +254,7 @@ public class DayView extends CalendarView {
 		frameAreaCols.clear();
 		eventColList.clear();
 		timeLines.clear();
+		timeBox.clear();
 		linePositionMap.clear();
 		minuteMapping.clear();
 		// hourLabels.clear();
@@ -278,6 +279,7 @@ public class DayView extends CalendarView {
 		// and timelines in different maps.
 		// key: date, value: label
 		/* ------------------------------------------------------- */
+		int lineCounter = 0;
 		long pos = getFirstInterval().getStartDate().getTime();
 		while (pos < getFirstInterval().getEndDate().getTime()) {
 			/* ------------------------------------------------------- */
@@ -310,14 +312,20 @@ public class DayView extends CalendarView {
 				// add the label to the panel. Layout will be done later in the
 				// layout manager
 				/* ------------------------------------------------------- */
+				JPanel panel = new JPanel();
+				panel.setBackground(lineCounter++ % 2 == 0 ? new Color(248, 248, 248) : Color.WHITE);
+				panel.setBorder(BorderFactory.createLineBorder(hlineColor));
+				calPanel.add(panel, 0);
+				
 				calPanel.add(line, GRID_LEVEL);
+
 				/* ------------------------------------------------------- */
 				// put a tuple of the current day and the minute that the line
 				// is representing
 				/* ------------------------------------------------------- */
-				timeLines
-						.put(new Tuple(currentHour, "" + (60 / timeSlots) * i),
-								line);
+				Tuple key = new Tuple(currentHour, "" + (60 / timeSlots) * i);
+				timeLines.put(key, line);
+				timeBox.put(key, panel);
 				addHorizontalLine(line);
 				/* ------------------------------------------------------- */
 			}
@@ -1397,6 +1405,9 @@ public class DayView extends CalendarView {
 						lineheight = 1;
 					}
 					line.setBounds(x1, y1, width, lineheight);
+					
+					JPanel panel = timeBox.get(key);
+					panel.setBounds(x1+1, y1, width-2, 250);
 					/* ------------------------------------------------------- */
 				}
 
@@ -1989,7 +2000,9 @@ public class DayView extends CalendarView {
 						lineheight = 1;
 					}
 					line.setBounds(x1, y1, width, lineheight);
-
+					
+					JPanel panel = timeBox.get(key);
+					panel.setBounds(x1+1, y1, width-2, 250);
 					/* ------------------------------------------------------- */
 				}
 				/* ------------------------------------------------------- */
