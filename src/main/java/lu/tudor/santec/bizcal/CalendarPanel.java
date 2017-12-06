@@ -60,6 +60,13 @@ import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.toedter.calendar.JCalendar;
+
+import bizcal.common.Event;
+import bizcal.swing.DayView;
+import bizcal.swing.PopupMenuCallback;
+import bizcal.swing.util.ResourceIcon;
+import bizcal.util.DateUtil;
 import lu.tudor.santec.bizcal.listeners.CalendarManagementListener;
 import lu.tudor.santec.bizcal.listeners.DateListener;
 import lu.tudor.santec.bizcal.listeners.IZoomSliderListener;
@@ -72,12 +79,6 @@ import lu.tudor.santec.bizcal.widgets.ButtonPanel;
 import lu.tudor.santec.bizcal.widgets.CheckBoxPanel;
 import lu.tudor.santec.bizcal.widgets.NaviBar;
 import lu.tudor.santec.i18n.Translatrix;
-import bizcal.common.Event;
-import bizcal.swing.DayView;
-import bizcal.swing.PopupMenuCallback;
-import bizcal.util.DateUtil;
-
-import com.toedter.calendar.JCalendar;
 
 /**
  * @author martin.heinemann@tudor.lu
@@ -372,7 +373,35 @@ public class CalendarPanel extends JPanel implements MouseListener, IZoomSliderL
 				setDate(new Date());
 			}
 		});
-		daychooserPanel.add(todayButton, BorderLayout.SOUTH);
+		ResourceIcon prevIcon = null;
+		ResourceIcon nextIcon = null;
+		try {
+			prevIcon = new ResourceIcon("/bizcal/res/go_fb.gif");
+			nextIcon = new ResourceIcon("/bizcal/res/go_ff.gif");
+		} catch (Exception e1) {
+		}
+		JButton nextMonthButton = new JButton(nextIcon);
+		nextMonthButton.setHorizontalAlignment(JLabel.LEFT);
+		nextMonthButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setDate(DateUtil.moveByMonth(dayChooser.getDate(), 1));
+			}
+		});
+		JButton prevMonthButton = new JButton(prevIcon);
+		prevMonthButton.setHorizontalAlignment(JLabel.LEFT);
+		prevMonthButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setDate(DateUtil.moveByMonth(dayChooser.getDate(), -1));
+			}
+		});
+		JPanel btnsPanel = new JPanel(new BorderLayout());
+		btnsPanel.setOpaque(false);
+		btnsPanel.setBackground(Color.WHITE);
+		btnsPanel.add(prevMonthButton, BorderLayout.WEST);
+		btnsPanel.add(todayButton, BorderLayout.CENTER);
+		btnsPanel.add(nextMonthButton, BorderLayout.EAST);
+		
+		daychooserPanel.add(btnsPanel, BorderLayout.SOUTH);
 
 		this.naviBar.addButtonPanel(daychooserPanel, NaviBar.BOTTOM);
 

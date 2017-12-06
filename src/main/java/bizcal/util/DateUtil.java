@@ -338,6 +338,25 @@ public class DateUtil
 		/* ================================================== */
 	}
 	
+	/**
+	 * Moves the date by the given amount of days.
+	 * It will consider any month overflows and switches
+	 * automatically to the next month.
+	 * 
+	 * @param date
+	 * @param offset
+	 * @return
+	 */
+	public static Date moveByMonth(Date date, int offset) {
+		/* ================================================== */
+		Calendar cal = newCalendar();
+		cal.setTime(date);
+		cal.add(Calendar.MONTH, offset);
+		
+		return cal.getTime();
+		/* ================================================== */
+	}
+	
 	
 	/**
 	 * Moves the given date by the given minutes.

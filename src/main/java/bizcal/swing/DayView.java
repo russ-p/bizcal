@@ -298,6 +298,8 @@ public class DayView extends CalendarView {
 			/* ------------------------------------------------------- */
 			// if (timeSlots > 10)
 			// timeSlots = 10;
+			//FIXME: hard-coded values
+			boolean workHours = DateUtil.getHourOfDay(currentHour) == 7 || DateUtil.getHourOfDay(currentHour) == 16;
 			/* ------------------------------------------------------- */
 			// create a horizontal line for each time slot
 			/* ------------------------------------------------------- */
@@ -314,7 +316,11 @@ public class DayView extends CalendarView {
 				/* ------------------------------------------------------- */
 				JPanel panel = new JPanel();
 				panel.setBackground(lineCounter++ % 2 == 0 ? new Color(248, 248, 248) : Color.WHITE);
-				panel.setBorder(BorderFactory.createLineBorder(hlineColor));
+				if (i == timeSlots && workHours){
+					panel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.BLUE));
+				} else {
+					panel.setBorder(BorderFactory.createLineBorder(hlineColor));
+				}
 				calPanel.add(panel, 0);
 				
 				calPanel.add(line, GRID_LEVEL);
